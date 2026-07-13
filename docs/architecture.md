@@ -1,0 +1,121 @@
+# Architecture
+
+This is the initial implementation of Realt AI: an onboarding flow that turns a
+free-text description of what someone wants into structured priorities, and a
+recommendations flow that scores candidate properties against those
+priorities using the Realt Thinking Framework.
+
+## Folder structure
+
+Feature-based, per `CLAUDE.md`:
+
+- `app/` — routes, layouts, route handlers (App Router).
+- `components/` — shared, feature-agnostic UI (`components/ui` holds
+  shadcn-style primitives authored directly in the repo, not pulled from a
+  registry, so tokens and behavior stay under our control).
+- `features/` — UI that's specific to one product area (`onboarding`,
+  `recommendations`), composed from `components/ui`.
+- `services/` — orchestration and business logic with no UI: `services/ai`
+  (OpenAI Responses API integration) and `services/matching` (the scoring
+  engine).
+- `lib/` — small stateless utilities (`cn`, validation schemas, rate
+  limiting, mock data).
+- `types/` — the domain model shared by services, API routes, and UI.
+- `hooks/` — client-only state helpers.
+- `tests/unit/` — business logic tests (see Testing below).
+
+## The Realt Thinking Framework, concretely
+
+The framework in `CLAUDE.md` maps to real code, not just prose:
+
+1. **Understand user goals** — `services/ai/priority-extraction.ts` turns
+   free text into a structured `UserPriorities` object.
+2. **Detect conflicts** — `detectPriorityConflicts` in
+   `services/matching/score-engine.ts` flags when stated priorities compete
+   with each other (e.g. a critical short commute and a critical tight
+   budget), and the recommendations page surfaces this before the results.
+3. **Rank priorities / 4. Evaluate trade-offs** — `scoreProperty` computes a
+   per-category (`budget`, `commute`, `space`, `safety`, `schools`,
+   `lifestyle`) score, weighted by the importance the user assigned each
+   category.
+4. **Recommend** — `rankProperties` sorts candidates by weighted score, with
+   deal-breaker matches excluded regardless of score.
+5. **Explain reasoning** — every `MatchResult` carries `strengths`,
+   `concerns`, `compromises`, and a plain-language `summary`, all derived
+   directly from the same data used to compute the score. Nothing in the
+   explanation is generated separately from the number, so the score and its
+   explanation can't drift apart.
+
+## Why explanations are template-based, not LLM-generated
+
+`CLAUDE.md` says the AI must never hallucinate and must always be able to
+explain a recommendation. Free-form LLM text about *why* a specific property
+fits is a hallucination risk — the model could describe an amenity or
+trade-off that isn't actually in the data. The scoring engine instead builds
+explanations deterministically from the same property/priority data it
+scores against, which is both fully explainable and trivially testable.
+
+The LLM's role is scoped to the one place natural-language understanding is
+actually needed: turning a person's free-text description into structured
+priorities (`services/ai/priority-extraction.ts`). Even there:
+
+- The model is constrained to a strict JSON schema (OpenAI Responses API
+  `json_schema` mode), so it can't return arbitrary text.
+- Whatever comes back is re-validated against the Zod schema
+  (`lib/validation.ts`) before it's trusted anywhere else in the app.
+- If no `OPENAI_API_KEY` is configured, or the request fails, extraction
+  falls back to `extractPrioritiesHeuristically` — a small deterministic
+  parser that only fills in fields it can find in the text, defaulting
+  everything else instead of guessing. The app is fully usable with zero
+  external configuration; the UI tells the user when it's in this "offline
+  mode" via `PriorityIntakeFlow`'s review step.
+
+## Data layer
+
+There is no database yet — `lib/mock-properties.ts` provides seed data that
+matches the `Property` type exactly. Swapping this for Supabase later should
+only require changing how `app/api/ai/recommend/route.ts` fetches candidate
+properties; the scoring engine and UI are unaffected.
+
+Priorities are handed off between `/onboarding` and `/recommendations` via
+`sessionStorage` (`hooks/use-priorities-store.ts`) rather than a backend,
+since there's no persistence layer yet and no user accounts. This is a
+known, intentional gap — see Limitations below.
+
+## Security
+
+- All API route input is validated with Zod (`lib/validation.ts`) before
+  touching any business logic — the client is never trusted.
+- `services/ai/client.ts` only reads the API key from `process.env`, never
+  from a request; nothing client-supplied can change which credentials are
+  used or where a request goes.
+- `lib/rate-limit.ts` rate-limits both AI-touching route handlers by client
+  IP.
+
+## Known limitations (by design, for this stage)
+
+- **Rate limiting is in-memory and per-process.** It resets on redeploy and
+  doesn't share state across multiple serverless instances. Fine for a
+  single-instance deployment or local development; before scaling
+  horizontally this needs a shared store (e.g. Upstash Redis).
+- **No persistence.** Priorities live only in `sessionStorage` for the
+  current tab. There are no accounts, no saved searches, and recommendations
+  can't be revisited later. Supabase integration is the next major piece of
+  work this unblocks.
+- **Property data is static mock data**, not a real inventory.
+- **No automated accessibility or end-to-end test suite yet** — accessibility
+  was manually verified (keyboard navigation, semantic landmarks, ARIA
+  labeling, focus states, skip link) but isn't regression-tested in CI.
+
+## Testing
+
+Per `CLAUDE.md`, tests prioritize business logic over UI. `tests/unit/`
+covers:
+
+- The scoring engine's budget/commute/space/safety/schools/lifestyle
+  scoring, deal-breaker exclusion, must-have compromise detection, and
+  conflict detection (`score-engine.test.ts`).
+- Input validation edge cases (`validation.test.ts`).
+- The deterministic priority-extraction fallback (`priority-extraction.test.ts`).
+
+Run with `npm run test`.
