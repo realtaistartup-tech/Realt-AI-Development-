@@ -174,6 +174,49 @@
     "risks": "Risker",
     "compromises": "Kompromisser"
   },
+  "account": {
+    "signIn": "Logga in",
+    "signOut": "Logga ut",
+    "mySearches": "Mina sökningar",
+    "signedInAs": "Inloggad som {email}",
+    "dialog": {
+      "title": "Logga in",
+      "description": "Simulerad inloggning för denna förlanseringsversion — inget lösenord, och inget e-postmeddelande skickas faktiskt. Ange valfri e-postadress för att fortsätta.",
+      "emailLabel": "E-post",
+      "emailPlaceholder": "du@example.com",
+      "submit": "Fortsätt",
+      "submitting": "Loggar in…",
+      "error": "Ange en giltig e-postadress."
+    }
+  },
+  "saveSearch": {
+    "save": "Spara den här sökningen",
+    "saving": "Sparar…",
+    "saved": "Sparad",
+    "signInPrompt": "Logga in för att spara den här sökningen",
+    "error": "Det gick inte att spara sökningen. Försök igen."
+  },
+  "mySearches": {
+    "metaTitle": "Mina sökningar",
+    "metaDescription": "Sparade sökningar du kan återvända till när som helst.",
+    "heading": "Mina sökningar",
+    "subheading": "Sparade prioriteringar från tidigare sessioner. Fortsätt där du slutade.",
+    "savedOn": "Sparad {date}",
+    "viewMatches": "Se matchningar",
+    "delete": "Ta bort",
+    "loading": "Hämtar dina sparade sökningar…",
+    "error": "Det gick inte att hämta dina sparade sökningar. Försök igen.",
+    "empty": {
+      "heading": "Inga sparade sökningar än",
+      "description": "Spara en sökning från din matchningssida för att se den här.",
+      "cta": "Starta en ny sökning"
+    },
+    "signInRequired": {
+      "heading": "Logga in för att se dina sparade sökningar",
+      "description": "Sparade sökningar är kopplade till ditt konto.",
+      "cta": "Logga in"
+    }
+  },
   "legal": {
     "draftNotice": {
       "title": "Utkast — ännu inte juridiskt granskat",

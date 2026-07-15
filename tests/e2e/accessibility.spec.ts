@@ -10,6 +10,8 @@ const PAGES = [
   { name: "privacy (en)", path: "/en/privacy" },
   { name: "terms (sv)", path: "/terms" },
   { name: "terms (en)", path: "/en/terms" },
+  { name: "my-searches signed out (sv)", path: "/my-searches" },
+  { name: "my-searches signed out (en)", path: "/en/my-searches" },
 ];
 
 for (const { name, path } of PAGES) {
@@ -32,6 +34,18 @@ test("recommendations page has no automatically detectable accessibility violati
   await expect(page.getByRole("heading", { name: "Review your priorities" })).toBeVisible();
   await page.getByRole("button", { name: "See my matches" }).click();
   await expect(page.getByRole("heading", { name: "Your matches" })).toBeVisible();
+
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+
+  expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
+});
+
+test("sign-in dialog has no automatically detectable accessibility violations", async ({ page }) => {
+  await page.goto("/en");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
 
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])

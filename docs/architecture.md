@@ -115,17 +115,49 @@ priorities (`services/ai/priority-extraction.ts`). Even there:
   external configuration; the UI tells the user when it's in this "offline
   mode" via `PriorityIntakeFlow`'s review step.
 
-## Data layer
+## Data layer, accounts, and saved searches
 
-There is no database yet — `lib/mock-properties.ts` provides seed data that
-matches the `Property` type exactly. Swapping this for Supabase later should
-only require changing how `app/api/ai/recommend/route.ts` fetches candidate
-properties; the scoring engine and UI are unaffected.
+There is no real database yet, but rather than let that block product work,
+`services/persistence/` defines the data layer as three repository
+interfaces — `AccountRepository`, `SavedSearchRepository`,
+`PropertyRepository` — each currently backed by an in-memory mock
+implementation (`services/persistence/mock/`), selected by
+`getAccountRepository()` / `getSavedSearchRepository()` /
+`getPropertyRepository()`. Every caller goes through the interface, so
+connecting a real Supabase project later means writing three new classes
+that implement the same interfaces and swapping them in at those three call
+sites — the scoring engine, the UI, and every route handler are unaffected.
 
-Priorities are handed off between `/onboarding` and `/recommendations` via
-`sessionStorage` (`hooks/use-priorities-store.ts`) rather than a backend,
-since there's no persistence layer yet and no user accounts. This is a
-known, intentional gap — see Limitations below.
+**Mock authentication** (`app/api/auth/*`, `lib/session.ts`,
+`components/account-provider.tsx`) follows the same philosophy. Entering an
+email immediately signs a person in — no password, no email actually sent,
+the account is created on first use via `AccountRepository.findOrCreateByEmail`.
+This is deliberately the same UX shape a real passwordless flow (e.g.
+Supabase Auth's email OTP/magic link) would have, so replacing the mock
+later changes what happens on the server while someone waits, not how they
+sign in. The session itself is a signed cookie (HMAC-SHA256 via
+`SESSION_SECRET`, see `.env.example`) — not full session management
+(no rotation, no revocation), but enough that a client can't simply set
+`realt_session=<any-account-id>` and impersonate another mock account.
+
+**Saved searches** are the first feature this unblocks:
+`SaveSearchButton` on `/recommendations` persists the current priorities
+via `POST /api/saved-searches` for a signed-in account; `/my-searches`
+lists them and lets someone revisit a past search (which replays through
+the existing `sessionStorage` handoff into `/recommendations` — no new
+mechanism needed there) or delete it.
+
+Two things worth being precise about:
+
+1. **This is mock persistence, not durable persistence.** All three mock
+   repositories live in server-process memory. Data does not survive a
+   restart and does not coordinate across multiple instances — the exact
+   same honest limitation as the in-memory rate limiter, for the same
+   reason (nothing is deployed yet).
+2. **Priorities still also flow through `sessionStorage`**
+   (`hooks/use-priorities-store.ts`) for the onboarding → recommendations
+   handoff regardless of sign-in state — saved searches are additive, not
+   a replacement for that mechanism.
 
 ## Security
 
@@ -165,10 +197,10 @@ same as it going fully down.
 
 ## Known limitations (by design, for this stage)
 
-- **No persistence.** Priorities live only in `sessionStorage` for the
-  current tab. There are no accounts, no saved searches, and recommendations
-  can't be revisited later. Supabase integration is the next major piece of
-  work this unblocks.
+- **Accounts, sessions, and saved searches are mocked, not durable.**
+  Everything lives in server-process memory (see "Data layer, accounts, and
+  saved searches" above) and is lost on restart. Real accounts and durable
+  storage are what Supabase integration replaces this with.
 - **Property data is static mock data**, not a real inventory.
 - **CI is authored but not active.** `.github/workflows/ci.yml` runs
   typecheck/lint/tests/build and the full E2E suite on every push and PR —

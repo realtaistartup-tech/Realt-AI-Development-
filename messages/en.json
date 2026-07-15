@@ -174,6 +174,49 @@
     "risks": "Risks",
     "compromises": "Compromises"
   },
+  "account": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "mySearches": "My searches",
+    "signedInAs": "Signed in as {email}",
+    "dialog": {
+      "title": "Sign in",
+      "description": "Mock sign-in for this pre-launch build — no password, and no email is actually sent. Enter any email to continue.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Continue",
+      "submitting": "Signing in…",
+      "error": "Please enter a valid email address."
+    }
+  },
+  "saveSearch": {
+    "save": "Save this search",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "signInPrompt": "Sign in to save this search",
+    "error": "Could not save this search. Please try again."
+  },
+  "mySearches": {
+    "metaTitle": "My searches",
+    "metaDescription": "Saved searches you can revisit anytime.",
+    "heading": "My searches",
+    "subheading": "Saved priorities from past sessions. Pick one up where you left off.",
+    "savedOn": "Saved {date}",
+    "viewMatches": "View matches",
+    "delete": "Delete",
+    "loading": "Loading your saved searches…",
+    "error": "Could not load your saved searches. Please try again.",
+    "empty": {
+      "heading": "No saved searches yet",
+      "description": "Save a search from your recommendations page to see it here.",
+      "cta": "Start a new search"
+    },
+    "signInRequired": {
+      "heading": "Sign in to see your saved searches",
+      "description": "Saved searches are tied to your mock account.",
+      "cta": "Sign in"
+    }
+  },
   "legal": {
     "draftNotice": {
       "title": "Draft — not yet reviewed by legal counsel",

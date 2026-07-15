@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { ThemeProvider } from "@/components/theme-provider";
+import { AccountProvider } from "@/components/account-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { routing } from "@/i18n/routing";
@@ -82,17 +83,19 @@ export default async function RootLayout({
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <NextIntlClientProvider>
           <ThemeProvider>
-            <a
-              href="#main-content"
-              className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
-            >
-              {t("skipToContent")}
-            </a>
-            <SiteHeader />
-            <main id="main-content" className="flex-1">
-              {children}
-            </main>
-            <SiteFooter />
+            <AccountProvider>
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+              >
+                {t("skipToContent")}
+              </a>
+              <SiteHeader />
+              <main id="main-content" className="flex-1">
+                {children}
+              </main>
+              <SiteFooter />
+            </AccountProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

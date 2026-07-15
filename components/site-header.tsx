@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { AccountMenu } from "@/components/account-menu";
 import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
@@ -23,6 +24,7 @@ export function SiteHeader() {
           <Button asChild variant="ghost" size="sm">
             <Link href="/onboarding">{t("nav.findMyHome")}</Link>
           </Button>
+          <AccountMenu />
           <LocaleSwitcher />
           <ThemeToggle />
         </nav>

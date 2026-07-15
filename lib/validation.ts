@@ -45,3 +45,15 @@ export const recommendationRequestSchema = z.object({
 });
 
 export type RecommendationRequest = z.infer<typeof recommendationRequestSchema>;
+
+export const saveSearchRequestSchema = z.object({
+  priorities: userPrioritiesSchema,
+});
+
+export type SaveSearchRequest = z.infer<typeof saveSearchRequestSchema>;
+
+export const mockSignInRequestSchema = z.object({
+  email: z.string().trim().toLowerCase().email().max(254),
+});
+
+export type MockSignInRequest = z.infer<typeof mockSignInRequestSchema>;

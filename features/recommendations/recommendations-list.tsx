@@ -8,25 +8,32 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { loadPriorities } from "@/hooks/use-priorities-store";
-import type { MatchResult, PriorityConflict } from "@/types";
+import type { MatchResult, PriorityConflict, UserPriorities } from "@/types";
 import { PropertyCard } from "./property-card";
+import { SaveSearchButton } from "./save-search-button";
 
 type LoadState =
   | { status: "loading" }
   | { status: "missing-priorities" }
   | { status: "error"; message: string }
-  | { status: "ready"; results: MatchResult[]; conflicts: PriorityConflict[] };
+  | {
+      status: "ready";
+      results: MatchResult[];
+      conflicts: PriorityConflict[];
+      priorities: UserPriorities;
+    };
 
 export function RecommendationsList() {
   const t = useTranslations("recommendations");
   const [state, setState] = useState<LoadState>({ status: "loading" });
 
   useEffect(() => {
-    const priorities = loadPriorities();
-    if (!priorities) {
+    const loaded = loadPriorities();
+    if (!loaded) {
       setState({ status: "missing-priorities" });
       return;
     }
+    const priorities: UserPriorities = loaded;
 
     let cancelled = false;
 
@@ -45,7 +52,12 @@ export function RecommendationsList() {
           conflicts: PriorityConflict[];
         };
         if (!cancelled) {
-          setState({ status: "ready", results: data.results, conflicts: data.conflicts });
+          setState({
+            status: "ready",
+            results: data.results,
+            conflicts: data.conflicts,
+            priorities,
+          });
         }
       } catch (err) {
         if (!cancelled) {
@@ -95,13 +107,16 @@ export function RecommendationsList() {
     );
   }
 
-  const { results, conflicts } = state;
+  const { results, conflicts, priorities } = state;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-16 sm:px-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{t("heading")}</h1>
-        <p className="mt-2 text-muted-foreground">{t("subheading")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">{t("heading")}</h1>
+          <p className="mt-2 text-muted-foreground">{t("subheading")}</p>
+        </div>
+        <SaveSearchButton priorities={priorities} />
       </div>
 
       {conflicts.length > 0 && (
