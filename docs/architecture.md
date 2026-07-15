@@ -145,14 +145,17 @@ known, intentional gap — see Limitations below.
   can't be revisited later. Supabase integration is the next major piece of
   work this unblocks.
 - **Property data is static mock data**, not a real inventory.
-- **No automated accessibility or end-to-end test suite yet** — accessibility
-  was manually verified (keyboard navigation, semantic landmarks, ARIA
-  labeling, focus states, skip link) but isn't regression-tested in CI.
+- **The E2E suite runs manually, not in CI yet** — it's fully written and
+  passing (`npm run test:e2e`), but nothing currently triggers it
+  automatically on push/PR; that's the CI pipeline item on the V1.0 roadmap.
 
 ## Testing
 
-Per `CLAUDE.md`, tests prioritize business logic over UI. `tests/unit/`
-covers:
+Per `CLAUDE.md`, tests prioritize business logic over UI, but "critical
+user flows" and accessibility are explicit requirements too, so both are
+covered by two separate, purpose-built suites rather than one.
+
+**`tests/unit/`** (Vitest) — business logic, no browser involved:
 
 - The scoring engine's budget/commute/space/safety/schools/lifestyle
   scoring, deal-breaker exclusion, must-have compromise detection, and
@@ -161,3 +164,30 @@ covers:
 - The deterministic priority-extraction fallback (`priority-extraction.test.ts`).
 
 Run with `npm run test`.
+
+**`tests/e2e/`** (Playwright, against a production build — not `next dev`,
+since dev-mode's on-demand compilation and slower hydration produce
+flakiness that has nothing to do with the app) — real user flows in a real
+browser:
+
+- `golden-path.spec.ts` — the full home → onboarding → review →
+  recommendations flow, once in Swedish and once in English, asserting the
+  heuristic extraction correctly reads free-text budget/commute values in
+  both languages.
+- `locale-switcher.spec.ts` — switching locale via the header control, and
+  that it preserves the current page rather than bouncing to the homepage.
+- `empty-recommendations.spec.ts` — visiting `/recommendations` with no
+  prior priorities shows the guided empty state, not an error.
+- `theme-toggle.spec.ts` — the light → dark → system cycle updates both the
+  control's accessible name and the document's `dark` class.
+- `accessibility.spec.ts` — `@axe-core/playwright` scans of the home,
+  onboarding, and recommendations pages (both locales) against WCAG 2.0/2.1
+  A and AA, asserting zero violations. This is what caught a real bug during
+  development: the "partial match" score badge's amber text failed contrast
+  (3.17:1 against its own tinted background, needed 4.5:1) — fixed by
+  darkening the `--warning`/`--success`/`--destructive` design tokens in
+  `globals.css` (verified by direct WCAG relative-luminance calculation
+  against each token's actual `/10`-opacity badge background, in both
+  themes, not just spot-checked).
+
+Run with `npm run test:e2e`.

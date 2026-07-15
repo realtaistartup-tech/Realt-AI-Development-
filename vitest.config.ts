@@ -8,6 +8,10 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./tests/setup/vitest-setup.ts"],
     globals: true,
+    // tests/e2e runs under Playwright's own test runner (`npm run test:e2e`),
+    // not Vitest — its specs use @playwright/test globals that are
+    // incompatible with Vitest's runner.
+    include: ["tests/unit/**/*.test.ts"],
   },
   resolve: {
     alias: {
