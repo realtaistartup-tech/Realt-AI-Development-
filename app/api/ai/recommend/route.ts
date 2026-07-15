@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { recommendationRequestSchema } from "@/lib/validation";
 import { checkRateLimit, getClientKey } from "@/lib/rate-limit";
-import { MOCK_PROPERTIES } from "@/lib/mock-properties";
+import { getPropertyRepository } from "@/services/persistence";
 import { detectPriorityConflicts, rankProperties } from "@/services/matching/score-engine";
 
 const RATE_LIMIT = 30;
@@ -34,8 +34,9 @@ export async function POST(request: Request) {
   }
 
   const { priorities } = parsed.data;
+  const properties = await getPropertyRepository().listAll();
   const conflicts = detectPriorityConflicts(priorities);
-  const results = rankProperties(MOCK_PROPERTIES, priorities);
+  const results = rankProperties(properties, priorities);
 
   return NextResponse.json({ results, conflicts }, { status: 200 });
 }
