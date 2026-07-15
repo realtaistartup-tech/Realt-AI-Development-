@@ -14,7 +14,9 @@
   },
   "footer": {
     "tagline": "Realt AI hjälper dig förstå dina prioriteringar innan du tittar på bostäder.",
-    "copyright": "© {year} Realt AI. Alla rättigheter förbehållna."
+    "copyright": "© {year} Realt AI. Alla rättigheter förbehållna.",
+    "privacyLink": "Integritetspolicy",
+    "termsLink": "Användarvillkor"
   },
   "theme": {
     "light": "ljust",
@@ -172,5 +174,152 @@
     "whyItFits": "Varför den passar",
     "risks": "Risker",
     "compromises": "Kompromisser"
+  },
+  "legal": {
+    "draftNotice": {
+      "title": "Utkast — ännu inte juridiskt granskat",
+      "body": "Den här sidan beskriver, så korrekt vi kan, vad Realt AI faktiskt gör idag. Den har inte granskats av en kvalificerad jurist och ska inte betraktas som en slutgiltig, bindande policy förrän så har skett. Använd den inte som underlag för en publik lansering utan juridisk granskning, särskilt med avseende på GDPR."
+    },
+    "updatedLabel": "Utkast upprättat",
+    "backLink": "Tillbaka till startsidan",
+    "privacy": {
+      "title": "Integritetspolicy",
+      "intro": "Den här integritetspolicyn förklarar vilken information Realt AI samlar in, varför, och vilka val du har.",
+      "sections": [
+        {
+          "heading": "Vilka vi är",
+          "paragraphs": [
+            "Realt AI ([juridiskt företagsnamn att läggas till]) driver den här webbplatsen som en AI-first beslutsassistent för bostäder. Vid frågor om denna policy eller dina uppgifter, kontakta [kontakt-e-post att läggas till]."
+          ]
+        },
+        {
+          "heading": "Vilken information vi samlar in",
+          "paragraphs": [
+            "Den fritextbeskrivning av dina bostadsprioriteringar som du skriver in i introduktionsflödet, samt de strukturerade prioriteringar som härleds från den (budget, pendling, antal sovrum och badrum, måsten, uteslutningar och livsstilspreferenser).",
+            "Ditt valda språk och temainställning.",
+            "Standardmässig teknisk data såsom din IP-adress, som endast används för att tillämpa hastighetsbegränsningar som skyddar tjänsten från missbruk. Detta lagras för närvarande endast i serverns minne under ett kort rullande tidsfönster och sparas inte permanent."
+          ]
+        },
+        {
+          "heading": "Hur vi använder din information",
+          "paragraphs": [
+            "För att driva produktens kärnfunktion: att förstå dina prioriteringar och generera förklarbara bostadsmatchningar.",
+            "Om en AI-leverantör är konfigurerad kan den fritextbeskrivning du anger skickas till OpenAI, L.L.C. (en tredjeparts AI-leverantör baserad i USA) för att extrahera strukturerade prioriteringar ur den. Realt AI instruerar leverantören att inte använda API-indata för att träna sina modeller. Om ingen AI-leverantör är konfigurerad extraheras prioriteringarna helt på vår egen server, utan någon tredje part inblandad."
+          ]
+        },
+        {
+          "heading": "Var din information lagras",
+          "paragraphs": [
+            "I detta utvecklingsskede driver Realt AI ingen permanent databas. De prioriteringar du anger lagras endast i din webbläsares sessionslagring under ditt besök, och sparas inte på Realt AIs servrar längre än den tid som krävs för att behandla en enskild förfrågan.",
+            "Detta kommer att förändras när konto- och sparade sökningar-funktioner introduceras. Denna policy kommer att uppdateras, och tydligt hållas aktuell, innan någon sådan funktion lanseras."
+          ]
+        },
+        {
+          "heading": "Rättslig grund för behandling (GDPR)",
+          "paragraphs": [
+            "Där GDPR är tillämplig behandlar vi informationen ovan med stöd av ditt samtycke, genom att du väljer att beskriva dina prioriteringar för oss, samt vårt berättigade intresse av att driva och skydda tjänsten, till exempel genom hastighetsbegränsning."
+          ]
+        },
+        {
+          "heading": "Dina rättigheter",
+          "paragraphs": [
+            "Beroende på var du befinner dig kan du ha rätt att få tillgång till, rätta, radera, begränsa eller få en kopia av dina uppgifter, samt att invända mot viss behandling. Om GDPR är tillämplig på dig har du också rätt att lämna in ett klagomål till din nationella tillsynsmyndighet — i Sverige, Integritetsskyddsmyndigheten (IMY).",
+            "Eftersom Realt AI för närvarande inte sparar dina uppgifter längre än din webbläsarsession, är de flesta av dessa rättigheter redan uppfyllda som standard. Kontakta oss om du har frågor."
+          ]
+        },
+        {
+          "heading": "Cookies och liknande tekniker",
+          "paragraphs": [
+            "Realt AI använder ett fåtal absolut nödvändiga tekniker: en cookie för att komma ihåg ditt valda språk, samt webbläsarens sessionslagring för att föra dina prioriteringar från introduktionsflödet till dina rekommendationer.",
+            "Realt AI använder för närvarande inte analys-, annons- eller spårningscookies. Om det ändras kommer denna policy att uppdateras och samtycke att inhämtas där det krävs."
+          ]
+        },
+        {
+          "heading": "Barns integritet",
+          "paragraphs": [
+            "Realt AI riktar sig inte till barn, och vi samlar inte medvetet in information från någon under 16 år."
+          ]
+        },
+        {
+          "heading": "Ändringar av denna policy",
+          "paragraphs": [
+            "Vi kommer att uppdatera den här sidan i takt med att produkten utvecklas, särskilt när konton, permanent lagring eller nya datakällor introduceras."
+          ]
+        },
+        {
+          "heading": "Kontakta oss",
+          "paragraphs": [
+            "[Kontakt-e-post att läggas till]"
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "title": "Användarvillkor",
+      "intro": "Dessa villkor reglerar din användning av Realt AI.",
+      "sections": [
+        {
+          "heading": "Godkännande av dessa villkor",
+          "paragraphs": [
+            "Genom att använda Realt AI godkänner du dessa villkor. Om du inte godkänner dem, vänligen använd inte tjänsten."
+          ]
+        },
+        {
+          "heading": "Vad Realt AI är",
+          "paragraphs": [
+            "Realt AI är ett beslutsstödsverktyg som hjälper dig tänka igenom dina bostadsprioriteringar och se förklarbara, transparenta bostadsmatchningar. Realt AI är inte en licensierad fastighetsmäklare, agent, värderingsman eller finansiell, juridisk eller skatterådgivare, och inget i tjänsten utgör sådan rådgivning."
+          ]
+        },
+        {
+          "heading": "Informationens korrekthet",
+          "paragraphs": [
+            "Under detta utvecklingsskede är de bostäder som visas i Realt AI illustrativa exempeldata och representerar inte verkliga, för närvarande tillgängliga objekt. Detta avsnitt kommer att revideras när Realt AI kopplas till en verklig datakälla för bostäder.",
+            "Matchningspoäng genereras utifrån de prioriteringar du anger och är avsedda att stödja, inte ersätta, ditt eget omdöme och professionell rådgivning."
+          ]
+        },
+        {
+          "heading": "Ditt ansvar",
+          "paragraphs": [
+            "Du åtar dig att lämna korrekt information och att inte missbruka tjänsten — till exempel genom att försöka överbelasta den med automatiserade förfrågningar. Tjänsten tillämpar hastighetsbegränsningar för att skydda den för alla användare."
+          ]
+        },
+        {
+          "heading": "Immateriella rättigheter",
+          "paragraphs": [
+            "Namnet Realt AI, designen och den underliggande programvaran ägs av [juridiskt företagsnamn att läggas till]. Du får inte kopiera, återge eller skapa bearbetningar av dem utan tillstånd."
+          ]
+        },
+        {
+          "heading": "Ansvarsfriskrivning",
+          "paragraphs": [
+            "Tjänsten tillhandahålls \"i befintligt skick\" och \"i den mån den är tillgänglig\", utan garantier av något slag, uttryckliga eller underförstådda, i den utsträckning lagen tillåter."
+          ]
+        },
+        {
+          "heading": "Ansvarsbegränsning",
+          "paragraphs": [
+            "I den utsträckning lagen tillåter ansvarar Realt AI inte för beslut som fattas baserat på dess rekommendationer, eller för indirekta, tillfälliga eller följdskador som uppstår från din användning av tjänsten."
+          ]
+        },
+        {
+          "heading": "Tillämplig lag",
+          "paragraphs": [
+            "Dessa villkor regleras av svensk lag, utan hänsyn till lagvalsregler. [Att bekräftas med juridisk rådgivare.]"
+          ]
+        },
+        {
+          "heading": "Ändringar av dessa villkor",
+          "paragraphs": [
+            "Vi kan komma att uppdatera dessa villkor i takt med att produkten utvecklas. Väsentliga ändringar kommer att markeras här."
+          ]
+        },
+        {
+          "heading": "Kontakta oss",
+          "paragraphs": [
+            "[Kontakt-e-post att läggas till]"
+          ]
+        }
+      ]
+    }
   }
 }

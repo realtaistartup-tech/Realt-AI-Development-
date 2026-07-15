@@ -14,7 +14,9 @@
   },
   "footer": {
     "tagline": "Realt AI helps you understand your priorities before you look at properties.",
-    "copyright": "© {year} Realt AI. All rights reserved."
+    "copyright": "© {year} Realt AI. All rights reserved.",
+    "privacyLink": "Privacy Policy",
+    "termsLink": "Terms of Service"
   },
   "theme": {
     "light": "light",
@@ -172,5 +174,152 @@
     "whyItFits": "Why it fits",
     "risks": "Risks",
     "compromises": "Compromises"
+  },
+  "legal": {
+    "draftNotice": {
+      "title": "Draft — not yet reviewed by legal counsel",
+      "body": "This page describes what Realt AI actually does today, as accurately as we can state it. It has not been reviewed by a qualified lawyer and should not be treated as a final, binding policy until it has. Do not rely on it for a public launch without legal review, particularly for compliance with the GDPR."
+    },
+    "updatedLabel": "Draft prepared",
+    "backLink": "Back to home",
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "This Privacy Policy explains what information Realt AI collects, why, and what choices you have.",
+      "sections": [
+        {
+          "heading": "Who we are",
+          "paragraphs": [
+            "Realt AI ([legal entity name to be added]) operates this site as an AI-first housing decision assistant. For questions about this policy or your data, contact [privacy contact email to be added]."
+          ]
+        },
+        {
+          "heading": "What information we collect",
+          "paragraphs": [
+            "The free-text description of your housing priorities that you type into the onboarding flow, and the structured priorities derived from it (budget, commute, bedrooms and bathrooms, must-haves, deal-breakers, and lifestyle preferences).",
+            "Your selected language and theme preference.",
+            "Standard technical data such as your IP address, used only to apply rate limits that protect the service from abuse. This is currently held only in server memory for a short rolling window and is not stored permanently."
+          ]
+        },
+        {
+          "heading": "How we use your information",
+          "paragraphs": [
+            "To operate the core feature of the product: understanding your priorities and generating explainable property matches.",
+            "If an AI provider is configured, the free-text description you provide may be sent to OpenAI, L.L.C. (a third-party AI provider based in the United States) to extract structured priorities from it. Realt AI instructs this provider not to use API inputs to train its models. If no AI provider is configured, priorities are extracted entirely on our own server, without any third party involved."
+          ]
+        },
+        {
+          "heading": "Where your information is stored",
+          "paragraphs": [
+            "At this stage of development, Realt AI does not operate a persistent database. The priorities you enter are held only in your browser's session storage for the duration of your visit, and are not stored on Realt AI's servers beyond the time needed to process a single request.",
+            "This will change as account and saved-search features are introduced. This policy will be updated, and made clearly current, before any such feature is launched."
+          ]
+        },
+        {
+          "heading": "Legal basis for processing (GDPR)",
+          "paragraphs": [
+            "Where the GDPR applies, we process the information described above on the basis of your consent, given by choosing to describe your priorities to us, and our legitimate interest in operating and securing the service, such as rate limiting."
+          ]
+        },
+        {
+          "heading": "Your rights",
+          "paragraphs": [
+            "Depending on your location, you may have the right to access, correct, delete, restrict, or receive a copy of your data, and to object to certain processing. If the GDPR applies to you, you also have the right to lodge a complaint with your national data protection authority — in Sweden, Integritetsskyddsmyndigheten (IMY).",
+            "Because Realt AI does not currently retain your data beyond your browsing session, most of these rights are already satisfied by default. Contact us if you have any questions."
+          ]
+        },
+        {
+          "heading": "Cookies and similar technologies",
+          "paragraphs": [
+            "Realt AI uses a small number of strictly necessary technologies: a cookie to remember your selected language, and browser session storage to carry your priorities from the intake flow to your recommendations.",
+            "Realt AI does not currently use analytics, advertising, or tracking cookies. If that changes, this policy will be updated and consent will be requested where required."
+          ]
+        },
+        {
+          "heading": "Children's privacy",
+          "paragraphs": [
+            "Realt AI is not directed at children, and we do not knowingly collect information from anyone under 16 years old."
+          ]
+        },
+        {
+          "heading": "Changes to this policy",
+          "paragraphs": [
+            "We will update this page as the product evolves, particularly once accounts, persistent storage, or new data sources are introduced."
+          ]
+        },
+        {
+          "heading": "Contact us",
+          "paragraphs": [
+            "[Contact email to be added]"
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "intro": "These Terms govern your use of Realt AI.",
+      "sections": [
+        {
+          "heading": "Acceptance of these terms",
+          "paragraphs": [
+            "By using Realt AI, you agree to these Terms. If you do not agree, please do not use the service."
+          ]
+        },
+        {
+          "heading": "What Realt AI is",
+          "paragraphs": [
+            "Realt AI is a decision-support tool that helps you think through your housing priorities and see explainable, transparent property matches. Realt AI is not a licensed real estate broker, agent, appraiser, or financial, legal, or tax advisor, and nothing in the service constitutes such advice."
+          ]
+        },
+        {
+          "heading": "Accuracy of information",
+          "paragraphs": [
+            "During this development phase, the properties shown in Realt AI are illustrative example data and do not represent real, currently available listings. This section will be revised once Realt AI is connected to a real property data source.",
+            "Match scores are generated from the priorities you provide and are intended to support, not replace, your own judgment and professional advice."
+          ]
+        },
+        {
+          "heading": "Your responsibilities",
+          "paragraphs": [
+            "You agree to provide accurate information and not to misuse the service — for example, by attempting to overwhelm it with automated requests. The service applies rate limits to protect it for everyone."
+          ]
+        },
+        {
+          "heading": "Intellectual property",
+          "paragraphs": [
+            "The Realt AI name, design, and underlying software are owned by [legal entity name to be added]. You may not copy, reproduce, or create derivative works from them without permission."
+          ]
+        },
+        {
+          "heading": "Disclaimer of warranties",
+          "paragraphs": [
+            "The service is provided \"as is\" and \"as available,\" without warranties of any kind, express or implied, to the fullest extent permitted by law."
+          ]
+        },
+        {
+          "heading": "Limitation of liability",
+          "paragraphs": [
+            "To the extent permitted by law, Realt AI is not liable for decisions made based on its recommendations, or for any indirect, incidental, or consequential damages arising from your use of the service."
+          ]
+        },
+        {
+          "heading": "Governing law",
+          "paragraphs": [
+            "These Terms are governed by the laws of Sweden, without regard to conflict-of-law principles. [To be confirmed with legal counsel.]"
+          ]
+        },
+        {
+          "heading": "Changes to these terms",
+          "paragraphs": [
+            "We may update these Terms as the product evolves. Material changes will be highlighted here."
+          ]
+        },
+        {
+          "heading": "Contact us",
+          "paragraphs": [
+            "[Contact email to be added]"
+          ]
+        }
+      ]
+    }
   }
 }

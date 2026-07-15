@@ -6,6 +6,10 @@ const PAGES = [
   { name: "home (en)", path: "/en" },
   { name: "onboarding (sv)", path: "/onboarding" },
   { name: "onboarding (en)", path: "/en/onboarding" },
+  { name: "privacy (sv)", path: "/privacy" },
+  { name: "privacy (en)", path: "/en/privacy" },
+  { name: "terms (sv)", path: "/terms" },
+  { name: "terms (en)", path: "/en/terms" },
 ];
 
 for (const { name, path } of PAGES) {
