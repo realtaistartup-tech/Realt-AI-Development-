@@ -19,9 +19,9 @@ Three things are already true of the current build (landing page, AI-first onboa
 | # | Feature | Complexity | MVP or V2 | Depends on | Status |
 |---|---|---|---|---|---|
 | 1 | Automated end-to-end + accessibility regression tests | M | **MVP** | none | **Done** |
-| 2 | Legal & compliance pages (privacy policy, terms, cookie notice) | S (scaffold) | **MVP** | none (content needs human legal review) | Not started |
-| 3 | CI pipeline (lint/typecheck/test/build on every change) | S | **MVP** | GitHub push access | Authorable now, can't activate yet |
-| 4 | Pluggable rate limiting (interface + shared-store-ready) | M | **MVP** | Full effect needs Redis credentials | Not started |
+| 2 | Legal & compliance pages (privacy policy, terms, cookie notice) | S (scaffold) | **MVP** | none (content needs human legal review) | **Done** (draft — needs legal review) |
+| 3 | CI pipeline (lint/typecheck/test/build on every change) | S | **MVP** | GitHub push access | **Authored, not active** — ready the moment push access exists |
+| 4 | Pluggable rate limiting (interface + shared-store-ready) | M | **MVP** | Full effect needs Redis credentials | **Done** — runs in-memory today, upgrades itself automatically once `UPSTASH_REDIS_REST_URL`/`TOKEN` are set |
 | 5 | Persistence layer (Supabase: priorities + properties) | L | **MVP** | Supabase project + credentials from you | Blocked — needs your input |
 | 6 | Anonymous session persistence (cookie-based, no login) | M | **MVP** | #5 | Blocked (depends on #5) |
 | 7 | Error monitoring / observability (e.g. Sentry) | S–M | **MVP** | Monitoring account + DSN from you | Blocked — needs your input |

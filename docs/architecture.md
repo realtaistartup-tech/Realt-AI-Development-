@@ -131,23 +131,50 @@ known, intentional gap — see Limitations below.
 - `services/ai/client.ts` only reads the API key from `process.env`, never
   from a request; nothing client-supplied can change which credentials are
   used or where a request goes.
-- `lib/rate-limit.ts` rate-limits both AI-touching route handlers by client
-  IP.
+- `lib/rate-limit/` rate-limits both AI-touching route handlers by client
+  IP, via a pluggable `RateLimiter` interface (see below) rather than one
+  hardcoded implementation.
+
+## Rate limiting
+
+`lib/rate-limit/` defines a small `RateLimiter` interface with two
+implementations, selected automatically by `getRateLimiter()`:
+
+- `InMemoryRateLimiter` — a fixed-window counter in a `Map`. Correct for a
+  single running instance; used whenever no shared store is configured.
+  This is what runs today, since nothing is deployed yet.
+- `UpstashRateLimiter` — the same fixed-window algorithm against Upstash
+  Redis's REST API (a pipelined `INCR` + `PEXPIRE ... NX`, so the window's
+  expiry is set atomically on the first request rather than racing a
+  second round trip). Activates automatically the moment
+  `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are set — no code
+  changes required, matching the same "the app upgrades itself once real
+  infrastructure exists" philosophy as `services/ai/client.ts`.
+
+`checkRateLimit()`, the function the route handlers actually call, wraps
+whichever limiter is active and **fails open** (allows the request) if it
+throws — a rate-limiter outage should degrade availability, not take down
+the routes it exists to protect. This is deliberately different from the
+AI extraction path, which fails closed into the heuristic fallback: being
+wrong about a rate limit for a few seconds during an outage is a much
+smaller risk than an AI route going fully unprotected being treated the
+same as it going fully down.
 
 ## Known limitations (by design, for this stage)
 
-- **Rate limiting is in-memory and per-process.** It resets on redeploy and
-  doesn't share state across multiple serverless instances. Fine for a
-  single-instance deployment or local development; before scaling
-  horizontally this needs a shared store (e.g. Upstash Redis).
 - **No persistence.** Priorities live only in `sessionStorage` for the
   current tab. There are no accounts, no saved searches, and recommendations
   can't be revisited later. Supabase integration is the next major piece of
   work this unblocks.
 - **Property data is static mock data**, not a real inventory.
-- **The E2E suite runs manually, not in CI yet** — it's fully written and
-  passing (`npm run test:e2e`), but nothing currently triggers it
-  automatically on push/PR; that's the CI pipeline item on the V1.0 roadmap.
+- **CI is authored but not active.** `.github/workflows/ci.yml` runs
+  typecheck/lint/tests/build and the full E2E suite on every push and PR —
+  but it can't actually run until GitHub push access is restored to this
+  repository.
+- **Legal pages are drafts, not reviewed by counsel.** `/privacy` and
+  `/terms` accurately describe what the app does today, but carry a visible
+  draft notice and placeholder business-identity fields; they are not a
+  substitute for real legal review before a public launch.
 
 ## Testing
 

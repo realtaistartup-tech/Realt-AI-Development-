@@ -10,7 +10,7 @@ const RATE_WINDOW_MS = 60_000;
 
 export async function POST(request: Request) {
   const clientKey = getClientKey(request);
-  const { allowed } = checkRateLimit(`recommend:${clientKey}`, RATE_LIMIT, RATE_WINDOW_MS);
+  const { allowed } = await checkRateLimit(`recommend:${clientKey}`, RATE_LIMIT, RATE_WINDOW_MS);
   if (!allowed) {
     return NextResponse.json(
       { error: "Too many requests. Please try again shortly." },
