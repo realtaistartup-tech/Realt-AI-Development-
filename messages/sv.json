@@ -1,0 +1,176 @@
+{
+  "metadata": {
+    "siteName": "Realt AI",
+    "title": "Realt AI — Fatta bättre bostadsbeslut",
+    "description": "Realt AI är en intelligent beslutsassistent som hjälper dig förstå dina prioriteringar, väga för- och nackdelar och tryggt välja rätt bostad."
+  },
+  "common": {
+    "skipToContent": "Hoppa till huvudinnehållet",
+    "brand": "Realt AI"
+  },
+  "nav": {
+    "primary": "Huvudnavigering",
+    "findMyHome": "Hitta mitt hem"
+  },
+  "footer": {
+    "tagline": "Realt AI hjälper dig förstå dina prioriteringar innan du tittar på bostäder.",
+    "copyright": "© {year} Realt AI. Alla rättigheter förbehållna."
+  },
+  "theme": {
+    "light": "ljust",
+    "dark": "mörkt",
+    "system": "system",
+    "switchLabel": "Byt tema, just nu {theme}"
+  },
+  "locale": {
+    "label": "Språk",
+    "sv": "Svenska",
+    "en": "English"
+  },
+  "home": {
+    "badge": "En AI-first beslutsassistent",
+    "heading": "Man köper inte en lägenhet. Man köper ett framtida liv.",
+    "subheading": "Realt AI hjälper dig förstå vad som faktiskt är viktigt för dig, väger för- och nackdelar ärligt och förklarar varje rekommendation — så att du kan välja bostad med trygghet, inte gissningar.",
+    "ctaPrimary": "Börja förstå mina prioriteringar",
+    "howItWorks": {
+      "heading": "Realts tankeramverk",
+      "subheading": "Samma resonemang ligger bakom varje rekommendation Realt AI ger.",
+      "steps": {
+        "understand": {
+          "title": "Förstå dina mål",
+          "description": "Berätta för Realt AI vad som är viktigt för dig i vanligt språk — budget, pendling, yta, trygghet, skolor, livsstil."
+        },
+        "tradeoffs": {
+          "title": "Se avvägningarna",
+          "description": "Realt AI flaggar ärligt när dina prioriteringar krockar med varandra, istället för att låtsas att allt går att uppfylla."
+        },
+        "match": {
+          "title": "Få en transparent matchning",
+          "description": "Varje bostad får ett förklarbart betyg — du ser alltid exakt varför den passar, eller varför den inte gör det."
+        },
+        "decide": {
+          "title": "Bestäm med trygghet",
+          "description": "Kompromisser och risker lyfts fram i förväg, så att du väljer bostad medvetet, inte av misstag."
+        }
+      }
+    },
+    "finalCta": {
+      "heading": "Redo att fundera igenom ditt nästa hem?",
+      "subheading": "Det tar några minuter att beskriva vad som är viktigt för dig. Inget konto krävs.",
+      "button": "Kom igång"
+    }
+  },
+  "onboarding": {
+    "metaTitle": "Berätta vad du letar efter",
+    "metaDescription": "Beskriv dina prioriteringar så att Realt AI kan förstå vad som är viktigt för dig.",
+    "stepLabel": "Steg {step} av 2",
+    "describe": {
+      "heading": "Berätta vad du letar efter",
+      "description": "Beskriv ditt drömboende med egna ord. Ta med det som är viktigast — budget, pendling, yta, trygghet, skolor eller livsstil.",
+      "label": "Dina prioriteringar",
+      "placeholder": "Vi är en familj på fyra som letar efter ett hus med 3–4 sovrum under 6 000 000 kr, helst högst 30 minuters bilresa till centrum, i ett lugnt, familjevänligt område med bra skolor. En trädgård vore toppen, och vi vill utesluta allt utan egen parkering.",
+      "hint": "Realt AI använder bara det du skriver här — den hittar inte på detaljer du inte har nämnt.",
+      "submit": "Fortsätt",
+      "submitting": "Förstår dina prioriteringar…"
+    },
+    "review": {
+      "heading": "Granska dina prioriteringar",
+      "description": "Så här uppfattade Realt AI det. Justera vid behov innan vi letar efter matchningar.",
+      "offlineTitle": "Körs i offlineläge",
+      "offlineDescription": "Ingen AI-modell är konfigurerad, så prioriteringarna extraherades med en enklare, regelbaserad läsare. Granska fälten nedan noga.",
+      "back": "Tillbaka",
+      "confirm": "Se mina matchningar"
+    },
+    "errors": {
+      "generic": "Något gick fel."
+    },
+    "fields": {
+      "budget": {
+        "legend": "Budget",
+        "min": "Minimum",
+        "max": "Maximum"
+      },
+      "commute": {
+        "legend": "Pendling",
+        "maxMinutes": "Maximal pendlingstid (minuter)",
+        "mode": "Färdsätt",
+        "modes": {
+          "drive": "Bil",
+          "transit": "Kollektivtrafik",
+          "walk": "Gång",
+          "bike": "Cykel"
+        }
+      },
+      "space": {
+        "legend": "Yta",
+        "bedrooms": "Minsta antal sovrum",
+        "bathrooms": "Minsta antal badrum"
+      },
+      "mustHaves": {
+        "label": "Måsten",
+        "description": "Bekvämligheter som bostaden absolut måste ha.",
+        "placeholder": "t.ex. parkering"
+      },
+      "dealBreakers": {
+        "label": "Uteslutningar",
+        "description": "Sådant som skulle utesluta en bostad helt.",
+        "placeholder": "t.ex. ingen hiss"
+      },
+      "lifestyle": {
+        "label": "Livsstil",
+        "description": "Hur du vill att området ska kännas.",
+        "placeholder": "t.ex. gångvänligt"
+      },
+      "importance": {
+        "legend": "Hur viktig är varje faktor?",
+        "levelLabel": "{level} av 5"
+      },
+      "categories": {
+        "budget": "Budget",
+        "commute": "Pendling",
+        "space": "Yta",
+        "safety": "Trygghet",
+        "schools": "Skolor",
+        "lifestyle": "Livsstil"
+      }
+    },
+    "tags": {
+      "remove": "Ta bort {tag}",
+      "selected": "{label} valda"
+    }
+  },
+  "recommendations": {
+    "metaTitle": "Dina matchningar",
+    "metaDescription": "Bostäder matchade och förklarade mot dina angivna prioriteringar.",
+    "loading": "Hittar dina matchningar…",
+    "missing": {
+      "heading": "Låt oss börja med dina prioriteringar",
+      "description": "Vi har inte dina prioriteringar för den här sessionen ännu.",
+      "cta": "Berätta vad du letar efter"
+    },
+    "error": {
+      "generic": "Det gick inte att hämta rekommendationer. Försök igen."
+    },
+    "heading": "Dina matchningar",
+    "subheading": "Rangordnade efter hur väl varje bostad passar de prioriteringar du delat, högst till lägst.",
+    "conflictsTitle": "Värt att känna till innan du jämför"
+  },
+  "matchScore": {
+    "strong": "Stark matchning",
+    "partial": "Delvis matchning",
+    "weak": "Svag matchning",
+    "ariaLabel": "Matchningspoäng {score} av 100, {tier}"
+  },
+  "propertyCard": {
+    "price": "Pris",
+    "bedroomsSr": "Sovrum",
+    "bathroomsSr": "Badrum",
+    "sqftSr": "Boarea",
+    "bed": "sovrum",
+    "bath": "badrum",
+    "sqft": "kvadratfot",
+    "whyItFits": "Varför den passar",
+    "risks": "Risker",
+    "compromises": "Kompromisser"
+  }
+}

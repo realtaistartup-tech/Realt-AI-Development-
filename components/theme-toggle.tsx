@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 const THEME_SEQUENCE = ["light", "dark", "system"] as const;
@@ -15,6 +16,7 @@ const THEME_ICON = {
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const t = useTranslations("theme");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -36,7 +38,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       onClick={cycleTheme}
-      aria-label={`Switch theme, currently ${current}`}
+      aria-label={t("switchLabel", { theme: t(current) })}
     >
       <Icon className="h-4 w-4" aria-hidden="true" />
     </Button>

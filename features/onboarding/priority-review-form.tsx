@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import { useTranslations } from "next-intl";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,21 +10,7 @@ import { cn } from "@/lib/utils";
 import { PRIORITY_CATEGORIES, type CommuteMode, type UserPriorities } from "@/types";
 import { TagListEditor } from "./tag-list-editor";
 
-const CATEGORY_LABELS: Record<(typeof PRIORITY_CATEGORIES)[number], string> = {
-  budget: "Budget",
-  commute: "Commute",
-  space: "Space",
-  safety: "Safety",
-  schools: "Schools",
-  lifestyle: "Lifestyle",
-};
-
-const COMMUTE_MODES: { value: CommuteMode; label: string }[] = [
-  { value: "drive", label: "Driving" },
-  { value: "transit", label: "Public transit" },
-  { value: "walk", label: "Walking" },
-  { value: "bike", label: "Biking" },
-];
+const COMMUTE_MODES: CommuteMode[] = ["drive", "transit", "walk", "bike"];
 
 interface PriorityReviewFormProps {
   priorities: UserPriorities;
@@ -31,6 +18,7 @@ interface PriorityReviewFormProps {
 }
 
 export function PriorityReviewForm({ priorities, onChange }: PriorityReviewFormProps) {
+  const t = useTranslations("onboarding.fields");
   const budgetMinId = useId();
   const budgetMaxId = useId();
   const commuteMinutesId = useId();
@@ -53,10 +41,10 @@ export function PriorityReviewForm({ priorities, onChange }: PriorityReviewFormP
   return (
     <div className="space-y-8">
       <fieldset className="space-y-4">
-        <legend className="text-sm font-semibold">Budget</legend>
+        <legend className="text-sm font-semibold">{t("budget.legend")}</legend>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor={budgetMinId}>Minimum</Label>
+            <Label htmlFor={budgetMinId}>{t("budget.min")}</Label>
             <Input
               id={budgetMinId}
               type="number"
@@ -67,7 +55,7 @@ export function PriorityReviewForm({ priorities, onChange }: PriorityReviewFormP
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor={budgetMaxId}>Maximum</Label>
+            <Label htmlFor={budgetMaxId}>{t("budget.max")}</Label>
             <Input
               id={budgetMaxId}
               type="number"
@@ -81,10 +69,10 @@ export function PriorityReviewForm({ priorities, onChange }: PriorityReviewFormP
       </fieldset>
 
       <fieldset className="space-y-4">
-        <legend className="text-sm font-semibold">Commute</legend>
+        <legend className="text-sm font-semibold">{t("commute.legend")}</legend>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor={commuteMinutesId}>Maximum commute (minutes)</Label>
+            <Label htmlFor={commuteMinutesId}>{t("commute.maxMinutes")}</Label>
             <Input
               id={commuteMinutesId}
               type="number"
@@ -95,7 +83,7 @@ export function PriorityReviewForm({ priorities, onChange }: PriorityReviewFormP
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="commute-mode">Mode</Label>
+            <Label htmlFor="commute-mode">{t("commute.mode")}</Label>
             <Select
               value={priorities.commuteMode}
               onValueChange={(value) => update("commuteMode", value as CommuteMode)}
@@ -105,8 +93,8 @@ export function PriorityReviewForm({ priorities, onChange }: PriorityReviewFormP
               </SelectTrigger>
               <SelectContent>
                 {COMMUTE_MODES.map((mode) => (
-                  <SelectItem key={mode.value} value={mode.value}>
-                    {mode.label}
+                  <SelectItem key={mode} value={mode}>
+                    {t(`commute.modes.${mode}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -116,10 +104,10 @@ export function PriorityReviewForm({ priorities, onChange }: PriorityReviewFormP
       </fieldset>
 
       <fieldset className="space-y-4">
-        <legend className="text-sm font-semibold">Space</legend>
+        <legend className="text-sm font-semibold">{t("space.legend")}</legend>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor={bedroomsId}>Minimum bedrooms</Label>
+            <Label htmlFor={bedroomsId}>{t("space.bedrooms")}</Label>
             <Input
               id={bedroomsId}
               type="number"
@@ -130,7 +118,7 @@ export function PriorityReviewForm({ priorities, onChange }: PriorityReviewFormP
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor={bathroomsId}>Minimum bathrooms</Label>
+            <Label htmlFor={bathroomsId}>{t("space.bathrooms")}</Label>
             <Input
               id={bathroomsId}
               type="number"
@@ -145,41 +133,42 @@ export function PriorityReviewForm({ priorities, onChange }: PriorityReviewFormP
       </fieldset>
 
       <TagListEditor
-        label="Must-haves"
-        description="Amenities the home absolutely needs."
+        label={t("mustHaves.label")}
+        description={t("mustHaves.description")}
         values={priorities.mustHaves}
         onChange={(values) => update("mustHaves", values)}
-        placeholder="e.g. parking"
+        placeholder={t("mustHaves.placeholder")}
       />
 
       <TagListEditor
-        label="Deal-breakers"
-        description="Anything that would rule a property out."
+        label={t("dealBreakers.label")}
+        description={t("dealBreakers.description")}
         values={priorities.dealBreakers}
         onChange={(values) => update("dealBreakers", values)}
-        placeholder="e.g. no elevator"
+        placeholder={t("dealBreakers.placeholder")}
       />
 
       <TagListEditor
-        label="Lifestyle"
-        description="How you want the neighborhood to feel."
+        label={t("lifestyle.label")}
+        description={t("lifestyle.description")}
         values={priorities.lifestyleTags}
         onChange={(values) => update("lifestyleTags", values)}
-        placeholder="e.g. walkable"
+        placeholder={t("lifestyle.placeholder")}
       />
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-semibold">How important is each factor?</legend>
+        <legend className="text-sm font-semibold">{t("importance.legend")}</legend>
         <div className="space-y-3">
           {PRIORITY_CATEGORIES.map((category) => {
             const weight = priorities.weights.find((w) => w.category === category);
             const importance = weight?.importance ?? 3;
+            const categoryLabel = t(`categories.${category}`);
             return (
               <div key={category} className="flex items-center justify-between gap-4">
-                <span className="text-sm text-foreground">{CATEGORY_LABELS[category]}</span>
+                <span className="text-sm text-foreground">{categoryLabel}</span>
                 <div
                   role="radiogroup"
-                  aria-label={`${CATEGORY_LABELS[category]} importance`}
+                  aria-label={categoryLabel}
                   className="flex gap-1"
                 >
                   {[1, 2, 3, 4, 5].map((level) => (
@@ -188,7 +177,7 @@ export function PriorityReviewForm({ priorities, onChange }: PriorityReviewFormP
                       type="button"
                       role="radio"
                       aria-checked={importance === level}
-                      aria-label={`${level} of 5`}
+                      aria-label={t("importance.levelLabel", { level })}
                       onClick={() => updateImportance(category, level)}
                       className={cn(
                         "h-7 w-7 rounded-full border border-input text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",

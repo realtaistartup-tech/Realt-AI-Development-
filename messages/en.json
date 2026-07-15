@@ -1,0 +1,176 @@
+{
+  "metadata": {
+    "siteName": "Realt AI",
+    "title": "Realt AI — Make better housing decisions",
+    "description": "Realt AI is an intelligent decision assistant that helps you understand your priorities, weigh trade-offs, and confidently choose the right home."
+  },
+  "common": {
+    "skipToContent": "Skip to main content",
+    "brand": "Realt AI"
+  },
+  "nav": {
+    "primary": "Main navigation",
+    "findMyHome": "Find my home"
+  },
+  "footer": {
+    "tagline": "Realt AI helps you understand your priorities before you look at properties.",
+    "copyright": "© {year} Realt AI. All rights reserved."
+  },
+  "theme": {
+    "light": "light",
+    "dark": "dark",
+    "system": "system",
+    "switchLabel": "Switch theme, currently {theme}"
+  },
+  "locale": {
+    "label": "Language",
+    "sv": "Svenska",
+    "en": "English"
+  },
+  "home": {
+    "badge": "An AI-first decision assistant",
+    "heading": "People don't buy apartments. People buy a future life.",
+    "subheading": "Realt AI helps you understand what actually matters to you, weighs the trade-offs honestly, and explains every recommendation — so you can choose a home with confidence, not guesswork.",
+    "ctaPrimary": "Start understanding my priorities",
+    "howItWorks": {
+      "heading": "The Realt Thinking Framework",
+      "subheading": "The same reasoning process behind every recommendation Realt AI makes.",
+      "steps": {
+        "understand": {
+          "title": "Understand your goals",
+          "description": "Tell Realt AI what matters to you in plain language — budget, commute, space, safety, schools, lifestyle."
+        },
+        "tradeoffs": {
+          "title": "See the trade-offs",
+          "description": "Realt AI flags conflicts between your priorities honestly, instead of pretending every box can be checked."
+        },
+        "match": {
+          "title": "Get a transparent match",
+          "description": "Every property comes with an explainable score — you always see exactly why it fits, or why it doesn't."
+        },
+        "decide": {
+          "title": "Decide with confidence",
+          "description": "Compromises and risks are called out up front, so you choose a home knowingly, not by accident."
+        }
+      }
+    },
+    "finalCta": {
+      "heading": "Ready to think through your next home?",
+      "subheading": "It takes a few minutes to describe what matters to you. No account required.",
+      "button": "Get started"
+    }
+  },
+  "onboarding": {
+    "metaTitle": "Tell us what you're looking for",
+    "metaDescription": "Describe your priorities so Realt AI can understand what matters to you.",
+    "stepLabel": "Step {step} of 2",
+    "describe": {
+      "heading": "Tell us what you're looking for",
+      "description": "Describe your ideal home in your own words. Include what matters most — budget, commute, space, safety, schools, or lifestyle.",
+      "label": "Your priorities",
+      "placeholder": "We're a family of four looking for a 3-4 bedroom home under $600,000, ideally a 30 minute drive or less to downtown, in a quiet, family-friendly neighborhood with good schools. A backyard would be great, and we'd rule out anything without off-street parking.",
+      "hint": "Realt AI only uses what you write here — it won't invent details you didn't mention.",
+      "submit": "Continue",
+      "submitting": "Understanding your priorities…"
+    },
+    "review": {
+      "heading": "Review your priorities",
+      "description": "Here's what Realt AI understood. Adjust anything before we look for matches.",
+      "offlineTitle": "Running in offline mode",
+      "offlineDescription": "No AI model is configured, so priorities were extracted with a simpler, rule-based reader. Review the fields below carefully.",
+      "back": "Back",
+      "confirm": "See my matches"
+    },
+    "errors": {
+      "generic": "Something went wrong."
+    },
+    "fields": {
+      "budget": {
+        "legend": "Budget",
+        "min": "Minimum",
+        "max": "Maximum"
+      },
+      "commute": {
+        "legend": "Commute",
+        "maxMinutes": "Maximum commute (minutes)",
+        "mode": "Mode",
+        "modes": {
+          "drive": "Driving",
+          "transit": "Public transit",
+          "walk": "Walking",
+          "bike": "Biking"
+        }
+      },
+      "space": {
+        "legend": "Space",
+        "bedrooms": "Minimum bedrooms",
+        "bathrooms": "Minimum bathrooms"
+      },
+      "mustHaves": {
+        "label": "Must-haves",
+        "description": "Amenities the home absolutely needs.",
+        "placeholder": "e.g. parking"
+      },
+      "dealBreakers": {
+        "label": "Deal-breakers",
+        "description": "Anything that would rule a property out.",
+        "placeholder": "e.g. no elevator"
+      },
+      "lifestyle": {
+        "label": "Lifestyle",
+        "description": "How you want the neighborhood to feel.",
+        "placeholder": "e.g. walkable"
+      },
+      "importance": {
+        "legend": "How important is each factor?",
+        "levelLabel": "{level} of 5"
+      },
+      "categories": {
+        "budget": "Budget",
+        "commute": "Commute",
+        "space": "Space",
+        "safety": "Safety",
+        "schools": "Schools",
+        "lifestyle": "Lifestyle"
+      }
+    },
+    "tags": {
+      "remove": "Remove {tag}",
+      "selected": "{label} selected"
+    }
+  },
+  "recommendations": {
+    "metaTitle": "Your matches",
+    "metaDescription": "Properties matched and explained against your stated priorities.",
+    "loading": "Finding your matches…",
+    "missing": {
+      "heading": "Let's start with your priorities first",
+      "description": "We don't have your priorities yet for this session.",
+      "cta": "Tell us what you're looking for"
+    },
+    "error": {
+      "generic": "Could not load recommendations. Please try again."
+    },
+    "heading": "Your matches",
+    "subheading": "Ranked by how well each property fits the priorities you shared, most to least.",
+    "conflictsTitle": "Worth knowing before you compare"
+  },
+  "matchScore": {
+    "strong": "Strong match",
+    "partial": "Partial match",
+    "weak": "Weak match",
+    "ariaLabel": "Match score {score} out of 100, {tier}"
+  },
+  "propertyCard": {
+    "price": "Price",
+    "bedroomsSr": "Bedrooms",
+    "bathroomsSr": "Bathrooms",
+    "sqftSr": "Square footage",
+    "bed": "bed",
+    "bath": "bath",
+    "sqft": "sqft",
+    "whyItFits": "Why it fits",
+    "risks": "Risks",
+    "compromises": "Compromises"
+  }
+}

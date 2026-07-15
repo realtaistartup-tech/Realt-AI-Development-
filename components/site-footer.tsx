@@ -1,9 +1,13 @@
+import { useTranslations } from "next-intl";
+
 export function SiteFooter() {
+  const t = useTranslations("footer");
+
   return (
     <footer className="border-t border-border">
       <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-muted-foreground sm:px-6">
-        <p>Realt AI helps you understand your priorities before you look at properties.</p>
-        <p className="mt-1">© {new Date().getFullYear()} Realt AI. All rights reserved.</p>
+        <p>{t("tagline")}</p>
+        <p className="mt-1">{t("copyright", { year: new Date().getFullYear() })}</p>
       </div>
     </footer>
   );

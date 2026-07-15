@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AlertTriangle, Loader2 } from "lucide-react";
 
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { loadPriorities } from "@/hooks/use-priorities-store";
@@ -17,6 +18,7 @@ type LoadState =
   | { status: "ready"; results: MatchResult[]; conflicts: PriorityConflict[] };
 
 export function RecommendationsList() {
+  const t = useTranslations("recommendations");
   const [state, setState] = useState<LoadState>({ status: "loading" });
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export function RecommendationsList() {
           body: JSON.stringify({ priorities }),
         });
         if (!response.ok) {
-          throw new Error("Could not load recommendations. Please try again.");
+          throw new Error(t("error.generic"));
         }
         const data = (await response.json()) as {
           results: MatchResult[];
@@ -49,7 +51,7 @@ export function RecommendationsList() {
         if (!cancelled) {
           setState({
             status: "error",
-            message: err instanceof Error ? err.message : "Something went wrong.",
+            message: err instanceof Error ? err.message : t("error.generic"),
           });
         }
       }
@@ -59,13 +61,14 @@ export function RecommendationsList() {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (state.status === "loading") {
     return (
       <div className="flex flex-col items-center gap-3 py-24 text-muted-foreground">
         <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
-        <p>Finding your matches…</p>
+        <p>{t("loading")}</p>
       </div>
     );
   }
@@ -73,12 +76,10 @@ export function RecommendationsList() {
   if (state.status === "missing-priorities") {
     return (
       <div className="mx-auto max-w-lg py-24 text-center">
-        <h1 className="text-xl font-semibold">Let&apos;s start with your priorities first</h1>
-        <p className="mt-2 text-muted-foreground">
-          We don&apos;t have your priorities yet for this session.
-        </p>
+        <h1 className="text-xl font-semibold">{t("missing.heading")}</h1>
+        <p className="mt-2 text-muted-foreground">{t("missing.description")}</p>
         <Button asChild className="mt-6">
-          <Link href="/onboarding">Tell us what you&apos;re looking for</Link>
+          <Link href="/onboarding">{t("missing.cta")}</Link>
         </Button>
       </div>
     );
@@ -99,10 +100,8 @@ export function RecommendationsList() {
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-16 sm:px-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Your matches</h1>
-        <p className="mt-2 text-muted-foreground">
-          Ranked by how well each property fits the priorities you shared, most to least.
-        </p>
+        <h1 className="text-2xl font-semibold tracking-tight">{t("heading")}</h1>
+        <p className="mt-2 text-muted-foreground">{t("subheading")}</p>
       </div>
 
       {conflicts.length > 0 && (
@@ -110,7 +109,7 @@ export function RecommendationsList() {
           <CardHeader className="flex-row items-start gap-3 space-y-0">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
             <div className="space-y-1">
-              <CardTitle className="text-sm">Worth knowing before you compare</CardTitle>
+              <CardTitle className="text-sm">{t("conflictsTitle")}</CardTitle>
               {conflicts.map((conflict) => (
                 <CardDescription key={conflict.description}>
                   {conflict.description}

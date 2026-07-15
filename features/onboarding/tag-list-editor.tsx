@@ -2,6 +2,7 @@
 
 import { useId, useState, type KeyboardEvent } from "react";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ export function TagListEditor({
   placeholder,
   maxItems = 10,
 }: TagListEditorProps) {
+  const t = useTranslations("onboarding.tags");
   const [draft, setDraft] = useState("");
   const inputId = useId();
   const descriptionId = useId();
@@ -69,7 +71,7 @@ export function TagListEditor({
         disabled={values.length >= maxItems}
       />
       {values.length > 0 && (
-        <ul className="flex flex-wrap gap-2" aria-label={`${label} selected`}>
+        <ul className="flex flex-wrap gap-2" aria-label={t("selected", { label })}>
           {values.map((tag) => (
             <li key={tag}>
               <Badge variant="secondary" className="gap-1 pr-1">
@@ -77,7 +79,7 @@ export function TagListEditor({
                 <button
                   type="button"
                   onClick={() => removeTag(tag)}
-                  aria-label={`Remove ${tag}`}
+                  aria-label={t("remove", { tag })}
                   className="rounded-full p-0.5 hover:bg-background/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <X className="h-3 w-3" aria-hidden="true" />

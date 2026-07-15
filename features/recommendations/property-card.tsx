@@ -1,4 +1,5 @@
 import { Bed, Bath, Ruler, MapPin, CheckCircle2, AlertTriangle, HandCoins, Home } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import type { MatchResult } from "@/types";
@@ -9,6 +10,7 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ result }: PropertyCardProps) {
+  const t = useTranslations("propertyCard");
   const { property, score, summary, strengths, concerns, compromises, excluded, exclusionReason } = result;
 
   return (
@@ -34,23 +36,29 @@ export function PropertyCard({ result }: PropertyCardProps) {
       <CardContent className="space-y-5">
         <dl className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-1.5">
-            <dt className="sr-only">Price</dt>
+            <dt className="sr-only">{t("price")}</dt>
             <dd className="font-medium text-foreground">${property.price.toLocaleString()}</dd>
           </div>
           <div className="flex items-center gap-1.5">
             <Bed className="h-4 w-4" aria-hidden="true" />
-            <dt className="sr-only">Bedrooms</dt>
-            <dd>{property.bedrooms} bed</dd>
+            <dt className="sr-only">{t("bedroomsSr")}</dt>
+            <dd>
+              {property.bedrooms} {t("bed")}
+            </dd>
           </div>
           <div className="flex items-center gap-1.5">
             <Bath className="h-4 w-4" aria-hidden="true" />
-            <dt className="sr-only">Bathrooms</dt>
-            <dd>{property.bathrooms} bath</dd>
+            <dt className="sr-only">{t("bathroomsSr")}</dt>
+            <dd>
+              {property.bathrooms} {t("bath")}
+            </dd>
           </div>
           <div className="flex items-center gap-1.5">
             <Ruler className="h-4 w-4" aria-hidden="true" />
-            <dt className="sr-only">Square footage</dt>
-            <dd>{property.sqft.toLocaleString()} sqft</dd>
+            <dt className="sr-only">{t("sqftSr")}</dt>
+            <dd>
+              {property.sqft.toLocaleString()} {t("sqft")}
+            </dd>
           </div>
         </dl>
 
@@ -67,7 +75,7 @@ export function PropertyCard({ result }: PropertyCardProps) {
               <div>
                 <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-success">
                   <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
-                  Why it fits
+                  {t("whyItFits")}
                 </h3>
                 <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                   {strengths.map((item) => (
@@ -80,7 +88,7 @@ export function PropertyCard({ result }: PropertyCardProps) {
               <div>
                 <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-destructive">
                   <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
-                  Risks
+                  {t("risks")}
                 </h3>
                 <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                   {concerns.map((item) => (
@@ -93,7 +101,7 @@ export function PropertyCard({ result }: PropertyCardProps) {
               <div>
                 <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-warning">
                   <HandCoins className="h-3.5 w-3.5" aria-hidden="true" />
-                  Compromises
+                  {t("compromises")}
                 </h3>
                 <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                   {compromises.map((item) => (
