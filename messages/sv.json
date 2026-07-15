@@ -167,10 +167,9 @@
     "price": "Pris",
     "bedroomsSr": "Sovrum",
     "bathroomsSr": "Badrum",
-    "sqftSr": "Boarea",
+    "areaSr": "Boarea",
     "bed": "sovrum",
     "bath": "badrum",
-    "sqft": "kvadratfot",
     "whyItFits": "Varför den passar",
     "risks": "Risker",
     "compromises": "Kompromisser"

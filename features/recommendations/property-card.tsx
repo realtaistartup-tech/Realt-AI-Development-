@@ -2,6 +2,7 @@ import { Bed, Bath, Ruler, MapPin, CheckCircle2, AlertTriangle, HandCoins, Home 
 import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { formatArea, formatPrice } from "@/lib/format";
 import type { MatchResult } from "@/types";
 import { MatchScoreBadge } from "./match-score-badge";
 
@@ -37,7 +38,7 @@ export function PropertyCard({ result }: PropertyCardProps) {
         <dl className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-1.5">
             <dt className="sr-only">{t("price")}</dt>
-            <dd className="font-medium text-foreground">${property.price.toLocaleString()}</dd>
+            <dd className="font-medium text-foreground">{formatPrice(property.price)}</dd>
           </div>
           <div className="flex items-center gap-1.5">
             <Bed className="h-4 w-4" aria-hidden="true" />
@@ -55,10 +56,8 @@ export function PropertyCard({ result }: PropertyCardProps) {
           </div>
           <div className="flex items-center gap-1.5">
             <Ruler className="h-4 w-4" aria-hidden="true" />
-            <dt className="sr-only">{t("sqftSr")}</dt>
-            <dd>
-              {property.sqft.toLocaleString()} {t("sqft")}
-            </dd>
+            <dt className="sr-only">{t("areaSr")}</dt>
+            <dd>{formatArea(property.areaSqm)}</dd>
           </div>
         </dl>
 

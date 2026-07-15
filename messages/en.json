@@ -167,10 +167,9 @@
     "price": "Price",
     "bedroomsSr": "Bedrooms",
     "bathroomsSr": "Bathrooms",
-    "sqftSr": "Square footage",
+    "areaSr": "Area",
     "bed": "bed",
     "bath": "bath",
-    "sqft": "sqft",
     "whyItFits": "Why it fits",
     "risks": "Risks",
     "compromises": "Compromises"

@@ -35,7 +35,7 @@ function makeProperty(overrides: Partial<Property> = {}): Property {
     price: 400_000,
     bedrooms: 3,
     bathrooms: 2,
-    sqft: 1200,
+    areaSqm: 110,
     commuteMinutesByMode: { drive: 20 },
     amenities: ["parking", "dishwasher"],
     lifestyleTags: ["quiet"],

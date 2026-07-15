@@ -25,7 +25,7 @@ Three things are already true of the current build (landing page, AI-first onboa
 | 5 | Persistence layer (Supabase: priorities + properties) | L | **MVP** | Supabase project + credentials from you | Blocked — needs your input |
 | 6 | Anonymous session persistence (cookie-based, no login) | M | **MVP** | #5 | Blocked (depends on #5) |
 | 7 | Error monitoring / observability (e.g. Sentry) | S–M | **MVP** | Monitoring account + DSN from you | Blocked — needs your input |
-| 8 | Real property data source (replace 6 mock listings) | XL | **MVP** | #5, and a business decision on data vendor | Blocked — needs your decision |
+| 8 | Real property data source (replace mock listings) | XL | **MVP** | #5, and a business decision on data vendor | Blocked on the vendor decision — but the mock data was upgraded to 8 realistic Swedish-market listings (real neighborhoods, SEK, m²) so the product is at least internally coherent for its actual market while this is pending |
 | 9 | Deployment to Vercel (real public URL) | S (config) | **MVP** | Vercel account, ideally #3 | Blocked — needs your input |
 | 10 | Full user accounts (signup/login, multi-device sync) | L | **V2** | #5 | Deferred |
 | 11 | Saved searches / revisit past sessions / comparison view | M | **V2** | #5, #10 | Deferred |

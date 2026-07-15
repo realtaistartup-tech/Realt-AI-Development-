@@ -5,10 +5,12 @@ export interface Property {
   title: string;
   address: string;
   city: string;
+  /** SEK */
   price: number;
   bedrooms: number;
   bathrooms: number;
-  sqft: number;
+  /** Square meters */
+  areaSqm: number;
   commuteMinutesByMode: Partial<Record<CommuteMode, number>>;
   amenities: string[];
   lifestyleTags: string[];

@@ -6,6 +6,7 @@ import type {
   UserPriorities,
 } from "@/types";
 import { DEFAULT_IMPORTANCE } from "@/types";
+import { formatArea, formatPrice } from "@/lib/format";
 
 function getImportance(priorities: UserPriorities, category: string): number {
   const weight = priorities.weights.find((w) => w.category === category);
@@ -75,15 +76,15 @@ function scoreBudget(property: Property, priorities: UserPriorities): MatchFacto
   if (price >= budgetMin && price <= budgetMax) {
     const headroom = (budgetMax - price) / Math.max(budgetMax - budgetMin, 1);
     score = clampScore(80 + headroom * 20);
-    explanation = `Priced at $${price.toLocaleString()}, within your $${budgetMin.toLocaleString()}-$${budgetMax.toLocaleString()} range.`;
+    explanation = `Priced at ${formatPrice(price)}, within your ${formatPrice(budgetMin)}–${formatPrice(budgetMax)} range.`;
   } else if (price > budgetMax) {
     const overBy = price - budgetMax;
     const overPct = overBy / budgetMax;
     score = clampScore(60 - overPct * 200);
-    explanation = `Priced at $${price.toLocaleString()}, which is $${overBy.toLocaleString()} (${Math.round(overPct * 100)}%) over your maximum budget.`;
+    explanation = `Priced at ${formatPrice(price)}, which is ${formatPrice(overBy)} (${Math.round(overPct * 100)}%) over your maximum budget.`;
   } else {
     score = 90;
-    explanation = `Priced at $${price.toLocaleString()}, below your minimum — worth confirming this isn't a quality trade-off.`;
+    explanation = `Priced at ${formatPrice(price)}, below your minimum — worth confirming this isn't a quality trade-off.`;
   }
 
   return {
@@ -154,7 +155,7 @@ function scoreSpace(property: Property, priorities: UserPriorities): MatchFactor
     explanation:
       notes.length > 0
         ? `Falls short on space: ${notes.join(", ")}.`
-        : `${property.bedrooms} bed / ${property.bathrooms} bath / ${property.sqft.toLocaleString()} sqft meets your space needs.`,
+        : `${property.bedrooms} bed / ${property.bathrooms} bath / ${formatArea(property.areaSqm)} meets your space needs.`,
     isRisk: notes.length > 0,
   };
 }
