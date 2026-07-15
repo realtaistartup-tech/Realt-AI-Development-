@@ -8,7 +8,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? "dot" : "list",
+  reporter: process.env.CI ? [["dot"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL: BASE_URL,
     trace: "retain-on-failure",
@@ -20,7 +20,11 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         launchOptions: {
-          executablePath: "/opt/pw-browsers/chromium",
+          // This sandboxed dev environment pre-installs Chromium outside
+          // Playwright's normal cache location; CI (and any other machine)
+          // installs it the standard way via `playwright install`, so only
+          // override the executable path here, never in CI.
+          executablePath: process.env.CI ? undefined : "/opt/pw-browsers/chromium",
         },
       },
     },
