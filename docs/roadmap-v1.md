@@ -22,7 +22,7 @@ Three things are already true of the current build (landing page, AI-first onboa
 | 2 | Legal & compliance pages (privacy policy, terms, cookie notice) | S (scaffold) | **MVP** | none (content needs human legal review) | **Done** (draft — needs legal review) |
 | 3 | CI pipeline (lint/typecheck/test/build on every change) | S | **MVP** | GitHub push access | **Authored, not active** — ready the moment push access exists |
 | 4 | Pluggable rate limiting (interface + shared-store-ready) | M | **MVP** | Full effect needs Redis credentials | **Done** — runs in-memory today, upgrades itself automatically once `UPSTASH_REDIS_REST_URL`/`TOKEN` are set |
-| 5 | Persistence layer (accounts, saved searches, properties) | L | **MVP** | Real durability needs a Supabase project + credentials from you | **Mocked** — repository interfaces + in-memory implementations built (`services/persistence/`); functionally works today, not durable across restarts/instances yet |
+| 5 | Persistence layer (accounts, saved searches) | L | **MVP** | Your Supabase project (connected) | **Built** — real `SupabaseAccountRepository`/`SupabaseSavedSearchRepository` (`services/persistence/supabase/`), migration in `supabase/migrations/0001_init.sql`. Activates automatically once `SUPABASE_URL`/`SUPABASE_SECRET_KEY` are set. **Not yet live-verified** — this session's network policy blocks `supabase.co`; see `docs/supabase-setup.md` for the verification steps you run locally |
 | 6 | Authentication (sign-in, tied to persistence) | M | **MVP** | Real verification needs Supabase Auth (or similar) from you | **Mocked** — email-only passwordless sign-in, no real verification (`app/api/auth/*`); same UX shape a real magic-link/OTP flow would have |
 | 7 | Error monitoring / observability (e.g. Sentry) | S–M | **MVP** | Monitoring account + DSN from you | Blocked — needs your input |
 | 8 | Real property data source (replace mock listings) | XL | **MVP** | Real persistence, and a business decision on data vendor | Blocked on the vendor decision — but the mock data was upgraded to 8 realistic Swedish-market listings (real neighborhoods, SEK, m²) so the product is at least internally coherent for its actual market while this is pending |
@@ -61,14 +61,12 @@ below.
 
 ## 4. What's still actually blocked on you
 
-Only three things now require external input before they can move:
-
-- **Real durability for accounts/searches** — a Supabase project + credentials, to replace the in-memory mock repositories in `services/persistence/`.
-- **Real property data** — a business decision on a Swedish listings data source/vendor.
-- **Observability and deployment** — a monitoring account (Sentry or similar) and Vercel/GitHub access.
+- **Live verification of the Supabase integration** — the code is written and unit-tested against a mocked client, but this session's network policy blocks `supabase.co`, so the live connection has never actually been exercised. You're doing this yourself (per your instruction) — see `docs/supabase-setup.md`.
+- **Real property data** — a business decision on a Swedish listings data source/vendor. Explicitly deferred for now (continue on mock data) per your instruction.
+- **Observability and deployment** — skipped for now per your instruction (Sentry, Vercel/GitHub deploy).
 
 Everything else that was on the "blocked" list has either shipped or been
-unblocked by mocking it — see below.
+unblocked by mocking/building it — see below.
 
 ---
 

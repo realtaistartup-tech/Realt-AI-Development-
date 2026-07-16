@@ -10,14 +10,18 @@ mission, principles, and standards this codebase is held to.
 
 ## Current status
 
-This is a pre-launch build. It runs against six illustrative mock properties, not real listings,
-and has no persistent database yet. See:
+This is a pre-launch build. It runs against 8 illustrative Swedish-market mock properties, not
+real listings. Accounts and saved searches work for real (Supabase-backed) once configured — see
+[`docs/supabase-setup.md`](./docs/supabase-setup.md) — and fall back to in-memory mocks otherwise.
+See:
 
 - [`docs/roadmap-v1.md`](./docs/roadmap-v1.md) — what's left before a real V1.0 launch, in
-  priority order, and what's blocked on external input (a Supabase project, a monitoring account,
-  a real property data source, deployment access).
+  priority order, and what's still blocked on external input (a real property data source,
+  monitoring, deployment access).
 - [`docs/architecture.md`](./docs/architecture.md) — how the app is built and why, including
   known limitations stated plainly rather than hidden.
+- [`docs/supabase-setup.md`](./docs/supabase-setup.md) — how to connect a real Supabase project
+  (migration + environment variables) for durable accounts/saved searches.
 - [`docs/engineering-report.md`](./docs/engineering-report.md) — a full accounting of the initial
   build: what's production-ready, what's a placeholder, and why.
 
@@ -25,8 +29,9 @@ and has no persistent database yet. See:
 
 Next.js 15 (App Router) · React 19 · TypeScript (strict) · Tailwind CSS · hand-authored
 shadcn/ui-style components on Radix primitives · next-intl (Swedish + English) · next-themes
-(light/dark/system) · Zod validation · Vitest (unit) · Playwright + axe-core (E2E and
-accessibility) · OpenAI Responses API (optional, with a deterministic offline fallback).
+(light/dark/system) · Zod validation · Supabase (accounts + saved searches, optional — falls back
+to in-memory mocks) · Vitest (unit) · Playwright + axe-core (E2E and accessibility) · OpenAI
+Responses API (optional, with a deterministic offline fallback).
 
 ## Getting started
 

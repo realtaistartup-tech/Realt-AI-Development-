@@ -117,30 +117,45 @@ priorities (`services/ai/priority-extraction.ts`). Even there:
 
 ## Data layer, accounts, and saved searches
 
-There is no real database yet, but rather than let that block product work,
 `services/persistence/` defines the data layer as three repository
 interfaces — `AccountRepository`, `SavedSearchRepository`,
-`PropertyRepository` — each currently backed by an in-memory mock
-implementation (`services/persistence/mock/`), selected by
-`getAccountRepository()` / `getSavedSearchRepository()` /
-`getPropertyRepository()`. Every caller goes through the interface, so
-connecting a real Supabase project later means writing three new classes
-that implement the same interfaces and swapping them in at those three call
-sites — the scoring engine, the UI, and every route handler are unaffected.
+`PropertyRepository` — selected by `getAccountRepository()` /
+`getSavedSearchRepository()` / `getPropertyRepository()`. Every caller goes
+through the interface, never a concrete implementation directly.
+
+**Accounts and saved searches now have two implementations each:**
+in-memory mocks (`services/persistence/mock/`) and real Supabase-backed
+ones (`services/persistence/supabase/`, `SupabaseAccountRepository` /
+`SupabaseSavedSearchRepository`, using `@supabase/supabase-js` with the
+server-only secret key). The factory in `services/persistence/index.ts`
+picks Supabase automatically the moment `SUPABASE_URL` and
+`SUPABASE_SECRET_KEY` are both set, and falls back to the mocks otherwise
+— no code changes either way. See `docs/supabase-setup.md` for the
+one-time migration (`supabase/migrations/0001_init.sql`) and environment
+variables needed to turn this on.
+
+**`PropertyRepository` deliberately stays mock regardless of Supabase
+configuration.** There's no real Swedish listings source connected yet
+(roadmap item #8), and building a Supabase properties table now would mean
+guessing at a schema for data that doesn't exist — likely wrong once a
+real vendor is chosen. This is the one place the factory doesn't follow
+the "switch automatically" rule, on purpose.
 
 **Mock authentication** (`app/api/auth/*`, `lib/session.ts`,
-`components/account-provider.tsx`) follows the same philosophy. Entering an
-email immediately signs a person in — no password, no email actually sent,
-the account is created on first use via `AccountRepository.findOrCreateByEmail`.
-This is deliberately the same UX shape a real passwordless flow (e.g.
-Supabase Auth's email OTP/magic link) would have, so replacing the mock
-later changes what happens on the server while someone waits, not how they
-sign in. The session itself is a signed cookie (HMAC-SHA256 via
-`SESSION_SECRET`, see `.env.example`) — not full session management
-(no rotation, no revocation), but enough that a client can't simply set
-`realt_session=<any-account-id>` and impersonate another mock account.
+`components/account-provider.tsx`) is a separate axis from persistence and
+is *not* wired to Supabase yet — entering an email still signs someone in
+immediately, no password, no email actually sent, the account created on
+first use via `AccountRepository.findOrCreateByEmail` (which now may write
+to real Supabase, but nothing verifies the email belongs to the person
+typing it). This is deliberately the same UX shape a real passwordless
+flow (e.g. Supabase Auth's email OTP/magic link) would have, so replacing
+it later changes what happens on the server while someone waits, not how
+they sign in. The session itself is a signed cookie (HMAC-SHA256 via
+`SESSION_SECRET`, see `.env.example`) — not full session management (no
+rotation, no revocation), but enough that a client can't simply set
+`realt_session=<any-account-id>` and impersonate another account.
 
-**Saved searches** are the first feature this unblocks:
+**Saved searches** are the product feature this unblocked:
 `SaveSearchButton` on `/recommendations` persists the current priorities
 via `POST /api/saved-searches` for a signed-in account; `/my-searches`
 lists them and lets someone revisit a past search (which replays through
@@ -149,15 +164,24 @@ mechanism needed there) or delete it.
 
 Two things worth being precise about:
 
-1. **This is mock persistence, not durable persistence.** All three mock
-   repositories live in server-process memory. Data does not survive a
-   restart and does not coordinate across multiple instances — the exact
-   same honest limitation as the in-memory rate limiter, for the same
-   reason (nothing is deployed yet).
+1. **Without Supabase configured, this is mock persistence — process
+   memory, not durable.** Data does not survive a restart and does not
+   coordinate across multiple instances. With Supabase configured, this
+   limitation goes away for accounts and saved searches specifically
+   (property data is still mock either way, see above).
 2. **Priorities still also flow through `sessionStorage`**
    (`hooks/use-priorities-store.ts`) for the onboarding → recommendations
    handoff regardless of sign-in state — saved searches are additive, not
    a replacement for that mechanism.
+3. **The Supabase implementations were written without live verification**
+   — the environment they were built in blocks outbound access to
+   `supabase.co` at the network-policy level. They're covered by unit
+   tests against a mocked Supabase client
+   (`tests/unit/supabase-persistence.test.ts`), which verifies the
+   repositories' own logic (mapping, error handling, the unique-violation
+   race-condition fallback on account creation, ownership-checked
+   deletes) but cannot prove the live connection works. See
+   `docs/supabase-setup.md` for how to close that gap.
 
 ## Security
 
