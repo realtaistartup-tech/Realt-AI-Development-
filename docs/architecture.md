@@ -76,9 +76,12 @@ The framework in `CLAUDE.md` maps to real code, not just prose:
 1. **Understand user goals** — `services/ai/priority-extraction.ts` turns
    free text into a structured `UserPriorities` object.
 2. **Detect conflicts** — `detectPriorityConflicts` in
-   `services/matching/score-engine.ts` flags when stated priorities compete
-   with each other (e.g. a critical short commute and a critical tight
-   budget), and the recommendations page surfaces this before the results.
+   `services/matching/conflict-detection.ts` flags when stated priorities
+   compete with each other, and the recommendations page surfaces this
+   before the results. See "Deep conflict detection" below — this is one of
+   the two steps of the framework, but deliberately the most heavily
+   invested-in, since it's the clearest expression of "understand people
+   before properties" from `CLAUDE.md`.
 3. **Rank priorities / 4. Evaluate trade-offs** — `scoreProperty` computes a
    per-category (`budget`, `commute`, `space`, `safety`, `schools`,
    `lifestyle`) score, weighted by the importance the user assigned each
@@ -90,6 +93,54 @@ The framework in `CLAUDE.md` maps to real code, not just prose:
    directly from the same data used to compute the score. Nothing in the
    explanation is generated separately from the number, so the score and its
    explanation can't drift apart.
+
+## Deep conflict detection
+
+`CLAUDE.md` calls out "detect conflicts" as its own step in the Realt
+Thinking Framework, separate from scoring — and `services/matching/
+conflict-detection.ts` treats it as a genuine product surface, not a
+side effect of scoring. It runs *before* any property is scored, purely
+against `UserPriorities`, and looks for two different kinds of problems:
+
+- **Literal contradictions in the structured fields** — a minimum budget
+  above the maximum, 4+ bedrooms demanded alongside a critical budget, a
+  short commute demanded alongside a critical budget. These use the
+  numeric fields (`budgetMin`/`budgetMax`, `commuteMaxMinutes`,
+  `minBedrooms`, `weights`) directly.
+- **Hidden trade-offs in free-text signals** — pets vs. rental
+  restrictions, nature vs. city-center living, nightlife vs. noise
+  sensitivity, working from home vs. a one-bedroom layout, accessibility
+  needs vs. a preference for historic buildings, and others. There is no
+  separate "do you have pets" field in the onboarding form; these are
+  recognized as keyword signals inside `mustHaves`, `dealBreakers`, and
+  `lifestyleTags` — the same open-vocabulary free-text arrays the AI
+  extraction layer (and the manual review form) already write into. A new
+  concept (say, "has a garden preference") is a new keyword set in
+  `conflict-detection.ts`, not a schema migration or an onboarding
+  redesign.
+
+Each detected `PriorityConflict` carries `title`, `description` (why the
+tension exists), `severity` (`low`/`medium`/`high`, an estimate of how
+much it narrows the search or affects long-term satisfaction), and
+`options: ConflictOption[]` — realistic compromises, each with its own
+`longTermConsequence`. `CLAUDE.md` is explicit that Realt AI never
+chooses for the user; this shape is the enforcement of that rule at the
+type level; there's no field for "recommended option," only alternatives
+presented side by side.
+
+Because the heuristic (non-AI) priority extraction path is what actually
+runs in this environment (no OpenAI key configured), `services/ai/
+priority-extraction.ts` was extended alongside this feature to recognize
+the same free-text signals — pets, "work from home", "wheelchair
+accessible", "forever home", "might relocate", "growing family", and so
+on — deterministically, from exact phrase matches only. It never infers a
+signal that wasn't actually written, consistent with the rest of that
+file's "never fabricate" discipline.
+
+`services/matching/priority-helpers.ts` holds the two tiny functions
+(`getImportance`, `clampScore`) shared between the scoring engine and the
+conflict detector, so the two modules don't duplicate them or import from
+each other.
 
 ## Why explanations are template-based, not LLM-generated
 
@@ -244,8 +295,12 @@ covered by two separate, purpose-built suites rather than one.
 **`tests/unit/`** (Vitest) — business logic, no browser involved:
 
 - The scoring engine's budget/commute/space/safety/schools/lifestyle
-  scoring, deal-breaker exclusion, must-have compromise detection, and
-  conflict detection (`score-engine.test.ts`).
+  scoring, deal-breaker exclusion, and must-have compromise detection
+  (`score-engine.test.ts`).
+- The deep conflict-detection engine — all 14 rules, plus a structural
+  test that every conflict returned always has a title, description,
+  severity, and at least one option with a consequence
+  (`conflict-detection.test.ts`).
 - Input validation edge cases (`validation.test.ts`).
 - The deterministic priority-extraction fallback (`priority-extraction.test.ts`).
 

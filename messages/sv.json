@@ -155,7 +155,17 @@
     },
     "heading": "Dina matchningar",
     "subheading": "Rangordnade efter hur väl varje bostad passar de prioriteringar du delat, högst till lägst.",
-    "conflictsTitle": "Värt att känna till innan du jämför"
+    "conflictsTitle": "Värt att känna till innan du jämför",
+    "conflictsSubheading": "Det här är spänningar i det du efterfrågat, inte problem med någon bostad — ett bra beslut börjar oftast med att veta vilket av dessa som faktiskt betyder mest för dig.",
+    "conflict": {
+      "severity": {
+        "low": "Värt att notera",
+        "medium": "Betydande avvägning",
+        "high": "Direkt konflikt"
+      },
+      "optionsToggle": "Se realistiska kompromisser",
+      "consequenceLabel": "Långsiktig konsekvens:"
+    }
   },
   "matchScore": {
     "strong": "Stark matchning",

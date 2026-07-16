@@ -112,10 +112,71 @@ export function extractPrioritiesHeuristically(freeText: string): UserPriorities
     "suburban",
     "nightlife",
     "near-parks",
+    "city-center",
+    "nature",
   ];
   priorities.lifestyleTags = lifestyleKeywords.filter((keyword) =>
     text.includes(keyword.replace("-", " ")),
   );
+
+  // Additional signals used by detectPriorityConflicts to surface hidden
+  // trade-offs (pets vs. rental restrictions, WFH vs. layout, etc.). These
+  // only ever get added when the exact phrase is present in what the person
+  // wrote — never inferred or guessed, consistent with the rest of this
+  // deterministic fallback.
+  if (/\bpets?\b/.test(text) || /\bdogs?\b/.test(text) || /\bcats?\b/.test(text)) {
+    priorities.lifestyleTags.push("pets");
+  }
+  if (
+    text.includes("home office") ||
+    text.includes("work from home") ||
+    text.includes("remote work") ||
+    /\bwfh\b/.test(text)
+  ) {
+    priorities.lifestyleTags.push("home-office");
+  }
+  if (text.includes("wheelchair") || text.includes("step-free") || text.includes("step free") || text.includes("accessib")) {
+    priorities.lifestyleTags.push("accessible");
+  }
+  if (
+    text.includes("historic") ||
+    text.includes("character") ||
+    text.includes("period property") ||
+    text.includes("old building") ||
+    text.includes("pre-war")
+  ) {
+    priorities.lifestyleTags.push("historic-character");
+  }
+  if (
+    text.includes("flexible") ||
+    text.includes("short-term") ||
+    text.includes("short term") ||
+    text.includes("may relocate") ||
+    text.includes("might relocate")
+  ) {
+    priorities.lifestyleTags.push("flexible-tenure");
+  }
+  if (
+    text.includes("forever home") ||
+    text.includes("settle down") ||
+    text.includes("long-term home") ||
+    text.includes("buying")
+  ) {
+    priorities.lifestyleTags.push("long-term-ownership");
+  }
+  if (
+    text.includes("growing family") ||
+    text.includes("planning a family") ||
+    text.includes("more kids") ||
+    text.includes("expecting") ||
+    text.includes("want kids") ||
+    text.includes("future kids")
+  ) {
+    priorities.lifestyleTags.push("family-growth-planned");
+  }
+  if (text.includes("parking") || text.includes("garage")) {
+    priorities.mustHaves.push("parking");
+  }
 
   if (text.includes("school")) {
     priorities.weights = priorities.weights.map((w) =>

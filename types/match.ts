@@ -29,8 +29,25 @@ export interface MatchResult {
   exclusionReason?: string;
 }
 
-export interface PriorityConflict {
-  categories: PriorityCategory[];
+export interface ConflictOption {
+  /** Short name for the compromise, e.g. "Prioritize location" */
+  label: string;
+  /** What choosing this option actually means in practice */
   description: string;
+  /** What this choice costs — or protects — over time if the user picks it */
+  longTermConsequence: string;
+}
+
+export interface PriorityConflict {
+  /** Stable identifier for the specific pattern detected, e.g. "budget-vs-location" */
+  id: string;
+  categories: PriorityCategory[];
+  title: string;
+  /** Why this tension exists, in plain terms */
+  description: string;
+  /** How much this is likely to narrow the search or affect long-term satisfaction */
   severity: "low" | "medium" | "high";
+  /** Realistic ways to resolve the tension, each with its own trade-off —
+   * Realt AI explains the trade-offs, it doesn't choose for the user. */
+  options: ConflictOption[];
 }

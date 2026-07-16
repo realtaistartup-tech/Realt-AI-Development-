@@ -155,7 +155,17 @@
     },
     "heading": "Your matches",
     "subheading": "Ranked by how well each property fits the priorities you shared, most to least.",
-    "conflictsTitle": "Worth knowing before you compare"
+    "conflictsTitle": "Worth knowing before you compare",
+    "conflictsSubheading": "These are tensions in what you asked for, not problems with any listing — a good decision usually starts with knowing which of these actually matters more to you.",
+    "conflict": {
+      "severity": {
+        "low": "Worth noting",
+        "medium": "Significant trade-off",
+        "high": "Direct conflict"
+      },
+      "optionsToggle": "See realistic compromises",
+      "consequenceLabel": "Long-term trade-off:"
+    }
   },
   "matchScore": {
     "strong": "Strong match",

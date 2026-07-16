@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { detectPriorityConflicts, rankProperties, scoreProperty } from "@/services/matching/score-engine";
+import { rankProperties, scoreProperty } from "@/services/matching/score-engine";
 import type { Property, UserPriorities } from "@/types";
 
 function makePriorities(overrides: Partial<UserPriorities> = {}): UserPriorities {
@@ -167,36 +167,5 @@ describe("rankProperties", () => {
       priorities,
     );
     expect(results[results.length - 1].property.id).toBe("excluded");
-  });
-});
-
-describe("detectPriorityConflicts", () => {
-  it("flags an inverted budget range as a high severity conflict", () => {
-    const conflicts = detectPriorityConflicts(
-      makePriorities({ budgetMin: 600_000, budgetMax: 400_000 }),
-    );
-    expect(conflicts.some((c) => c.severity === "high")).toBe(true);
-  });
-
-  it("flags a short commute combined with a strict critical budget", () => {
-    const conflicts = detectPriorityConflicts(
-      makePriorities({
-        commuteMaxMinutes: 10,
-        weights: [
-          { category: "commute", importance: 5 },
-          { category: "budget", importance: 5 },
-          { category: "space", importance: 3 },
-          { category: "safety", importance: 3 },
-          { category: "schools", importance: 3 },
-          { category: "lifestyle", importance: 3 },
-        ],
-      }),
-    );
-    expect(conflicts.some((c) => c.categories.includes("commute"))).toBe(true);
-  });
-
-  it("returns no conflicts for reasonable, non-competing priorities", () => {
-    const conflicts = detectPriorityConflicts(makePriorities());
-    expect(conflicts).toHaveLength(0);
   });
 });

@@ -1,71 +1,9 @@
-import type {
-  MatchFactor,
-  MatchResult,
-  PriorityConflict,
-  Property,
-  UserPriorities,
-} from "@/types";
-import { CRITICAL_IMPORTANCE, DEFAULT_IMPORTANCE } from "@/types";
+import type { MatchFactor, MatchResult, Property, UserPriorities } from "@/types";
+import { CRITICAL_IMPORTANCE } from "@/types";
 import { formatArea, formatPrice } from "@/lib/format";
+import { clampScore, getImportance } from "./priority-helpers";
 
-function getImportance(priorities: UserPriorities, category: string): number {
-  const weight = priorities.weights.find((w) => w.category === category);
-  return weight?.importance ?? DEFAULT_IMPORTANCE;
-}
-
-function clampScore(value: number): number {
-  return Math.max(0, Math.min(100, value));
-}
-
-/**
- * Step 2 of the Realt Thinking Framework: detect conflicts between what the
- * user is asking for so recommendations can be explained honestly instead of
- * silently failing to satisfy every constraint.
- */
-export function detectPriorityConflicts(
-  priorities: UserPriorities,
-): PriorityConflict[] {
-  const conflicts: PriorityConflict[] = [];
-
-  const commuteImportance = getImportance(priorities, "commute");
-  const budgetImportance = getImportance(priorities, "budget");
-  if (
-    priorities.commuteMaxMinutes <= 15 &&
-    commuteImportance >= 4 &&
-    budgetImportance >= 4
-  ) {
-    conflicts.push({
-      categories: ["commute", "budget"],
-      description:
-        "A very short commute and a strict budget both rated as critical often conflict, since properties close to major job centers tend to cost more.",
-      severity: "medium",
-    });
-  }
-
-  const spaceImportance = getImportance(priorities, "space");
-  if (
-    priorities.minBedrooms >= 4 &&
-    budgetImportance >= 4 &&
-    spaceImportance >= 4
-  ) {
-    conflicts.push({
-      categories: ["space", "budget"],
-      description:
-        "Requiring 4+ bedrooms while treating budget as critical narrows the realistic options significantly.",
-      severity: "medium",
-    });
-  }
-
-  if (priorities.budgetMin > priorities.budgetMax) {
-    conflicts.push({
-      categories: ["budget"],
-      description: "The minimum budget entered is higher than the maximum budget.",
-      severity: "high",
-    });
-  }
-
-  return conflicts;
-}
+export { detectPriorityConflicts } from "./conflict-detection";
 
 function scoreBudget(property: Property, priorities: UserPriorities): MatchFactor {
   const { price } = property;

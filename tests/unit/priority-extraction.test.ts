@@ -29,4 +29,27 @@ describe("extractPrioritiesHeuristically", () => {
     const priorities = extractPrioritiesHeuristically("We need a 2 bedroom apartment.");
     expect(priorities.lifestyleTags).toHaveLength(0);
   });
+
+  it("recognizes a pets signal", () => {
+    const priorities = extractPrioritiesHeuristically("We have two dogs and need a pet-friendly place.");
+    expect(priorities.lifestyleTags).toContain("pets");
+  });
+
+  it("recognizes a work-from-home signal", () => {
+    const priorities = extractPrioritiesHeuristically("I work from home most days and need a home office.");
+    expect(priorities.lifestyleTags).toContain("home-office");
+  });
+
+  it("recognizes parking as a must-have", () => {
+    const priorities = extractPrioritiesHeuristically("We need dedicated parking for two cars.");
+    expect(priorities.mustHaves).toContain("parking");
+  });
+
+  it("recognizes conflicting tenure signals in the same text", () => {
+    const priorities = extractPrioritiesHeuristically(
+      "Looking for our forever home, but we might relocate for work in a year so want to stay flexible.",
+    );
+    expect(priorities.lifestyleTags).toContain("long-term-ownership");
+    expect(priorities.lifestyleTags).toContain("flexible-tenure");
+  });
 });

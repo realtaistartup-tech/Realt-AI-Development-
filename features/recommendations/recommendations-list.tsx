@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { loadPriorities } from "@/hooks/use-priorities-store";
 import type { MatchResult, PriorityConflict, UserPriorities } from "@/types";
+import { ConflictCard } from "./conflict-card";
 import { PropertyCard } from "./property-card";
 import { SaveSearchButton } from "./save-search-button";
 
@@ -120,19 +120,19 @@ export function RecommendationsList() {
       </div>
 
       {conflicts.length > 0 && (
-        <Card className="border-warning/40 bg-warning/5">
-          <CardHeader className="flex-row items-start gap-3 space-y-0">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
-            <div className="space-y-1">
-              <CardTitle className="text-sm">{t("conflictsTitle")}</CardTitle>
-              {conflicts.map((conflict) => (
-                <CardDescription key={conflict.description}>
-                  {conflict.description}
-                </CardDescription>
-              ))}
-            </div>
-          </CardHeader>
-        </Card>
+        <section aria-labelledby="conflicts-heading" className="space-y-3">
+          <div>
+            <h2 id="conflicts-heading" className="text-sm font-semibold text-foreground">
+              {t("conflictsTitle")}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("conflictsSubheading")}</p>
+          </div>
+          <div className="space-y-3">
+            {conflicts.map((conflict) => (
+              <ConflictCard key={conflict.id} conflict={conflict} />
+            ))}
+          </div>
+        </section>
       )}
 
       <div className="space-y-4">
