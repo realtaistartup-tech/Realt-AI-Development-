@@ -1,9 +1,20 @@
-import { Bed, Bath, Ruler, MapPin, CheckCircle2, AlertTriangle, HandCoins, Home } from "lucide-react";
+import {
+  Bed,
+  Bath,
+  Ruler,
+  MapPin,
+  CheckCircle2,
+  AlertTriangle,
+  HandCoins,
+  Home,
+  ShieldAlert,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { formatArea, formatPrice } from "@/lib/format";
 import type { MatchResult } from "@/types";
+import { MatchBreakdown } from "./match-breakdown";
 import { MatchScoreBadge } from "./match-score-badge";
 
 interface PropertyCardProps {
@@ -12,7 +23,18 @@ interface PropertyCardProps {
 
 export function PropertyCard({ result }: PropertyCardProps) {
   const t = useTranslations("propertyCard");
-  const { property, score, summary, strengths, concerns, compromises, excluded, exclusionReason } = result;
+  const {
+    property,
+    score,
+    summary,
+    strengths,
+    concerns,
+    criticalConcerns,
+    compromises,
+    factors,
+    excluded,
+    exclusionReason,
+  } = result;
 
   return (
     <Card className={excluded ? "opacity-60" : undefined}>
@@ -69,47 +91,68 @@ export function PropertyCard({ result }: PropertyCardProps) {
             {exclusionReason}
           </p>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-3">
-            {strengths.length > 0 && (
-              <div>
-                <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-success">
-                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
-                  {t("whyItFits")}
-                </h3>
-                <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                  {strengths.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+          <>
+            {criticalConcerns.length > 0 && (
+              <div className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/5 px-4 py-3">
+                <ShieldAlert
+                  className="mt-0.5 h-4 w-4 shrink-0 text-destructive"
+                  aria-hidden="true"
+                />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-destructive">
+                    {t("criticalConcern")}
+                  </p>
+                  <ul className="mt-1 space-y-1 text-sm text-foreground">
+                    {criticalConcerns.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             )}
-            {concerns.length > 0 && (
-              <div>
-                <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-destructive">
-                  <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
-                  {t("risks")}
-                </h3>
-                <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                  {concerns.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {compromises.length > 0 && (
-              <div>
-                <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-warning">
-                  <HandCoins className="h-3.5 w-3.5" aria-hidden="true" />
-                  {t("compromises")}
-                </h3>
-                <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                  {compromises.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {strengths.length > 0 && (
+                <div>
+                  <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-success">
+                    <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+                    {t("whyItFits")}
+                  </h3>
+                  <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                    {strengths.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {concerns.length > 0 && (
+                <div>
+                  <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-destructive">
+                    <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
+                    {t("risks")}
+                  </h3>
+                  <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                    {concerns.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {compromises.length > 0 && (
+                <div>
+                  <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-warning">
+                    <HandCoins className="h-3.5 w-3.5" aria-hidden="true" />
+                    {t("compromises")}
+                  </h3>
+                  <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                    {compromises.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+            <MatchBreakdown factors={factors} />
+          </>
         )}
       </CardContent>
     </Card>

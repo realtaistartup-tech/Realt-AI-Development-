@@ -172,7 +172,12 @@
     "bath": "badrum",
     "whyItFits": "Varför den passar",
     "risks": "Risker",
-    "compromises": "Kompromisser"
+    "criticalConcern": "Kritiskt problem",
+    "compromises": "Kompromisser",
+    "breakdown": {
+      "toggle": "Se hela matchningsöversikten",
+      "importance": "Vikt: {level}/5"
+    }
   },
   "account": {
     "signIn": "Logga in",

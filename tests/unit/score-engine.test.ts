@@ -98,6 +98,50 @@ describe("scoreProperty", () => {
     expect(result.score).toBeGreaterThanOrEqual(0);
     expect(result.score).toBeLessThanOrEqual(100);
   });
+
+  it("flags a risk as a critical concern when the user rated that factor critical", () => {
+    const priorities = makePriorities({
+      minBedrooms: 5,
+      weights: [
+        { category: "budget", importance: 3 },
+        { category: "commute", importance: 3 },
+        { category: "space", importance: 5 },
+        { category: "safety", importance: 3 },
+        { category: "schools", importance: 3 },
+        { category: "lifestyle", importance: 3 },
+      ],
+    });
+    const result = scoreProperty(makeProperty({ bedrooms: 1 }), priorities);
+
+    const spaceFactor = result.factors.find((f) => f.category === "space");
+    expect(spaceFactor?.isRisk).toBe(true);
+    expect(result.criticalConcerns).toContain(spaceFactor?.explanation);
+  });
+
+  it("does not flag a risk as critical when the user rated that factor low importance", () => {
+    const priorities = makePriorities({
+      minBedrooms: 5,
+      weights: [
+        { category: "budget", importance: 3 },
+        { category: "commute", importance: 3 },
+        { category: "space", importance: 1 },
+        { category: "safety", importance: 3 },
+        { category: "schools", importance: 3 },
+        { category: "lifestyle", importance: 3 },
+      ],
+    });
+    const result = scoreProperty(makeProperty({ bedrooms: 1 }), priorities);
+
+    const spaceFactor = result.factors.find((f) => f.category === "space");
+    expect(spaceFactor?.isRisk).toBe(true);
+    expect(result.concerns).toContain(spaceFactor?.explanation);
+    expect(result.criticalConcerns).not.toContain(spaceFactor?.explanation);
+  });
+
+  it("returns no critical concerns when nothing critical is at risk", () => {
+    const result = scoreProperty(makeProperty(), makePriorities());
+    expect(result.criticalConcerns).toEqual([]);
+  });
 });
 
 describe("rankProperties", () => {

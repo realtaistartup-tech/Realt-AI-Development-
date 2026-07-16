@@ -37,3 +37,4 @@ export const PRIORITY_CATEGORIES: PriorityCategory[] = [
 ];
 
 export const DEFAULT_IMPORTANCE = 3;
+export const CRITICAL_IMPORTANCE = 5;

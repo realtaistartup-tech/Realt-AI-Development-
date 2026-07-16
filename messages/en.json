@@ -172,7 +172,12 @@
     "bath": "bath",
     "whyItFits": "Why it fits",
     "risks": "Risks",
-    "compromises": "Compromises"
+    "criticalConcern": "Critical concern",
+    "compromises": "Compromises",
+    "breakdown": {
+      "toggle": "See the full match breakdown",
+      "importance": "Importance: {level}/5"
+    }
   },
   "account": {
     "signIn": "Sign in",

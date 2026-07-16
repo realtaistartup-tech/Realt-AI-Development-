@@ -18,6 +18,11 @@ export interface MatchResult {
   factors: MatchFactor[];
   strengths: string[];
   concerns: string[];
+  /** Subset of concerns where the underlying factor is also weighted
+   * "critical" (importance 5) by the user — an unmet critical need is
+   * categorically worse than an unmet nice-to-have, not just a bigger
+   * number in the weighted average, so it's surfaced separately. */
+  criticalConcerns: string[];
   compromises: string[];
   summary: string;
   excluded: boolean;

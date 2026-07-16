@@ -5,7 +5,7 @@ import type {
   Property,
   UserPriorities,
 } from "@/types";
-import { DEFAULT_IMPORTANCE } from "@/types";
+import { CRITICAL_IMPORTANCE, DEFAULT_IMPORTANCE } from "@/types";
 import { formatArea, formatPrice } from "@/lib/format";
 
 function getImportance(priorities: UserPriorities, category: string): number {
@@ -256,6 +256,9 @@ export function scoreProperty(
     .filter((f) => f.score >= 75)
     .map((f) => f.explanation);
   const concerns = factors.filter((f) => f.isRisk).map((f) => f.explanation);
+  const criticalConcerns = factors
+    .filter((f) => f.isRisk && f.weight >= CRITICAL_IMPORTANCE)
+    .map((f) => f.explanation);
   const compromises = missedMustHaves.map(
     (item) => `Does not include "${item}", which you listed as a must-have.`,
   );
@@ -271,6 +274,7 @@ export function scoreProperty(
     factors,
     strengths,
     concerns,
+    criticalConcerns,
     compromises,
     summary: excluded
       ? `Excluded because it appears to include "${violatedDealBreaker}", which you listed as a deal-breaker.`
