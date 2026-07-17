@@ -139,7 +139,24 @@ describe("buildDecisionReport", () => {
       [makeProperty()],
     );
     expect(report.longTermConsequences.length).toBeGreaterThan(0);
-    expect(report.longTermConsequences[0]).toContain("Fix the numbers");
+    expect(report.longTermConsequences[0].conflictTitle).toContain("budget");
+    expect(report.longTermConsequences[0].options[0].label).toBe("Fix the numbers");
+    expect(report.longTermConsequences[0].options[0].consequence.length).toBeGreaterThan(0);
+  });
+
+  it("groups long-term consequences by conflict rather than repeating the title per option", () => {
+    const report = buildDecisionReport(
+      makePriorities({
+        lifestyleTags: ["nightlife", "quiet"],
+      }),
+      FULL_CONFIDENCE,
+      [makeProperty()],
+    );
+    const group = report.longTermConsequences.find((g) =>
+      g.conflictTitle.includes("Nightlife"),
+    );
+    expect(group).toBeDefined();
+    expect(group?.options.length).toBeGreaterThan(1);
   });
 
   it("derives likely-to-appreciate statements from the top match's strong factors", () => {

@@ -15,13 +15,13 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 text-base font-semibold tracking-tight text-foreground"
+          className="flex shrink-0 items-center gap-2 whitespace-nowrap text-base font-semibold tracking-tight text-foreground"
         >
           <Home className="h-5 w-5 text-primary" aria-hidden="true" />
           {t("common.brand")}
         </Link>
-        <nav aria-label={t("nav.primary")} className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="sm">
+        <nav aria-label={t("nav.primary")} className="flex items-center gap-1 sm:gap-2">
+          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link href="/onboarding">{t("nav.findMyHome")}</Link>
           </Button>
           <AccountMenu />

@@ -10,6 +10,20 @@ export interface PriorityRankingEntry {
 
 export type ConfidenceTier = "high" | "medium" | "low";
 
+export interface LongTermConsequenceOption {
+  label: string;
+  consequence: string;
+}
+
+/** Every option under one conflict, grouped so the conflict's title is
+ * stated once rather than repeated per option — see
+ * services/report/decision-report.ts for why this is grouped instead of a
+ * flat list. */
+export interface LongTermConsequenceGroup {
+  conflictTitle: string;
+  options: LongTermConsequenceOption[];
+}
+
 /**
  * The Realt Decision Report: the structured, explainable output of the full
  * Realt Thinking Framework for one search — not a results page, a decision
@@ -34,8 +48,9 @@ export interface DecisionReport {
   /** What the top match asks the user to give up, if anything. */
   compromises: string[];
   /** Forward-looking implications of how the detected conflicts could be
-   * resolved, one per option, drawn directly from PriorityConflict.options. */
-  longTermConsequences: string[];
+   * resolved, grouped by conflict, drawn directly from
+   * PriorityConflict.options. */
+  longTermConsequences: LongTermConsequenceGroup[];
   /** Grounded in the top match's own strongest factors. */
   likelyToAppreciate: string[];
   /** Grounded in the top match's own risk factors. */

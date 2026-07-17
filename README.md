@@ -27,6 +27,9 @@ See:
   (migration + environment variables) for durable accounts/saved searches.
 - [`docs/engineering-report.md`](./docs/engineering-report.md) — a full accounting of the initial
   build: what's production-ready, what's a placeholder, and why.
+- [`docs/v1-completion-report.md`](./docs/v1-completion-report.md) — a full first-time-user product
+  review (design, UX, accessibility, frontend, AI product lenses) with what was fixed, why, and
+  what's honestly still rough.
 
 ## Tech stack
 

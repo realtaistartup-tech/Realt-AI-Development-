@@ -4,6 +4,7 @@ import { getImportance } from "@/services/matching/priority-helpers";
 import type {
   ConfidenceTier,
   DecisionReport,
+  LongTermConsequenceGroup,
   MatchResult,
   PriorityCategory,
   PriorityConfidence,
@@ -42,18 +43,28 @@ function deriveCompromises(bestMatch: MatchResult | undefined): string[] {
   return bestMatch?.compromises ?? [];
 }
 
-function deriveLongTermConsequences(conflicts: PriorityConflict[]): string[] {
+/**
+ * Grouped by conflict rather than a flat list — stating each conflict's
+ * title once and listing its options underneath reads naturally; repeating
+ * the full title on every single option (the original design) felt
+ * mechanically repetitive once a conflict had more than one option.
+ */
+function deriveLongTermConsequences(conflicts: PriorityConflict[]): LongTermConsequenceGroup[] {
   const bySeverity = [...conflicts].sort(
     (a, b) => SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity],
   );
-  const consequences: string[] = [];
+  const groups: LongTermConsequenceGroup[] = [];
+  let totalOptions = 0;
   for (const conflict of bySeverity) {
-    for (const option of conflict.options) {
-      consequences.push(`${option.label} (${conflict.title}): ${option.longTermConsequence}`);
-      if (consequences.length >= MAX_LONG_TERM_CONSEQUENCES) return consequences;
-    }
+    if (totalOptions >= MAX_LONG_TERM_CONSEQUENCES) break;
+    const options = conflict.options
+      .slice(0, MAX_LONG_TERM_CONSEQUENCES - totalOptions)
+      .map((option) => ({ label: option.label, consequence: option.longTermConsequence }));
+    if (options.length === 0) continue;
+    groups.push({ conflictTitle: conflict.title, options });
+    totalOptions += options.length;
   }
-  return consequences;
+  return groups;
 }
 
 /**

@@ -201,7 +201,8 @@
       "cta": "Tell us what you're looking for"
     },
     "error": {
-      "generic": "Could not load your decision report. Please try again."
+      "generic": "Could not load your decision report. Please try again.",
+      "retry": "Try again"
     },
     "conflict": {
       "severity": {
@@ -329,7 +330,7 @@
     "error": "Could not load your saved searches. Please try again.",
     "empty": {
       "heading": "No saved searches yet",
-      "description": "Save a search from your recommendations page to see it here.",
+      "description": "Save a search from your decision report to see it here.",
       "cta": "Start a new search"
     },
     "signInRequired": {

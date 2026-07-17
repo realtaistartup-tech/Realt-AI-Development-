@@ -124,3 +124,31 @@
     outline-offset: 2px;
   }
 }
+
+/* Respect the user's OS-level request for reduced motion — nothing in this
+   app relies on animation to convey information, so shrinking every
+   transition/animation to effectively nothing is always safe. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* The Realt Decision Report's <details> disclosures (conflict compromises,
+   property card analysis, the match breakdown) are collapsed by default —
+   printing without expanding them would silently drop all of that
+   reasoning from the saved PDF. The real fix is JS-driven
+   (components/print-expand-details.tsx toggles the actual `open` attribute
+   on beforeprint/afterprint, which is the only approach that reliably
+   works in Chromium — this CSS rule is a harmless fallback for engines
+   where the collapsed state genuinely is plain `display: none`). */
+@media print {
+  details:not([open]) > *:not(summary) {
+    display: block !important;
+  }
+}

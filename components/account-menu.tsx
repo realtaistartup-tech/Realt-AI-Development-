@@ -45,7 +45,7 @@ export function AccountMenu() {
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1 sm:gap-2">
       <Button asChild variant="ghost" size="sm">
         <Link href="/my-searches">{t("mySearches")}</Link>
       </Button>

@@ -278,6 +278,23 @@ PDF" button is a plain `window.print()` call; `site-header.tsx` and
 the report, not the site chrome around it. No new infrastructure — native
 browser print is enough to make the report something a person can keep.
 
+Every disclosure on the page (conflict compromises, property card
+analysis, the match breakdown) is a native `<details>`, collapsed by
+default — printing without expanding them first would silently drop all
+of that reasoning from the saved PDF, which would badly undercut "built
+to be saved." `components/print-expand-details.tsx` (mounted once at the
+top of `DecisionReport`) listens for the browser's real
+`beforeprint`/`afterprint` events and toggles the actual `open` attribute
+on every `<details>` on the page, restoring the original collapsed state
+afterward. This was deliberately **not** solved with a CSS-only `@media
+print` override of the UA stylesheet's hidden-content rule — that
+approach was tried first and turned out not to reliably repaint in
+Chromium even with `display: block !important`; forcing the real `open`
+attribute is the only approach that's spec-guaranteed to work in every
+browser. A matching CSS rule stays in `globals.css` as a harmless
+fallback for engines where the collapsed state genuinely is a plain
+`display: none`.
+
 ## Why explanations are template-based, not LLM-generated
 
 `CLAUDE.md` says the AI must never hallucinate and must always be able to

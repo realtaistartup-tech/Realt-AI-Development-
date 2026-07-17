@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { HandCoins, HelpCircle, Hourglass, Loader2, ThumbsDown, ThumbsUp, UserRound } from "lucide-react";
+import { HandCoins, HelpCircle, Loader2, ThumbsDown, ThumbsUp, UserRound } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { PrintExpandDetails } from "@/components/print-expand-details";
 import { loadPriorities } from "@/hooks/use-priorities-store";
 import { PrioritySummary } from "@/features/onboarding/priority-summary";
 import type { DecisionReport as DecisionReportData } from "@/types";
 import { ConflictsSection } from "./conflicts-section";
+import { LongTermConsequencesSection } from "./long-term-consequences-section";
 import { PriorityRanking } from "./priority-ranking";
 import { PropertyCard } from "./property-card";
 import { ReportHeader } from "./report-header";
@@ -31,8 +33,10 @@ export function DecisionReport() {
   const t = useTranslations("recommendations");
   const tReport = useTranslations("report");
   const [state, setState] = useState<LoadState>({ status: "loading" });
+  const reportRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  const load = useCallback(() => {
+    setState({ status: "loading" });
     const loaded = loadPriorities();
     if (!loaded) {
       setState({ status: "missing-priorities" });
@@ -40,42 +44,43 @@ export function DecisionReport() {
     }
     const { priorities, confidence } = loaded;
 
-    let cancelled = false;
-
-    async function fetchReport() {
-      try {
-        const response = await fetch("/api/ai/recommend", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ priorities, confidence }),
-        });
+    fetch("/api/ai/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ priorities, confidence }),
+    })
+      .then(async (response) => {
         if (!response.ok) {
           throw new Error(t("error.generic"));
         }
-        const report = (await response.json()) as DecisionReportData;
-        if (!cancelled) {
-          setState({ status: "ready", report });
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setState({
-            status: "error",
-            message: err instanceof Error ? err.message : t("error.generic"),
-          });
-        }
-      }
-    }
-
-    fetchReport();
-    return () => {
-      cancelled = true;
-    };
+        return (await response.json()) as DecisionReportData;
+      })
+      .then((report) => setState({ status: "ready", report }))
+      .catch((err) => {
+        setState({
+          status: "error",
+          message: err instanceof Error ? err.message : t("error.generic"),
+        });
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // Move focus into the report once it replaces the loading state, so
+  // screen reader users get a clear signal that new content has arrived
+  // instead of silently sitting on a spinner that's already gone.
+  useEffect(() => {
+    if (state.status === "ready") {
+      reportRef.current?.focus();
+    }
+  }, [state.status]);
+
   if (state.status === "loading") {
     return (
-      <div className="flex flex-col items-center gap-3 py-24 text-muted-foreground">
+      <div role="status" className="flex flex-col items-center gap-3 py-24 text-muted-foreground">
         <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
         <p>{t("loading")}</p>
       </div>
@@ -100,6 +105,9 @@ export function DecisionReport() {
         <p role="alert" className="text-destructive">
           {state.message}
         </p>
+        <Button variant="outline" className="mt-6" onClick={load}>
+          {t("error.retry")}
+        </Button>
       </div>
     );
   }
@@ -107,7 +115,12 @@ export function DecisionReport() {
   const { report } = state;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-10 px-4 py-16 sm:px-6 print:max-w-none print:px-0">
+    <div
+      ref={reportRef}
+      tabIndex={-1}
+      className="mx-auto max-w-3xl space-y-10 px-4 py-16 outline-none sm:px-6 print:max-w-none print:px-0"
+    >
+      <PrintExpandDetails />
       <ReportHeader
         realtScore={report.realtScore}
         confidenceScore={report.confidenceScore}
@@ -137,13 +150,7 @@ export function DecisionReport() {
         tone="caution"
       />
 
-      <ReportListSection
-        icon={Hourglass}
-        title={tReport("longTermConsequences.heading")}
-        description={tReport("longTermConsequences.description")}
-        items={report.longTermConsequences}
-        emptyMessage={tReport("longTermConsequences.empty")}
-      />
+      <LongTermConsequencesSection groups={report.longTermConsequences} />
 
       <div className="grid gap-8 sm:grid-cols-2">
         <ReportListSection

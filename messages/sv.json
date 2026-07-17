@@ -201,7 +201,8 @@
       "cta": "Berätta vad du letar efter"
     },
     "error": {
-      "generic": "Det gick inte att hämta din beslutsrapport. Försök igen."
+      "generic": "Det gick inte att hämta din beslutsrapport. Försök igen.",
+      "retry": "Försök igen"
     },
     "conflict": {
       "severity": {
@@ -329,7 +330,7 @@
     "error": "Det gick inte att hämta dina sparade sökningar. Försök igen.",
     "empty": {
       "heading": "Inga sparade sökningar än",
-      "description": "Spara en sökning från din matchningssida för att se den här.",
+      "description": "Spara en sökning från din beslutsrapport för att se den här.",
       "cta": "Starta en ny sökning"
     },
     "signInRequired": {

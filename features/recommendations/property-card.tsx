@@ -38,7 +38,12 @@ export function PropertyCard({ result }: PropertyCardProps) {
         <summary className="block cursor-pointer list-none marker:content-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background [&::-webkit-details-marker]:hidden">
           <div className="aspect-[16/9] w-full overflow-hidden bg-secondary">
             {/* eslint-disable-next-line @next/next/no-img-element -- mock SVG illustrations, not an optimizable remote photo set yet */}
-            <img src={property.imageUrl} alt={property.title} className="h-full w-full object-cover" />
+            <img
+              src={property.imageUrl}
+              alt={property.title}
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
           </div>
           <CardContent className="space-y-3 pt-5">
             <div className="flex items-start justify-between gap-3">
@@ -55,7 +60,7 @@ export function PropertyCard({ result }: PropertyCardProps) {
             <div className="flex items-center justify-between gap-3">
               <p className="font-semibold text-foreground">{formatPrice(property.price)}</p>
               <span
-                className="inline-flex shrink-0 items-center gap-1 rounded-md border border-input px-2.5 py-1 text-xs font-medium text-muted-foreground"
+                className="inline-flex shrink-0 items-center gap-1 text-xs text-muted-foreground print:hidden"
                 title={t("originalListingTooltip")}
               >
                 <ExternalLink className="h-3 w-3" aria-hidden="true" />
@@ -65,7 +70,7 @@ export function PropertyCard({ result }: PropertyCardProps) {
 
             <p className="text-sm text-foreground">{summary}</p>
 
-            <p className="flex items-center gap-1 text-xs font-medium text-primary">
+            <p className="flex items-center gap-1 text-xs font-medium text-primary print:hidden">
               <ChevronRight
                 className="h-3.5 w-3.5 shrink-0 transition-transform group-open:rotate-90"
                 aria-hidden="true"

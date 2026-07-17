@@ -21,7 +21,7 @@ export function MatchBreakdown({ factors }: MatchBreakdownProps) {
 
   return (
     <details className="group rounded-lg border border-border">
-      <summary className="flex cursor-pointer list-none items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-foreground marker:content-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-foreground marker:content-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring print:hidden [&::-webkit-details-marker]:hidden">
         <ChevronRight
           className="h-4 w-4 shrink-0 transition-transform group-open:rotate-90"
           aria-hidden="true"
