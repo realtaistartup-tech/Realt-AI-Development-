@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import type { PriorityConfidence } from "@/types";
+
 const MAX_LIST_ITEMS = 10;
 const MAX_TAG_LENGTH = 60;
 
@@ -29,6 +31,13 @@ export const userPrioritiesSchema = z
   });
 
 export type UserPrioritiesInput = z.infer<typeof userPrioritiesSchema>;
+
+export const priorityConfidenceSchema: z.ZodType<PriorityConfidence> = z.object({
+  budget: z.boolean(),
+  commute: z.boolean(),
+  space: z.boolean(),
+  weights: z.boolean(),
+});
 
 export const priorityIntakeRequestSchema = z.object({
   answers: z

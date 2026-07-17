@@ -65,7 +65,7 @@
   "onboarding": {
     "metaTitle": "Tell us what you're looking for",
     "metaDescription": "Describe your priorities so Realt AI can understand what matters to you.",
-    "stepLabel": "Step {step} of 2",
+    "progressLabel": "Onboarding progress",
     "describe": {
       "heading": "Tell us what you're looking for",
       "description": "Describe your ideal home in your own words. Include what matters most — budget, commute, space, safety, schools, or lifestyle.",
@@ -82,6 +82,56 @@
       "offlineDescription": "No AI model is configured, so priorities were extracted with a simpler, rule-based reader. Review the fields below carefully.",
       "back": "Back",
       "confirm": "See my matches"
+    },
+    "clarify": {
+      "heading": "A couple of quick questions",
+      "intro": "Just the details we need to find good matches — nothing more.",
+      "skip": "Not sure — skip this",
+      "continue": "Continue",
+      "budget": {
+        "question": "What's your budget range?",
+        "hint": "A rough range is fine — you can refine it later.",
+        "min": "Minimum",
+        "max": "Maximum"
+      },
+      "commute": {
+        "question": "How do you want to get around, and what's the longest commute you'd accept?",
+        "mode": "Mode",
+        "maxMinutes": "Maximum commute (minutes)"
+      },
+      "space": {
+        "question": "How many bedrooms and bathrooms do you need, at minimum?",
+        "bedrooms": "Bedrooms",
+        "bathrooms": "Bathrooms"
+      },
+      "weights": {
+        "question": "Which of these matters most to you? Pick up to two.",
+        "hint": "We'll weigh these more heavily when scoring properties.",
+        "balanced": "Nothing stands out — keep it balanced"
+      }
+    },
+    "summary": {
+      "heading": "Here's what we understood",
+      "description": "This is what Realt AI will use to find and score your matches.",
+      "budget": "Budget",
+      "commute": "Commute",
+      "commuteValue": "{mode}, up to {minutes} min",
+      "space": "Space",
+      "spaceValue": "{bedrooms} bed / {bathrooms} bath, minimum",
+      "topPriorities": "What matters most",
+      "topPrioritiesBalanced": "Weighted evenly across all factors",
+      "mustHaves": "Must-haves",
+      "dealBreakers": "Deal-breakers",
+      "lifestyle": "Lifestyle",
+      "assumedNote": "We used a default for: {fields} — adjust it any time in Edit details.",
+      "edit": "Edit details",
+      "confirm": "See my matches",
+      "fieldLabels": {
+        "budget": "budget",
+        "commute": "commute",
+        "space": "space",
+        "weights": "priority ranking"
+      }
     },
     "errors": {
       "generic": "Something went wrong."

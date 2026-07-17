@@ -74,7 +74,10 @@ Feature-based, per `CLAUDE.md`:
 The framework in `CLAUDE.md` maps to real code, not just prose:
 
 1. **Understand user goals** — `services/ai/priority-extraction.ts` turns
-   free text into a structured `UserPriorities` object.
+   free text into a structured `UserPriorities` object, and the guided
+   onboarding conversation (`features/onboarding`, see below) keeps asking
+   short follow-up questions until it's actually confident it understands
+   enough to proceed, not just once and done.
 2. **Detect conflicts** — `detectPriorityConflicts` in
    `services/matching/conflict-detection.ts` flags when stated priorities
    compete with each other, and the recommendations page surfaces this
@@ -93,6 +96,68 @@ The framework in `CLAUDE.md` maps to real code, not just prose:
    directly from the same data used to compute the score. Nothing in the
    explanation is generated separately from the number, so the score and its
    explanation can't drift apart.
+
+## Guided onboarding: a confidence-driven conversation
+
+The onboarding flow (`features/onboarding/priority-intake-flow.tsx`) is a
+small state machine — `describe → clarify* → review → editing` — built
+around one idea: never ask a question the extraction step already
+answered confidently, and never show the full form by default.
+
+**Per-field confidence, not just a value.** `extractPriorities`
+(`services/ai/priority-extraction.ts`) returns `{ priorities, source,
+confidence }`. `confidence` (`types/onboarding.ts`) is a boolean per
+essential field — `budget`, `commute`, `space`, `weights` — true only if
+the person actually stated that information, false if it's resting on a
+default. mustHaves/dealBreakers/lifestyleTags are deliberately excluded
+from this set: an empty list is a legitimate answer for those, not a gap,
+so asking about them unprompted would violate "never ask unnecessary
+questions." Both extraction paths report this honestly:
+
+- The heuristic parser sets a field's confidence flag exactly when its own
+  regex/keyword match fired — it already knows whether it found something
+  or fell back to `FALLBACK_DEFAULTS`, so this is a direct readout of
+  existing logic, not new guessing. Its keyword vocabulary also recognizes
+  common Swedish phrasing (`sovrum`, `badrum`, `skol-`, `säker`/`trygg`,
+  `billig`) alongside English, since Swedish is the default locale and
+  this heuristic path is what actually runs whenever `OPENAI_API_KEY`
+  isn't configured — which is always, in this environment.
+- The AI path is asked, in the same structured JSON-schema call that
+  extracts priorities, to also self-report a `confidence` object — the
+  system prompt is explicit that this must reflect whether the person
+  actually said it, not whether the returned value looks plausible.
+
+**Deciding what to ask, one question at a time.**
+`services/onboarding/clarifying-flow.ts` is a small pure module —
+`nextClarifyingField(confidence, askedFields)` returns the single
+highest-priority field that's still unconfirmed, in a fixed order
+(budget → commute → space → weights), or `null` once nothing is left to
+ask. There's no cap beyond "the 4 fields that exist" — bounded, one at a
+time, always skippable, which is what keeps a worst-case (a fully vague
+description) from feeling like an interrogation rather than a genuinely
+overwhelming number of questions.
+
+**One purpose-built question, not the form.** `ClarifyingQuestion`
+(`features/onboarding/clarifying-question.tsx`) renders exactly one
+compact input for whichever field is being asked about — a budget range,
+a commute mode + minutes, bedroom/bathroom counts, or a "pick up to two"
+chip picker for what matters most — never the full multi-field form.
+Every question has a "Not sure — skip this" action; skipping moves on
+immediately rather than blocking, and the field's confidence stays false
+so the final summary discloses it as an assumed default instead of
+silently presenting a guess as understood.
+
+**The structured profile, made legible.** Once nothing is left to ask
+(confidence was high from the start, or every gap got answered or
+skipped), the flow lands on `PrioritySummary`
+(`features/onboarding/priority-summary.tsx`) — a compact, read-only
+statement of budget, commute, space, and top priorities, plus any
+must-haves/deal-breakers/lifestyle tags that were mentioned. This *is*
+the "structured internal user profile" — it's the same `UserPriorities`
+object `rankProperties` and `detectPriorityConflicts` already consume,
+just made human-readable before the person commits to it, with an "Edit
+details" escape hatch into the full form (`PriorityReviewForm`, unchanged)
+for anyone who wants to see or correct every field directly.
 
 ## Deep conflict detection
 
@@ -302,7 +367,12 @@ covered by two separate, purpose-built suites rather than one.
   severity, and at least one option with a consequence
   (`conflict-detection.test.ts`).
 - Input validation edge cases (`validation.test.ts`).
-- The deterministic priority-extraction fallback (`priority-extraction.test.ts`).
+- The deterministic priority-extraction fallback, including its per-field
+  `confidence` reporting and Swedish keyword coverage
+  (`priority-extraction.test.ts`).
+- The guided onboarding decision engine — `nextClarifyingField` ordering,
+  the skip-still-counts-as-asked rule, and the hard cap at 4 questions
+  (`clarifying-flow.test.ts`).
 
 Run with `npm run test`.
 
@@ -311,10 +381,17 @@ since dev-mode's on-demand compilation and slower hydration produce
 flakiness that has nothing to do with the app) — real user flows in a real
 browser:
 
-- `golden-path.spec.ts` — the full home → onboarding → review →
-  recommendations flow, once in Swedish and once in English, asserting the
-  heuristic extraction correctly reads free-text budget/commute values in
-  both languages.
+- `golden-path.spec.ts` — the full home → onboarding → summary →
+  recommendations flow, once in Swedish and once in English, with a
+  fully-specified free-text answer that asserts the guided onboarding
+  flow correctly skips every clarifying question when it's already
+  confident, rather than asking anyway.
+- `guided-onboarding.spec.ts` — the clarifying-question loop itself: a
+  vague description asks budget, then commute, then space, then "what
+  matters most," in that order, one at a time; skipping a question moves
+  on and the summary discloses it as an assumed default; "Edit details"
+  from the summary opens the full form and "Back" returns to the summary
+  without losing progress.
 - `locale-switcher.spec.ts` — switching locale via the header control, and
   that it preserves the current page rather than bouncing to the homepage.
 - `empty-recommendations.spec.ts` — visiting `/recommendations` with no
@@ -323,7 +400,9 @@ browser:
   control's accessible name and the document's `dark` class.
 - `accessibility.spec.ts` — `@axe-core/playwright` scans of the home,
   onboarding, and recommendations pages (both locales) against WCAG 2.0/2.1
-  A and AA, asserting zero violations. This is what caught a real bug during
+  A and AA, asserting zero violations — including the new guided-onboarding
+  clarifying-question and summary screens specifically, not just the
+  describe step. This is what caught a real bug during
   development: the "partial match" score badge's amber text failed contrast
   (3.17:1 against its own tinted background, needed 4.5:1) — fixed by
   darkening the `--warning`/`--success`/`--destructive` design tokens in

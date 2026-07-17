@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ArrowRight, Loader2, Sparkles } from "lucide-react";
 
@@ -11,10 +11,13 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { savePriorities } from "@/hooks/use-priorities-store";
-import type { UserPriorities } from "@/types";
+import { nextClarifyingField } from "@/services/onboarding/clarifying-flow";
+import { PRIORITY_FIELD_ORDER, type PriorityConfidence, type PriorityFieldKey, type UserPriorities } from "@/types";
+import { ClarifyingQuestion } from "./clarifying-question";
 import { PriorityReviewForm } from "./priority-review-form";
+import { PrioritySummary } from "./priority-summary";
 
-type Step = "describe" | "review";
+type Step = "describe" | "clarify" | "review" | "editing";
 
 export function PriorityIntakeFlow() {
   const router = useRouter();
@@ -22,9 +25,21 @@ export function PriorityIntakeFlow() {
   const [step, setStep] = useState<Step>("describe");
   const [freeText, setFreeText] = useState("");
   const [priorities, setPriorities] = useState<UserPriorities | null>(null);
+  const [confidence, setConfidence] = useState<PriorityConfidence | null>(null);
+  const [askedFields, setAskedFields] = useState<PriorityFieldKey[]>([]);
+  const [assumedFields, setAssumedFields] = useState<PriorityFieldKey[]>([]);
+  const [initialClarifyCount, setInitialClarifyCount] = useState(0);
   const [source, setSource] = useState<"ai" | "heuristic" | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  const currentField =
+    step === "clarify" && confidence ? nextClarifyingField(confidence, askedFields) : null;
+
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, [step, currentField]);
 
   async function handleDescribeSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -40,15 +55,45 @@ export function PriorityIntakeFlow() {
         const body = (await response.json().catch(() => null)) as { error?: string } | null;
         throw new Error(body?.error ?? t("errors.generic"));
       }
-      const data = (await response.json()) as { priorities: UserPriorities; source: "ai" | "heuristic" };
+      const data = (await response.json()) as {
+        priorities: UserPriorities;
+        source: "ai" | "heuristic";
+        confidence: PriorityConfidence;
+      };
       setPriorities(data.priorities);
       setSource(data.source);
-      setStep("review");
+      setConfidence(data.confidence);
+      setAskedFields([]);
+      setAssumedFields([]);
+
+      const gapCount = PRIORITY_FIELD_ORDER.filter((field) => !data.confidence[field]).length;
+      setInitialClarifyCount(gapCount);
+      setStep(nextClarifyingField(data.confidence, []) ? "clarify" : "review");
     } catch (err) {
       setError(err instanceof Error ? err.message : t("errors.generic"));
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  function advanceAfter(updatedAsked: PriorityFieldKey[], updatedConfidence: PriorityConfidence) {
+    setAskedFields(updatedAsked);
+    const next = nextClarifyingField(updatedConfidence, updatedAsked);
+    setStep(next ? "clarify" : "review");
+  }
+
+  function handleClarifyAnswer(updated: UserPriorities) {
+    if (!currentField || !confidence) return;
+    setPriorities(updated);
+    const updatedConfidence = { ...confidence, [currentField]: true };
+    setConfidence(updatedConfidence);
+    advanceAfter([...askedFields, currentField], updatedConfidence);
+  }
+
+  function handleClarifySkip() {
+    if (!currentField || !confidence) return;
+    setAssumedFields((prev) => [...prev, currentField]);
+    advanceAfter([...askedFields, currentField], confidence);
   }
 
   function handleConfirm() {
@@ -57,17 +102,23 @@ export function PriorityIntakeFlow() {
     router.push("/recommendations");
   }
 
+  const progress =
+    step === "describe"
+      ? 10
+      : step === "clarify"
+        ? 10 + (askedFields.length / Math.max(initialClarifyCount, 1)) * 70
+        : 100;
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-      <Progress value={step === "describe" ? 50 : 100} aria-label="Onboarding progress" />
-      <p className="mt-2 text-sm text-muted-foreground">
-        {t("stepLabel", { step: step === "describe" ? 1 : 2 })}
-      </p>
+      <Progress value={progress} aria-label={t("progressLabel")} />
 
       {step === "describe" && (
         <form onSubmit={handleDescribeSubmit} className="mt-6 space-y-6">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">{t("describe.heading")}</h1>
+            <h1 ref={headingRef} tabIndex={-1} className="text-2xl font-semibold tracking-tight outline-none">
+              {t("describe.heading")}
+            </h1>
             <p className="mt-2 text-muted-foreground">{t("describe.description")}</p>
           </div>
           <div className="space-y-2">
@@ -108,11 +159,30 @@ export function PriorityIntakeFlow() {
         </form>
       )}
 
+      {step === "clarify" && currentField && priorities && (
+        <div className="mt-6 space-y-6">
+          <div>
+            <h1 ref={headingRef} tabIndex={-1} className="text-2xl font-semibold tracking-tight outline-none">
+              {t("clarify.heading")}
+            </h1>
+            <p className="mt-2 text-muted-foreground">{t("clarify.intro")}</p>
+          </div>
+          <ClarifyingQuestion
+            field={currentField}
+            priorities={priorities}
+            onAnswer={handleClarifyAnswer}
+            onSkip={handleClarifySkip}
+          />
+        </div>
+      )}
+
       {step === "review" && priorities && (
         <div className="mt-6 space-y-6">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">{t("review.heading")}</h1>
-            <p className="mt-2 text-muted-foreground">{t("review.description")}</p>
+            <h1 ref={headingRef} tabIndex={-1} className="text-2xl font-semibold tracking-tight outline-none">
+              {t("summary.heading")}
+            </h1>
+            <p className="mt-2 text-muted-foreground">{t("summary.description")}</p>
           </div>
           {source === "heuristic" && (
             <Card className="border-warning/40 bg-warning/5">
@@ -125,9 +195,26 @@ export function PriorityIntakeFlow() {
               </CardHeader>
             </Card>
           )}
+          <PrioritySummary
+            priorities={priorities}
+            assumedFields={assumedFields}
+            onEdit={() => setStep("editing")}
+            onConfirm={handleConfirm}
+          />
+        </div>
+      )}
+
+      {step === "editing" && priorities && (
+        <div className="mt-6 space-y-6">
+          <div>
+            <h1 ref={headingRef} tabIndex={-1} className="text-2xl font-semibold tracking-tight outline-none">
+              {t("review.heading")}
+            </h1>
+            <p className="mt-2 text-muted-foreground">{t("review.description")}</p>
+          </div>
           <PriorityReviewForm priorities={priorities} onChange={setPriorities} />
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setStep("describe")}>
+            <Button variant="outline" onClick={() => setStep("review")}>
               {t("review.back")}
             </Button>
             <Button onClick={handleConfirm}>

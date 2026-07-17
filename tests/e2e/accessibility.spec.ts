@@ -29,11 +29,46 @@ test("recommendations page has no automatically detectable accessibility violati
   await page.goto("/en/onboarding");
   await page
     .getByLabel("Your priorities")
-    .fill("We need a 3 bedroom home under $500,000 near good schools.");
+    .fill("We need a 3 bedroom home under $500,000, no more than a 30 minute drive, near good schools.");
   await page.getByRole("button", { name: "Continue" }).click();
-  await expect(page.getByRole("heading", { name: "Review your priorities" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Here's what we understood" })).toBeVisible();
   await page.getByRole("button", { name: "See my matches" }).click();
   await expect(page.getByRole("heading", { name: "Your matches" })).toBeVisible();
+
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+
+  expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
+});
+
+test("guided onboarding clarifying-question screen has no automatically detectable accessibility violations", async ({
+  page,
+}) => {
+  await page.goto("/en/onboarding");
+  await page.getByLabel("Your priorities").fill("Looking for a nice place to live.");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByRole("heading", { name: "A couple of quick questions" })).toBeVisible();
+
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+
+  expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
+});
+
+test("guided onboarding summary screen has no automatically detectable accessibility violations", async ({
+  page,
+}) => {
+  await page.goto("/en/onboarding");
+  await page.getByLabel("Your priorities").fill("Looking for a nice place to live.");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByRole("heading", { name: "A couple of quick questions" })).toBeVisible();
+
+  for (let i = 0; i < 4; i++) {
+    await page.getByRole("button", { name: "Not sure — skip this" }).click();
+  }
+  await expect(page.getByRole("heading", { name: "Here's what we understood" })).toBeVisible();
 
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])

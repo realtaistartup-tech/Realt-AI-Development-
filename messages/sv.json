@@ -65,7 +65,7 @@
   "onboarding": {
     "metaTitle": "Berätta vad du letar efter",
     "metaDescription": "Beskriv dina prioriteringar så att Realt AI kan förstå vad som är viktigt för dig.",
-    "stepLabel": "Steg {step} av 2",
+    "progressLabel": "Framsteg i introduktionen",
     "describe": {
       "heading": "Berätta vad du letar efter",
       "description": "Beskriv ditt drömboende med egna ord. Ta med det som är viktigast — budget, pendling, yta, trygghet, skolor eller livsstil.",
@@ -82,6 +82,56 @@
       "offlineDescription": "Ingen AI-modell är konfigurerad, så prioriteringarna extraherades med en enklare, regelbaserad läsare. Granska fälten nedan noga.",
       "back": "Tillbaka",
       "confirm": "Se mina matchningar"
+    },
+    "clarify": {
+      "heading": "Några snabba frågor",
+      "intro": "Bara det vi behöver för att hitta bra matchningar — inget mer.",
+      "skip": "Osäker — hoppa över",
+      "continue": "Fortsätt",
+      "budget": {
+        "question": "Vad har du för budget?",
+        "hint": "Ett ungefärligt spann räcker — du kan finjustera det senare.",
+        "min": "Minimum",
+        "max": "Maximum"
+      },
+      "commute": {
+        "question": "Hur vill du ta dig fram, och hur lång pendling accepterar du som mest?",
+        "mode": "Färdsätt",
+        "maxMinutes": "Maximal pendlingstid (minuter)"
+      },
+      "space": {
+        "question": "Hur många sovrum och badrum behöver du, som minst?",
+        "bedrooms": "Sovrum",
+        "bathrooms": "Badrum"
+      },
+      "weights": {
+        "question": "Vilket av det här betyder mest för dig? Välj upp till två.",
+        "hint": "Vi väger de här tyngre när vi poängsätter bostäder.",
+        "balanced": "Inget sticker ut — håll det balanserat"
+      }
+    },
+    "summary": {
+      "heading": "Så här uppfattade vi det",
+      "description": "Det här är vad Realt AI använder för att hitta och poängsätta dina matchningar.",
+      "budget": "Budget",
+      "commute": "Pendling",
+      "commuteValue": "{mode}, upp till {minutes} min",
+      "space": "Yta",
+      "spaceValue": "{bedrooms} sovrum / {bathrooms} badrum, som minst",
+      "topPriorities": "Vad som betyder mest",
+      "topPrioritiesBalanced": "Viktat jämnt mellan alla faktorer",
+      "mustHaves": "Måsten",
+      "dealBreakers": "Uteslutningar",
+      "lifestyle": "Livsstil",
+      "assumedNote": "Vi använde ett standardvärde för: {fields} — justera det när som helst under Redigera detaljer.",
+      "edit": "Redigera detaljer",
+      "confirm": "Se mina matchningar",
+      "fieldLabels": {
+        "budget": "budget",
+        "commute": "pendling",
+        "space": "yta",
+        "weights": "prioritering"
+      }
     },
     "errors": {
       "generic": "Något gick fel."

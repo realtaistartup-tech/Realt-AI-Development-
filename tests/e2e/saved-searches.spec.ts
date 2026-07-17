@@ -20,13 +20,16 @@ test.describe("Saved searches (mock auth + mock persistence)", () => {
     await page.getByRole("button", { name: "Fortsätt" }).click();
     await expect(page.getByRole("button", { name: "Logga ut" })).toBeVisible();
 
-    // Run the onboarding flow to reach recommendations.
+    // Run the onboarding flow to reach recommendations. Budget, commute,
+    // bedrooms, and an explicit priority (schools) are all mentioned so this
+    // sails straight through to the summary without any clarifying
+    // questions — this test is about saved searches, not onboarding.
     await page.goto("/onboarding");
     await page
       .getByLabel("Dina prioriteringar")
-      .fill("Vi letar efter ett hus med 3 sovrum under 5000000 kr nara bra skolor.");
+      .fill("Vi letar efter ett hus med 3 sovrum under 5000000 kr, högst 20 minuters bilresa, nära bra skolor.");
     await page.getByRole("button", { name: "Fortsätt" }).click();
-    await expect(page.getByRole("heading", { name: "Granska dina prioriteringar" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Så här uppfattade vi det" })).toBeVisible();
     await page.getByRole("button", { name: "Se mina matchningar" }).click();
     await expect(page.getByRole("heading", { name: "Dina matchningar" })).toBeVisible();
 
