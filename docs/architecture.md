@@ -95,7 +95,9 @@ The framework in `CLAUDE.md` maps to real code, not just prose:
    `concerns`, `compromises`, and a plain-language `summary`, all derived
    directly from the same data used to compute the score. Nothing in the
    explanation is generated separately from the number, so the score and its
-   explanation can't drift apart.
+   explanation can't drift apart. All of it is assembled into the Realt
+   Decision Report (see below) — the actual page a user lands on, not a
+   bare results list.
 
 ## Guided onboarding: a confidence-driven conversation
 
@@ -206,6 +208,75 @@ file's "never fabricate" discipline.
 (`getImportance`, `clampScore`) shared between the scoring engine and the
 conflict detector, so the two modules don't duplicate them or import from
 each other.
+
+## The Realt Decision Report
+
+`/recommendations` is not a results list — it's the Realt Decision Report,
+the single page CLAUDE.md calls "the heart of the product." Everything on
+it is assembled server-side by `buildDecisionReport`
+(`services/report/decision-report.ts`), a pure function of data already
+produced elsewhere (`rankProperties`, `detectPriorityConflicts`). This
+module adds no new scoring or conflict logic of its own — only
+interpretation and framing — so the report can never claim something the
+underlying data doesn't support.
+
+**Two headline numbers, both explained, neither hidden behind jargon:**
+
+- **Realt Score** — the best available match's score. If nothing clears
+  the user's deal-breakers, it's honestly 0, not a misleadingly averaged
+  number.
+- **Confidence Score** — new for this feature: the percentage of the four
+  essential fields (`budget`/`commute`/`space`/`weights`) the user actually
+  confirmed, from the same `PriorityConfidence` the guided onboarding flow
+  produces. This is why `hooks/use-priorities-store.ts` now persists
+  confidence alongside priorities (defaulting to fully-confirmed for a
+  saved search loaded from a past session, which never carried this signal
+  to begin with — see the function's own comment for the reasoning). Low
+  confidence deliberately doesn't use the same red/destructive tone as a
+  weak property match — it means "tell us more," not "something's wrong."
+
+**Sections that synthesize existing data, not new facts:**
+
+- *Compromise analysis* is the top match's own `compromises` (missed
+  must-haves).
+- *Long-term consequences* is every conflict's own `ConflictOption.
+  longTermConsequence`, most severe conflicts first, capped at 6.
+- *Likely to appreciate* / *possible regrets after 12 months* are the top
+  match's own strong (`score >= 75`) and risk (`isRisk`) factors, each
+  paired with a category-aware framing sentence (`APPRECIATE_FRAMING` /
+  `REGRET_FRAMING`) about why that *kind* of factor tends to matter more
+  or less with time — the framing is generic per category, the fact is
+  always specific to the property. These two lists and the underlying
+  strengths/concerns lists are deliberately kept mutually exclusive (a
+  factor scoring exactly 75 while also being a risk — e.g. missing a
+  single bedroom — must never show up as both a reason to feel good and a
+  reason to worry; see the `!factor.isRisk` guards in both
+  `score-engine.ts` and `decision-report.ts`, and the regression tests
+  covering it).
+- *Important unanswered questions* combines unconfirmed fields (phrased as
+  direct questions) with medium/high-severity conflicts (phrased as
+  "which matters more to you?") — never low-severity ones, to avoid
+  turning transparency into noise.
+- *Suggested property matches* is `rankProperties`, filtered to
+  non-excluded results and capped at `MAX_TOP_MATCHES` (5) — curated, not
+  the full candidate list, on purpose.
+
+**The property card is compact by default, not a wall of text.** Image,
+title, street + house number (`lib/address.ts` splits `Property.address`),
+municipality, price, Realt Score, and a one-line reason are always
+visible; the full critical-concern callout, strengths/risks/compromises
+grid, and per-factor breakdown are one click away behind a `<details>`
+disclosure, same accessible pattern as `MatchBreakdown`. A "View original
+listing" badge sits exactly where a real Hemnet/Booli/broker/landlord
+link will go later — deliberately a plain, honest `<span>`, not a dead
+link or a disabled `<button>` nested inside a `<summary>` (which would be
+invalid HTML), since no real listing exists yet.
+
+**Built to be saved, not just read once.** The header's "Print / Save as
+PDF" button is a plain `window.print()` call; `site-header.tsx` and
+`site-footer.tsx` carry `print:hidden` so a printed/PDF'd report is just
+the report, not the site chrome around it. No new infrastructure — native
+browser print is enough to make the report something a person can keep.
 
 ## Why explanations are template-based, not LLM-generated
 
@@ -373,6 +444,12 @@ covered by two separate, purpose-built suites rather than one.
 - The guided onboarding decision engine — `nextClarifyingField` ordering,
   the skip-still-counts-as-asked rule, and the hard cap at 4 questions
   (`clarifying-flow.test.ts`).
+- The Realt Decision Report builder — confidence-score math, priority
+  ranking order and tie-breaks, compromise/long-term-consequence/
+  appreciate/regret derivation, the mutual-exclusivity guarantee between
+  appreciate and regret, open-question generation, and the top-matches cap
+  and exclusion filtering (`decision-report.test.ts`).
+- The street/house-number address parser (`address.test.ts`).
 
 Run with `npm run test`.
 

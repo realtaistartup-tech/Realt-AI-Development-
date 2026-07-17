@@ -192,21 +192,17 @@
     }
   },
   "recommendations": {
-    "metaTitle": "Dina matchningar",
-    "metaDescription": "Bostäder matchade och förklarade mot dina angivna prioriteringar.",
-    "loading": "Hittar dina matchningar…",
+    "metaTitle": "Din Realt-beslutsrapport",
+    "metaDescription": "En komplett, förklarbar genomgång av dina prioriteringar, avvägningar och bäst matchande bostäder.",
+    "loading": "Bygger din beslutsrapport…",
     "missing": {
       "heading": "Låt oss börja med dina prioriteringar",
       "description": "Vi har inte dina prioriteringar för den här sessionen ännu.",
       "cta": "Berätta vad du letar efter"
     },
     "error": {
-      "generic": "Det gick inte att hämta rekommendationer. Försök igen."
+      "generic": "Det gick inte att hämta din beslutsrapport. Försök igen."
     },
-    "heading": "Dina matchningar",
-    "subheading": "Rangordnade efter hur väl varje bostad passar de prioriteringar du delat, högst till lägst.",
-    "conflictsTitle": "Värt att känna till innan du jämför",
-    "conflictsSubheading": "Det här är spänningar i det du efterfrågat, inte problem med någon bostad — ett bra beslut börjar oftast med att veta vilket av dessa som faktiskt betyder mest för dig.",
     "conflict": {
       "severity": {
         "low": "Värt att notera",
@@ -217,6 +213,69 @@
       "consequenceLabel": "Långsiktig konsekvens:"
     }
   },
+  "report": {
+    "header": {
+      "eyebrow": "Realt-beslutsrapport",
+      "heading": "Ditt beslut, förklarat",
+      "subheading": "Inte en annonssida — en komplett, ärlig genomgång av vad du letar efter, var det motsäger sig självt och vad det betyder på lång sikt.",
+      "generatedOn": "Genererad {date}",
+      "print": "Skriv ut / Spara som PDF",
+      "realtScoreLabel": "Realt Score",
+      "realtScoreExplain": {
+        "strong": "Din bästa tillgängliga matchning passar bra med det du har berättat för oss.",
+        "partial": "Din bästa tillgängliga matchning är rimlig, med verkliga avvägningar värda att granska.",
+        "weak": "Inget som finns tillgängligt just nu är en stark matchning — värt att se över dina prioriteringar eller bredda sökningen."
+      },
+      "confidenceScoreLabel": "Confidence Score",
+      "confidenceScoreExplain": {
+        "high": "Den här rapporten bygger på prioriteringar du själv bekräftat, inte standardvärden.",
+        "medium": "Delar av rapporten vilar fortfarande på standardvärden — se de obesvarade frågorna nedan.",
+        "low": "Det mesta av rapporten vilar på standardvärden. Att svara på några fler frågor skulle skärpa den betydligt."
+      }
+    },
+    "profile": {
+      "heading": "Din profil, i dina egna ord"
+    },
+    "priorityRanking": {
+      "heading": "Vad som betyder mest, i ordning",
+      "description": "Rangordnat efter vikten du gav varje faktor — det är detta poängen ovan faktiskt är viktad efter."
+    },
+    "conflicts": {
+      "heading": "Upptäckta konflikter",
+      "description": "Spänningar i det du efterfrågat, inte problem med någon bostad. Att förstå de här är oftast skillnaden mellan ett bra beslut och ett snabbt.",
+      "empty": "Inga betydande konflikter upptäcktes i det du har berättat för oss."
+    },
+    "compromises": {
+      "heading": "Kompromissanalys",
+      "description": "Vad din bästa tillgängliga matchning ber dig ge upp, om något.",
+      "empty": "Din bästa matchning ber dig inte kompromissa om något du listade som ett måste."
+    },
+    "longTermConsequences": {
+      "heading": "Långsiktiga konsekvenser",
+      "description": "Hur konflikterna ovan brukar utvecklas över tid, beroende på vilket håll du lutar åt.",
+      "empty": "Inga betydande långsiktiga avvägningar identifierades utifrån det du har berättat för oss."
+    },
+    "appreciate": {
+      "heading": "Troligt att uppskatta efter 12 månader",
+      "description": "Grundat i din bästa matchnings verkliga styrkor — den typ som ofta betyder mer med tiden, inte mindre.",
+      "empty": "Inget i din bästa matchning stack ut som en stark, bestående styrka ännu."
+    },
+    "regret": {
+      "heading": "Möjliga ånger efter 12 månader",
+      "description": "Grundat i din bästa matchnings verkliga riskfaktorer — värt att fundera på innan du bestämmer dig.",
+      "empty": "Inga betydande långsiktiga riskfaktorer identifierades för din bästa matchning."
+    },
+    "openQuestions": {
+      "heading": "Viktiga obesvarade frågor",
+      "description": "Realt AI väljer inte åt dig — det här är luckorna värda att lösa själv innan du fullt ut litar på rapporten.",
+      "empty": "Inget viktigt är fortfarande olöst — rapporten bygger på en komplett bild."
+    },
+    "matches": {
+      "heading": "Föreslagna bostadsmatchningar",
+      "description": "Utvalda, inte uttömmande — bostäderna som passar allt ovan bäst, högst till lägst.",
+      "empty": "Ingen tillgänglig bostad klarar just nu dina uteslutningar. Överväg att se över dina måsten eller uteslutningar."
+    }
+  },
   "matchScore": {
     "strong": "Stark matchning",
     "partial": "Delvis matchning",
@@ -224,16 +283,13 @@
     "ariaLabel": "Matchningspoäng {score} av 100, {tier}"
   },
   "propertyCard": {
-    "price": "Pris",
-    "bedroomsSr": "Sovrum",
-    "bathroomsSr": "Badrum",
-    "areaSr": "Boarea",
-    "bed": "sovrum",
-    "bath": "badrum",
     "whyItFits": "Varför den passar",
     "risks": "Risker",
     "criticalConcern": "Kritiskt problem",
     "compromises": "Kompromisser",
+    "viewOriginalListing": "Visa originalannonsen",
+    "originalListingTooltip": "Riktiga annonser (Hemnet, Booli, mäklare, hyresvärd) kommer snart — inte kopplat än.",
+    "seeFullAnalysis": "Se hela analysen bakom den här poängen",
     "breakdown": {
       "toggle": "Se hela matchningsöversikten",
       "importance": "Vikt: {level}/5"

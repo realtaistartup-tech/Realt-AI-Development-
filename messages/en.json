@@ -192,21 +192,17 @@
     }
   },
   "recommendations": {
-    "metaTitle": "Your matches",
-    "metaDescription": "Properties matched and explained against your stated priorities.",
-    "loading": "Finding your matches…",
+    "metaTitle": "Your Realt Decision Report",
+    "metaDescription": "A complete, explainable breakdown of your priorities, trade-offs, and best-matching properties.",
+    "loading": "Building your decision report…",
     "missing": {
       "heading": "Let's start with your priorities first",
       "description": "We don't have your priorities yet for this session.",
       "cta": "Tell us what you're looking for"
     },
     "error": {
-      "generic": "Could not load recommendations. Please try again."
+      "generic": "Could not load your decision report. Please try again."
     },
-    "heading": "Your matches",
-    "subheading": "Ranked by how well each property fits the priorities you shared, most to least.",
-    "conflictsTitle": "Worth knowing before you compare",
-    "conflictsSubheading": "These are tensions in what you asked for, not problems with any listing — a good decision usually starts with knowing which of these actually matters more to you.",
     "conflict": {
       "severity": {
         "low": "Worth noting",
@@ -217,6 +213,69 @@
       "consequenceLabel": "Long-term trade-off:"
     }
   },
+  "report": {
+    "header": {
+      "eyebrow": "Realt Decision Report",
+      "heading": "Your decision, explained",
+      "subheading": "Not a listings page — a complete, honest breakdown of what you're looking for, where it conflicts with itself, and what it means for the long run.",
+      "generatedOn": "Generated on {date}",
+      "print": "Print / Save as PDF",
+      "realtScoreLabel": "Realt Score",
+      "realtScoreExplain": {
+        "strong": "Your best available match is a strong fit for what you've told us.",
+        "partial": "Your best available match is a reasonable fit, with real trade-offs worth reviewing.",
+        "weak": "Nothing currently available is a strong fit — worth revisiting your priorities or widening the search."
+      },
+      "confidenceScoreLabel": "Confidence Score",
+      "confidenceScoreExplain": {
+        "high": "This report is built on priorities you confirmed yourself, not defaults.",
+        "medium": "Some of this report is still resting on defaults — see the open questions below.",
+        "low": "Most of this report is resting on defaults. Answering a few more questions would sharpen it significantly."
+      }
+    },
+    "profile": {
+      "heading": "Your profile, in your own terms"
+    },
+    "priorityRanking": {
+      "heading": "What matters most, in order",
+      "description": "Ranked by the importance you assigned each factor — this is what the score above is actually weighted by."
+    },
+    "conflicts": {
+      "heading": "Detected conflicts",
+      "description": "Tensions in what you asked for, not problems with any listing. Understanding these is usually the difference between a good decision and a quick one.",
+      "empty": "No meaningful conflicts were detected in what you've told us."
+    },
+    "compromises": {
+      "heading": "Compromise analysis",
+      "description": "What your best-available match asks you to give up, if anything.",
+      "empty": "Your best match doesn't ask you to compromise on anything you listed as a must-have."
+    },
+    "longTermConsequences": {
+      "heading": "Long-term consequences",
+      "description": "How the conflicts above tend to play out over time, depending on which way you lean.",
+      "empty": "No significant long-term trade-offs were identified from what you've told us."
+    },
+    "appreciate": {
+      "heading": "Likely to appreciate after 12 months",
+      "description": "Grounded in your best match's real strengths — the kind that tend to matter more with time, not less.",
+      "empty": "Nothing about your best match stood out as a strong, lasting strength yet."
+    },
+    "regret": {
+      "heading": "Possible regrets after 12 months",
+      "description": "Grounded in your best match's real risk factors — worth sitting with before deciding.",
+      "empty": "No notable long-term risk factors were identified for your best match."
+    },
+    "openQuestions": {
+      "heading": "Important unanswered questions",
+      "description": "Realt AI doesn't choose for you — these are the gaps worth resolving yourself before fully trusting this report.",
+      "empty": "Nothing important is still unresolved — this report is built on a complete picture."
+    },
+    "matches": {
+      "heading": "Suggested property matches",
+      "description": "Curated, not exhaustive — the properties that best fit everything above, most to least.",
+      "empty": "No available property currently clears your deal-breakers. Consider revisiting your must-haves or deal-breakers."
+    }
+  },
   "matchScore": {
     "strong": "Strong match",
     "partial": "Partial match",
@@ -224,16 +283,13 @@
     "ariaLabel": "Match score {score} out of 100, {tier}"
   },
   "propertyCard": {
-    "price": "Price",
-    "bedroomsSr": "Bedrooms",
-    "bathroomsSr": "Bathrooms",
-    "areaSr": "Area",
-    "bed": "bed",
-    "bath": "bath",
     "whyItFits": "Why it fits",
     "risks": "Risks",
     "criticalConcern": "Critical concern",
     "compromises": "Compromises",
+    "viewOriginalListing": "View original listing",
+    "originalListingTooltip": "Live listings (Hemnet, Booli, broker, landlord) are coming soon — not connected yet.",
+    "seeFullAnalysis": "See the full analysis behind this score",
     "breakdown": {
       "toggle": "See the full match breakdown",
       "importance": "Importance: {level}/5"

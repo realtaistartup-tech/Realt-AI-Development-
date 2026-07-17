@@ -38,10 +38,17 @@ test.describe("Golden path — Swedish (default locale)", () => {
 
     await page.getByRole("button", { name: "Se mina matchningar" }).click();
     await expect(page).toHaveURL(/\/recommendations$/);
-    await expect(page.getByRole("heading", { name: "Dina matchningar" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ditt beslut, förklarat" })).toBeVisible();
 
-    await expect(page.getByText("VARFÖR DEN PASSAR").first()).toBeVisible();
-    await expect(page.getByText(/matchning/).first()).toBeVisible();
+    await expect(page.getByText("Realt Score")).toBeVisible();
+    await expect(page.getByText("Confidence Score")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Föreslagna bostadsmatchningar" })).toBeVisible();
+
+    // A property card is compact by default and expands to the full
+    // reasoning on click — never the reverse.
+    await expect(page.getByText("Varför den passar").first()).not.toBeVisible();
+    await page.getByText("Se hela analysen bakom den här poängen").first().click();
+    await expect(page.getByText("Varför den passar").first()).toBeVisible();
   });
 });
 
@@ -67,7 +74,14 @@ test.describe("Golden path — English", () => {
 
     await page.getByRole("button", { name: "See my matches" }).click();
     await expect(page).toHaveURL(/\/en\/recommendations$/);
-    await expect(page.getByRole("heading", { name: "Your matches" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your decision, explained" })).toBeVisible();
+
+    await expect(page.getByText("Realt Score")).toBeVisible();
+    await expect(page.getByText("Confidence Score")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Suggested property matches" })).toBeVisible();
+
+    await expect(page.getByText("Why it fits").first()).not.toBeVisible();
+    await page.getByText("See the full analysis behind this score").first().click();
     await expect(page.getByText("Why it fits").first()).toBeVisible();
   });
 });

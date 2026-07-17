@@ -6,7 +6,7 @@ export function SiteFooter() {
   const t = useTranslations("footer");
 
   return (
-    <footer className="border-t border-border">
+    <footer className="border-t border-border print:hidden">
       <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-muted-foreground sm:px-6">
         <p>{t("tagline")}</p>
         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">

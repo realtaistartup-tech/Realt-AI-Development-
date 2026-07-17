@@ -51,6 +51,11 @@ export type PriorityIntakeRequest = z.infer<typeof priorityIntakeRequestSchema>;
 
 export const recommendationRequestSchema = z.object({
   priorities: userPrioritiesSchema,
+  // Optional: a saved search loaded from a past session, or any caller
+  // that predates confidence tracking, won't have this. The decision
+  // report treats a missing value as fully confirmed — see
+  // hooks/use-priorities-store.ts for the same default.
+  confidence: priorityConfidenceSchema.optional(),
 });
 
 export type RecommendationRequest = z.infer<typeof recommendationRequestSchema>;

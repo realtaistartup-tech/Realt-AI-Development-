@@ -68,6 +68,19 @@ describe("scoreProperty", () => {
     expect(result.concerns.length).toBeGreaterThan(0);
   });
 
+  it("never lists the same factor as both a strength and a concern", () => {
+    // Short by exactly one bedroom scores 75 — right at the strength
+    // threshold — while still correctly being a risk. A property card must
+    // never present the same explanation as a reason it fits and a reason
+    // it doesn't.
+    const result = scoreProperty(makeProperty({ bedrooms: 3 }), makePriorities({ minBedrooms: 4 }));
+    const spaceFactor = result.factors.find((f) => f.category === "space");
+    expect(spaceFactor?.score).toBeGreaterThanOrEqual(75);
+    expect(spaceFactor?.isRisk).toBe(true);
+    expect(result.strengths).not.toContain(spaceFactor?.explanation);
+    expect(result.concerns).toContain(spaceFactor?.explanation);
+  });
+
   it("excludes a property that matches a stated deal-breaker", () => {
     const result = scoreProperty(
       makeProperty({ amenities: ["parking", "no elevator"] }),

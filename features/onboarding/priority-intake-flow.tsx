@@ -27,7 +27,6 @@ export function PriorityIntakeFlow() {
   const [priorities, setPriorities] = useState<UserPriorities | null>(null);
   const [confidence, setConfidence] = useState<PriorityConfidence | null>(null);
   const [askedFields, setAskedFields] = useState<PriorityFieldKey[]>([]);
-  const [assumedFields, setAssumedFields] = useState<PriorityFieldKey[]>([]);
   const [initialClarifyCount, setInitialClarifyCount] = useState(0);
   const [source, setSource] = useState<"ai" | "heuristic" | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,7 +63,6 @@ export function PriorityIntakeFlow() {
       setSource(data.source);
       setConfidence(data.confidence);
       setAskedFields([]);
-      setAssumedFields([]);
 
       const gapCount = PRIORITY_FIELD_ORDER.filter((field) => !data.confidence[field]).length;
       setInitialClarifyCount(gapCount);
@@ -92,13 +90,12 @@ export function PriorityIntakeFlow() {
 
   function handleClarifySkip() {
     if (!currentField || !confidence) return;
-    setAssumedFields((prev) => [...prev, currentField]);
     advanceAfter([...askedFields, currentField], confidence);
   }
 
   function handleConfirm() {
-    if (!priorities) return;
-    savePriorities(priorities);
+    if (!priorities || !confidence) return;
+    savePriorities(priorities, confidence);
     router.push("/recommendations");
   }
 
@@ -176,7 +173,7 @@ export function PriorityIntakeFlow() {
         </div>
       )}
 
-      {step === "review" && priorities && (
+      {step === "review" && priorities && confidence && (
         <div className="mt-6 space-y-6">
           <div>
             <h1 ref={headingRef} tabIndex={-1} className="text-2xl font-semibold tracking-tight outline-none">
@@ -197,7 +194,7 @@ export function PriorityIntakeFlow() {
           )}
           <PrioritySummary
             priorities={priorities}
-            assumedFields={assumedFields}
+            confidence={confidence}
             onEdit={() => setStep("editing")}
             onConfirm={handleConfirm}
           />

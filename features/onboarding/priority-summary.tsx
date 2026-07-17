@@ -4,28 +4,36 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
-import { PRIORITY_CATEGORIES, type PriorityFieldKey, type UserPriorities } from "@/types";
+import { PRIORITY_CATEGORIES, PRIORITY_FIELD_ORDER, type PriorityConfidence, type UserPriorities } from "@/types";
 
 interface PrioritySummaryProps {
   priorities: UserPriorities;
-  /** Fields the person explicitly skipped during the clarifying step — shown
-   * transparently rather than silently presenting a guess as understood. */
-  assumedFields: PriorityFieldKey[];
-  onEdit: () => void;
-  onConfirm: () => void;
+  /** Which essential fields were actually confirmed vs. left on a default —
+   * unconfirmed ones are shown transparently rather than presenting a
+   * guess as understood. A field is "unconfirmed" whenever confidence is
+   * false, regardless of whether that's because the person skipped a
+   * clarifying question or the priorities came from elsewhere (a saved
+   * search) without that signal at all. */
+  confidence: PriorityConfidence;
+  /** Omit both to render as a read-only summary — used as-is inside the
+   * Realt Decision Report, where there's no in-flow edit/confirm step. */
+  onEdit?: () => void;
+  onConfirm?: () => void;
 }
 
 /**
  * The "structured internal user profile," made legible. Not the full edit
  * form — a compact, readable statement of what Realt AI is about to use to
  * score properties, so the person can confirm at a glance instead of
- * re-reading a wall of fields. Editing is one click away, but isn't the
- * default presentation.
+ * re-reading a wall of fields. Editing is one click away during onboarding,
+ * but isn't the default presentation — and isn't offered at all when reused
+ * read-only in the decision report.
  */
-export function PrioritySummary({ priorities, assumedFields, onEdit, onConfirm }: PrioritySummaryProps) {
+export function PrioritySummary({ priorities, confidence, onEdit, onConfirm }: PrioritySummaryProps) {
   const t = useTranslations("onboarding.summary");
   const tModes = useTranslations("onboarding.fields.commute.modes");
   const tCategories = useTranslations("onboarding.fields.categories");
+  const unconfirmedFields = PRIORITY_FIELD_ORDER.filter((field) => !confidence[field]);
 
   const topCategories = PRIORITY_CATEGORIES.filter(
     (category) => (priorities.weights.find((w) => w.category === category)?.importance ?? 3) >= 4,
@@ -83,24 +91,30 @@ export function PrioritySummary({ priorities, assumedFields, onEdit, onConfirm }
         )}
       </dl>
 
-      {assumedFields.length > 0 && (
+      {unconfirmedFields.length > 0 && (
         <p className="text-xs text-muted-foreground">
           {t("assumedNote", {
-            fields: assumedFields.map((field) => t(`fieldLabels.${field}`)).join(", "),
+            fields: unconfirmedFields.map((field) => t(`fieldLabels.${field}`)).join(", "),
           })}
         </p>
       )}
 
-      <div className="flex flex-wrap gap-3">
-        <Button variant="outline" onClick={onEdit}>
-          <Pencil className="h-4 w-4" aria-hidden="true" />
-          {t("edit")}
-        </Button>
-        <Button onClick={onConfirm}>
-          {t("confirm")}
-          <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </Button>
-      </div>
+      {(onEdit || onConfirm) && (
+        <div className="flex flex-wrap gap-3">
+          {onEdit && (
+            <Button variant="outline" onClick={onEdit}>
+              <Pencil className="h-4 w-4" aria-hidden="true" />
+              {t("edit")}
+            </Button>
+          )}
+          {onConfirm && (
+            <Button onClick={onConfirm}>
+              {t("confirm")}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

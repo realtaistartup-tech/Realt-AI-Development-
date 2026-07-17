@@ -3,7 +3,10 @@
 An AI-first housing decision assistant — not a listings search engine. Realt AI helps someone
 understand their own priorities, see honest trade-offs, and get a transparent, explainable match
 score, following the "Realt Thinking Framework": understand → detect conflicts → rank → evaluate
-trade-offs → recommend → explain.
+trade-offs → recommend → explain. A guided, confidence-driven onboarding conversation feeds into
+the Realt Decision Report — a Realt Score, a Confidence Score, priority ranking, detected
+conflicts, compromise analysis, long-term consequences, a 12-months-later outlook, open questions,
+and curated property matches, all on one explainable, printable page (`/recommendations`).
 
 The full product and engineering guide lives in [`CLAUDE.md`](./CLAUDE.md). Start there for the
 mission, principles, and standards this codebase is held to.

@@ -31,7 +31,7 @@ test.describe("Saved searches (mock auth + mock persistence)", () => {
     await page.getByRole("button", { name: "Fortsätt" }).click();
     await expect(page.getByRole("heading", { name: "Så här uppfattade vi det" })).toBeVisible();
     await page.getByRole("button", { name: "Se mina matchningar" }).click();
-    await expect(page.getByRole("heading", { name: "Dina matchningar" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ditt beslut, förklarat" })).toBeVisible();
 
     // Save the search.
     await page.getByRole("button", { name: "Spara den här sökningen" }).click();
@@ -46,7 +46,7 @@ test.describe("Saved searches (mock auth + mock persistence)", () => {
     // View matches from the saved search takes us back to recommendations.
     await page.getByRole("button", { name: "Se matchningar" }).click();
     await expect(page).toHaveURL(/\/recommendations$/);
-    await expect(page.getByRole("heading", { name: "Dina matchningar" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ditt beslut, förklarat" })).toBeVisible();
 
     // Delete it and confirm the empty state appears.
     await page.getByRole("link", { name: "Mina sökningar" }).click();

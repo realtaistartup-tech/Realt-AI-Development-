@@ -190,8 +190,12 @@ export function scoreProperty(
     (item) => !matchedMustHaves.includes(item),
   );
 
+  // A risk factor can still score >= 75 (e.g. missing a single bedroom
+  // scores 75, right at the strength threshold) — excluding isRisk here
+  // keeps strengths and concerns mutually exclusive, so a property card
+  // never lists the same explanation as both a reason it fits and a risk.
   const strengths = factors
-    .filter((f) => f.score >= 75)
+    .filter((f) => f.score >= 75 && !f.isRisk)
     .map((f) => f.explanation);
   const concerns = factors.filter((f) => f.isRisk).map((f) => f.explanation);
   const criticalConcerns = factors

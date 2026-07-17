@@ -3,7 +3,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
 import { routing } from "@/i18n/routing";
-import { RecommendationsList } from "@/features/recommendations/recommendations-list";
+import { DecisionReport } from "@/features/recommendations/decision-report";
 
 export async function generateMetadata({
   params,
@@ -20,5 +20,5 @@ export async function generateMetadata({
 }
 
 export default function RecommendationsPage() {
-  return <RecommendationsList />;
+  return <DecisionReport />;
 }

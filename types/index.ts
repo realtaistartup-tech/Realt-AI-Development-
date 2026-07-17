@@ -4,3 +4,4 @@ export * from "./match";
 export * from "./account";
 export * from "./saved-search";
 export * from "./onboarding";
+export * from "./report";
