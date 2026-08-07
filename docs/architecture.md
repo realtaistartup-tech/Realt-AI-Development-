@@ -345,19 +345,58 @@ guessing at a schema for data that doesn't exist — likely wrong once a
 real vendor is chosen. This is the one place the factory doesn't follow
 the "switch automatically" rule, on purpose.
 
-**Mock authentication** (`app/api/auth/*`, `lib/session.ts`,
-`components/account-provider.tsx`) is a separate axis from persistence and
-is *not* wired to Supabase yet — entering an email still signs someone in
-immediately, no password, no email actually sent, the account created on
-first use via `AccountRepository.findOrCreateByEmail` (which now may write
-to real Supabase, but nothing verifies the email belongs to the person
-typing it). This is deliberately the same UX shape a real passwordless
-flow (e.g. Supabase Auth's email OTP/magic link) would have, so replacing
-it later changes what happens on the server while someone waits, not how
-they sign in. The session itself is a signed cookie (HMAC-SHA256 via
-`SESSION_SECRET`, see `.env.example`) — not full session management (no
-rotation, no revocation), but enough that a client can't simply set
-`realt_session=<any-account-id>` and impersonate another account.
+**Authentication is real Supabase Auth** (`lib/supabase/`, `lib/auth.ts`,
+`components/account-provider.tsx`, `features/account/`) — email/password,
+plus Google and Microsoft OAuth once each is configured. This replaced an
+earlier mock (email-only, no verification, a hand-rolled HMAC-signed
+cookie); nothing from that system remains. See
+`docs/supabase-auth-setup.md` for the one-time migration
+(`supabase/migrations/0002_auth.sql`) and Dashboard configuration.
+
+Two Supabase concerns stay deliberately separate, using different keys:
+
+- **Auth** (`lib/supabase/browser.ts`, `lib/supabase/server.ts`) uses the
+  public anon/publishable key (`NEXT_PUBLIC_SUPABASE_URL` /
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY`) — safe to ship to the browser, since
+  Supabase Auth is designed for the client to call directly (sign up, sign
+  in, OAuth redirects). `getSessionAccountId()` (`lib/auth.ts`) is the
+  single server-side helper that resolves "who is signed in" via
+  `supabase.auth.getUser()` (which re-validates against Supabase's Auth
+  server on every call, not just a locally-decoded cookie).
+- **Data** (`services/persistence/supabase/client.ts`) keeps using the
+  server-only secret key exactly as before — Supabase Auth verifies
+  *identity*, but the app's own tables are still only ever read/written
+  from the server, never directly from the browser under RLS. This was a
+  deliberate choice to keep the migration's attack surface small rather
+  than also moving to browser-side, RLS-scoped data access.
+
+The app's own `accounts` table predates Supabase Auth and has its own
+primary key, unrelated to `auth.users.id` — `AccountRepository
+.findOrCreateByAuthUser()` bridges the two (linking by email on first
+sign-in under real auth), so every account and saved search that existed
+under the old mock system stays intact through the migration; nothing was
+deleted or re-keyed.
+
+Real Supabase Auth requires `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` to be set — without them, the sign-in form
+shows an explicit "not configured" message rather than a broken one (see
+`isAuthConfigured()`, `lib/supabase/config.ts`). Google and Microsoft
+sign-in are each independently gated behind their own
+`NEXT_PUBLIC_AUTH_GOOGLE_ENABLED` / `NEXT_PUBLIC_AUTH_MICROSOFT_ENABLED`
+flag (`lib/auth-providers.ts`) — a provider button only ever renders once
+it's actually configured end to end (credentials in the Supabase
+Dashboard, then the flag flipped), never speculatively. Apple is
+structured into the same provider list but not implemented (it needs a
+paid Apple Developer account) — adding it later is one new array entry and
+one new flag, not a restructure.
+
+Housing preferences also gained durable, per-account storage in this
+migration (`accounts.preferences`, `AccountRepository.getPreferences` /
+`updatePreferences`, `GET`/`PUT /api/account/preferences`) — previously
+they only ever lived in `sessionStorage`. That mechanism (below) still
+handles the anonymous onboarding → recommendations handoff unchanged; the
+new capability is additive and isn't wired into any UI yet (that's the
+Settings area's Housing Preferences page).
 
 **Saved searches** are the product feature this unblocked:
 `SaveSearchButton` on `/recommendations` persists the current priorities

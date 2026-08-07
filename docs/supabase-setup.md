@@ -35,9 +35,9 @@ Both are on your Supabase project's **Settings → API** page. Use the
 only from the server (Next.js route handlers), never from the browser, so
 the code is written against the key that bypasses RLS by design.
 
-`SESSION_SECRET` (see `.env.example`) is unrelated to Supabase but also
-required for the mock-auth session cookie to be trustworthy — set it too
-if you haven't already.
+This pair is for data access only. Real sign-in (email/password, Google,
+Microsoft) is a separate concern using a different key pair — see
+[`docs/supabase-auth-setup.md`](./supabase-auth-setup.md).
 
 ## 3. Verify it's working
 
@@ -74,7 +74,8 @@ Steps 1–3 above are how to close that gap.
 
 - **Property data** (`lib/mock-properties.ts`) — no table for this exists
   yet; see `docs/roadmap-v1.md` item #8.
-- **Authentication itself** — signing in still doesn't verify the email
-  belongs to the person entering it (no password, no magic link actually
-  sent). Real verification is Supabase Auth (or similar), a separate piece
-  of work from the persistence layer this document covers.
+
+Authentication itself is no longer mocked — see
+[`docs/supabase-auth-setup.md`](./supabase-auth-setup.md) for the real
+Supabase Auth migration (a separate one-time setup step from the one on
+this page).

@@ -303,13 +303,48 @@
     "signedInAs": "Inloggad som {email}",
     "dialog": {
       "title": "Logga in",
-      "description": "Simulerad inloggning för denna förlanseringsversion — inget lösenord, och inget e-postmeddelande skickas faktiskt. Ange valfri e-postadress för att fortsätta.",
+      "description": "Logga in för att spara sökningar och fortsätta där du slutade.",
+      "notConfigured": "Inloggning är inte konfigurerad än.",
       "emailLabel": "E-post",
       "emailPlaceholder": "du@example.com",
-      "submit": "Fortsätt",
-      "submitting": "Loggar in…",
-      "error": "Ange en giltig e-postadress."
+      "passwordLabel": "Lösenord",
+      "passwordPlaceholder": "••••••••",
+      "continueWith": {
+        "google": "Fortsätt med Google",
+        "microsoft": "Fortsätt med Microsoft",
+        "apple": "Fortsätt med Apple"
+      },
+      "orDivider": "eller",
+      "signIn": "Logga in",
+      "createAccount": "Skapa konto",
+      "signingIn": "Loggar in…",
+      "creatingAccount": "Skapar konto…",
+      "toggleToSignUp": "Har du inget konto? Skapa ett",
+      "toggleToSignIn": "Har du redan ett konto? Logga in",
+      "forgotPassword": "Glömt lösenordet?",
+      "sendResetLink": "Skicka återställningslänk",
+      "sendingReset": "Skickar…",
+      "resetSent": "Om ett konto finns för {email} har vi skickat en länk för att återställa lösenordet.",
+      "backToSignIn": "Tillbaka till inloggning",
+      "passwordTooShort": "Lösenordet måste vara minst {min} tecken.",
+      "error": "Något gick fel. Försök igen."
     }
+  },
+  "resetPassword": {
+    "metaTitle": "Återställ ditt lösenord",
+    "metaDescription": "Ange ett nytt lösenord för ditt Realt AI-konto.",
+    "heading": "Ange ett nytt lösenord",
+    "subheading": "Välj ett nytt lösenord för ditt konto.",
+    "notConfigured": "Återställning av lösenord är inte konfigurerad än.",
+    "newPasswordLabel": "Nytt lösenord",
+    "confirmPasswordLabel": "Bekräfta nytt lösenord",
+    "submit": "Uppdatera lösenord",
+    "submitting": "Uppdaterar…",
+    "successHeading": "Lösenordet har uppdaterats",
+    "successDescription": "Ditt lösenord har ändrats. Du är inloggad med ditt nya lösenord.",
+    "backHome": "Tillbaka till startsidan",
+    "passwordTooShort": "Lösenordet måste vara minst {min} tecken.",
+    "passwordsDontMatch": "Lösenorden matchar inte."
   },
   "saveSearch": {
     "save": "Spara den här sökningen",

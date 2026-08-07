@@ -65,9 +65,3 @@ export const saveSearchRequestSchema = z.object({
 });
 
 export type SaveSearchRequest = z.infer<typeof saveSearchRequestSchema>;
-
-export const mockSignInRequestSchema = z.object({
-  email: z.string().trim().toLowerCase().email().max(254),
-});
-
-export type MockSignInRequest = z.infer<typeof mockSignInRequestSchema>;

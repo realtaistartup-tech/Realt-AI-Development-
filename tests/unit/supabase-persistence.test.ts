@@ -23,10 +23,16 @@ class FakeQueryBuilder implements PromiseLike<FakeResult> {
   eq() {
     return this;
   }
+  is() {
+    return this;
+  }
   order() {
     return this;
   }
   insert() {
+    return this;
+  }
+  update() {
     return this;
   }
   delete() {
@@ -75,7 +81,7 @@ describe("SupabaseAccountRepository", () => {
     process.env = { ...originalEnv };
   });
 
-  it("returns the existing account when the email is already found", async () => {
+  it("returns the existing account when it's already linked to this auth user", async () => {
     const { SupabaseAccountRepository } = await loadRepositories();
     mockFrom.mockReturnValueOnce(
       new FakeQueryBuilder({
@@ -85,15 +91,41 @@ describe("SupabaseAccountRepository", () => {
     );
 
     const repo = new SupabaseAccountRepository();
-    const account = await repo.findOrCreateByEmail("Person@Example.com");
+    const account = await repo.findOrCreateByAuthUser("auth-1", "Person@Example.com");
 
     expect(account).toEqual({ id: "acc-1", email: "person@example.com", createdAt: "2026-01-01T00:00:00Z" });
+    expect(mockFrom).toHaveBeenCalledTimes(1);
   });
 
-  it("creates a new account when no existing row is found", async () => {
+  it("links a pre-existing (pre-migration) account by email instead of creating a duplicate", async () => {
     const { SupabaseAccountRepository } = await loadRepositories();
     mockFrom
-      .mockReturnValueOnce(new FakeQueryBuilder({ data: null, error: null })) // select: not found
+      .mockReturnValueOnce(new FakeQueryBuilder({ data: null, error: null })) // not linked by auth_user_id
+      .mockReturnValueOnce(
+        new FakeQueryBuilder({
+          data: { id: "acc-legacy", email: "legacy@example.com", created_at: "2025-01-01T00:00:00Z" },
+          error: null,
+        }),
+      ) // found by email, auth_user_id still null
+      .mockReturnValueOnce(
+        new FakeQueryBuilder({
+          data: { id: "acc-legacy", email: "legacy@example.com", created_at: "2025-01-01T00:00:00Z" },
+          error: null,
+        }),
+      ); // update: link it
+
+    const repo = new SupabaseAccountRepository();
+    const account = await repo.findOrCreateByAuthUser("auth-2", "legacy@example.com");
+
+    expect(account.id).toBe("acc-legacy");
+    expect(mockFrom).toHaveBeenCalledTimes(3);
+  });
+
+  it("creates a new account when neither a linked row nor a pre-existing email row is found", async () => {
+    const { SupabaseAccountRepository } = await loadRepositories();
+    mockFrom
+      .mockReturnValueOnce(new FakeQueryBuilder({ data: null, error: null })) // not linked
+      .mockReturnValueOnce(new FakeQueryBuilder({ data: null, error: null })) // no pre-existing email row
       .mockReturnValueOnce(
         new FakeQueryBuilder({
           data: { id: "acc-2", email: "new@example.com", created_at: "2026-01-02T00:00:00Z" },
@@ -102,16 +134,17 @@ describe("SupabaseAccountRepository", () => {
       ); // insert
 
     const repo = new SupabaseAccountRepository();
-    const account = await repo.findOrCreateByEmail("new@example.com");
+    const account = await repo.findOrCreateByAuthUser("auth-3", "new@example.com");
 
     expect(account.id).toBe("acc-2");
-    expect(mockFrom).toHaveBeenCalledTimes(2);
+    expect(mockFrom).toHaveBeenCalledTimes(3);
   });
 
   it("falls back to reading the row on a concurrent unique-constraint race", async () => {
     const { SupabaseAccountRepository } = await loadRepositories();
     mockFrom
-      .mockReturnValueOnce(new FakeQueryBuilder({ data: null, error: null })) // select: not found yet
+      .mockReturnValueOnce(new FakeQueryBuilder({ data: null, error: null })) // not linked
+      .mockReturnValueOnce(new FakeQueryBuilder({ data: null, error: null })) // no pre-existing email row
       .mockReturnValueOnce(
         new FakeQueryBuilder({ data: null, error: { code: "23505", message: "duplicate key" } }),
       ) // insert: lost the race
@@ -120,10 +153,10 @@ describe("SupabaseAccountRepository", () => {
           data: { id: "acc-3", email: "race@example.com", created_at: "2026-01-03T00:00:00Z" },
           error: null,
         }),
-      ); // re-select: read the winner's row
+      ); // re-select by auth_user_id: read the winner's row
 
     const repo = new SupabaseAccountRepository();
-    const account = await repo.findOrCreateByEmail("race@example.com");
+    const account = await repo.findOrCreateByAuthUser("auth-4", "race@example.com");
 
     expect(account.id).toBe("acc-3");
   });
@@ -135,7 +168,9 @@ describe("SupabaseAccountRepository", () => {
     );
 
     const repo = new SupabaseAccountRepository();
-    await expect(repo.findOrCreateByEmail("fails@example.com")).rejects.toThrow(/connection reset/);
+    await expect(repo.findOrCreateByAuthUser("auth-5", "fails@example.com")).rejects.toThrow(
+      /connection reset/,
+    );
   });
 
   it("finds an account by id, and returns null when missing", async () => {
@@ -155,6 +190,53 @@ describe("SupabaseAccountRepository", () => {
 
     mockFrom.mockReturnValueOnce(new FakeQueryBuilder({ data: null, error: null }));
     expect(await repo.findById("missing")).toBeNull();
+  });
+
+  it("reads stored preferences, and null when none are set", async () => {
+    const { SupabaseAccountRepository } = await loadRepositories();
+    const preferences = {
+      budgetMin: 2_000_000,
+      budgetMax: 3_500_000,
+      commuteMaxMinutes: 25,
+      commuteMode: "transit" as const,
+      minBedrooms: 2,
+      minBathrooms: 1,
+      mustHaves: [],
+      dealBreakers: [],
+      lifestyleTags: [],
+      weights: [],
+    };
+    mockFrom.mockReturnValueOnce(new FakeQueryBuilder({ data: { preferences }, error: null }));
+    const repo = new SupabaseAccountRepository();
+    expect(await repo.getPreferences("acc-5")).toEqual(preferences);
+
+    mockFrom.mockReturnValueOnce(new FakeQueryBuilder({ data: { preferences: null }, error: null }));
+    expect(await repo.getPreferences("acc-6")).toBeNull();
+  });
+
+  it("writes preferences, and throws a descriptive error on failure", async () => {
+    const { SupabaseAccountRepository } = await loadRepositories();
+    const repo = new SupabaseAccountRepository();
+    const preferences = {
+      budgetMin: 2_000_000,
+      budgetMax: 3_500_000,
+      commuteMaxMinutes: 25,
+      commuteMode: "transit" as const,
+      minBedrooms: 2,
+      minBathrooms: 1,
+      mustHaves: [],
+      dealBreakers: [],
+      lifestyleTags: [],
+      weights: [],
+    };
+
+    mockFrom.mockReturnValueOnce(new FakeQueryBuilder({ data: null, error: null }));
+    await expect(repo.updatePreferences("acc-5", preferences)).resolves.toBeUndefined();
+
+    mockFrom.mockReturnValueOnce(
+      new FakeQueryBuilder({ data: null, error: { message: "row not found" } }),
+    );
+    await expect(repo.updatePreferences("acc-missing", preferences)).rejects.toThrow(/row not found/);
   });
 });
 
