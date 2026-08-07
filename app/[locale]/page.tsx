@@ -54,10 +54,10 @@ export default function Home() {
               <Card key={step.key} className="text-left">
                 <CardHeader>
                   <div className="flex items-center gap-2">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-foreground">
                       {index + 1}
                     </span>
-                    <step.icon className="h-5 w-5 text-primary" aria-hidden="true" />
+                    <step.icon className="h-5 w-5 text-foreground" aria-hidden="true" />
                   </div>
                   <CardTitle className="mt-3 text-base">
                     {t(`howItWorks.steps.${step.key}.title`)}
