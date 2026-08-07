@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { formatPrice } from "@/lib/format";
 import { PRIORITY_CATEGORIES, PRIORITY_FIELD_ORDER, type PriorityConfidence, type UserPriorities } from "@/types";
 
@@ -43,17 +44,17 @@ export function PrioritySummary({ priorities, confidence, onEdit, onConfirm }: P
     <div className="space-y-6">
       <dl className="grid gap-4 rounded-lg border border-border p-5 sm:grid-cols-2">
         <div>
-          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <Eyebrow as="dt" className="text-muted-foreground">
             {t("budget")}
-          </dt>
+          </Eyebrow>
           <dd className="mt-1 text-sm text-foreground">
             {formatPrice(priorities.budgetMin)} – {formatPrice(priorities.budgetMax)}
           </dd>
         </div>
         <div>
-          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <Eyebrow as="dt" className="text-muted-foreground">
             {t("commute")}
-          </dt>
+          </Eyebrow>
           <dd className="mt-1 text-sm text-foreground">
             {t("commuteValue", {
               minutes: priorities.commuteMaxMinutes,
@@ -62,17 +63,17 @@ export function PrioritySummary({ priorities, confidence, onEdit, onConfirm }: P
           </dd>
         </div>
         <div>
-          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <Eyebrow as="dt" className="text-muted-foreground">
             {t("space")}
-          </dt>
+          </Eyebrow>
           <dd className="mt-1 text-sm text-foreground">
             {t("spaceValue", { bedrooms: priorities.minBedrooms, bathrooms: priorities.minBathrooms })}
           </dd>
         </div>
         <div>
-          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <Eyebrow as="dt" className="text-muted-foreground">
             {t("topPriorities")}
-          </dt>
+          </Eyebrow>
           <dd className="mt-1 text-sm text-foreground">
             {topCategories.length > 0
               ? topCategories.map((c) => tCategories(c)).join(", ")
@@ -122,7 +123,9 @@ export function PrioritySummary({ priorities, confidence, onEdit, onConfirm }: P
 function TagRow({ label, tags }: { label: string; tags: string[] }) {
   return (
     <div className="sm:col-span-2">
-      <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</dt>
+      <Eyebrow as="dt" className="text-muted-foreground">
+        {label}
+      </Eyebrow>
       <dd className="mt-1.5 flex flex-wrap gap-1.5">
         {tags.map((tag) => (
           <Badge key={tag} variant="secondary">

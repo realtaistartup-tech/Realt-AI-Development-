@@ -2,6 +2,7 @@ import { CheckCircle2, AlertTriangle, ChevronRight, ExternalLink, HandCoins, Map
 import { useTranslations } from "next-intl";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { parseAddress } from "@/lib/address";
 import { formatPrice } from "@/lib/format";
 import type { MatchResult } from "@/types";
@@ -88,9 +89,7 @@ export function PropertyCard({ result }: PropertyCardProps) {
                 aria-hidden="true"
               />
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-destructive">
-                  {t("criticalConcern")}
-                </p>
+                <Eyebrow className="text-destructive">{t("criticalConcern")}</Eyebrow>
                 <ul className="mt-1 space-y-1 text-sm text-foreground">
                   {criticalConcerns.map((item) => (
                     <li key={item}>{item}</li>
@@ -102,10 +101,10 @@ export function PropertyCard({ result }: PropertyCardProps) {
           <div className="grid gap-4 sm:grid-cols-3">
             {strengths.length > 0 && (
               <div>
-                <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-success">
+                <Eyebrow as="h3" className="flex items-center gap-1.5 text-success">
                   <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
                   {t("whyItFits")}
-                </h3>
+                </Eyebrow>
                 <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                   {strengths.map((item) => (
                     <li key={item}>{item}</li>
@@ -115,10 +114,10 @@ export function PropertyCard({ result }: PropertyCardProps) {
             )}
             {concerns.length > 0 && (
               <div>
-                <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-destructive">
+                <Eyebrow as="h3" className="flex items-center gap-1.5 text-destructive">
                   <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
                   {t("risks")}
-                </h3>
+                </Eyebrow>
                 <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                   {concerns.map((item) => (
                     <li key={item}>{item}</li>
@@ -128,10 +127,10 @@ export function PropertyCard({ result }: PropertyCardProps) {
             )}
             {compromises.length > 0 && (
               <div>
-                <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-warning">
+                <Eyebrow as="h3" className="flex items-center gap-1.5 text-warning">
                   <HandCoins className="h-3.5 w-3.5" aria-hidden="true" />
                   {t("compromises")}
-                </h3>
+                </Eyebrow>
                 <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                   {compromises.map((item) => (
                     <li key={item}>{item}</li>

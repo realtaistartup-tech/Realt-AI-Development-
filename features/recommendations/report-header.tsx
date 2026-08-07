@@ -4,6 +4,7 @@ import { Printer } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { cn } from "@/lib/utils";
 import type { ConfidenceTier, UserPriorities } from "@/types";
 import { SaveSearchButton } from "./save-search-button";
@@ -59,9 +60,7 @@ export function ReportHeader({
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-            {t("eyebrow")}
-          </p>
+          <Eyebrow className="text-primary">{t("eyebrow")}</Eyebrow>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">
             {t("heading")}
           </h1>
@@ -81,14 +80,12 @@ export function ReportHeader({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className={cn("rounded-xl border p-5", REALT_SCORE_TONE[tier])}>
-          <p className="text-xs font-semibold uppercase tracking-wide">{t("realtScoreLabel")}</p>
+          <Eyebrow>{t("realtScoreLabel")}</Eyebrow>
           <p className="mt-1 text-4xl font-bold tabular-nums">{realtScore}</p>
           <p className="mt-1 text-sm">{t(`realtScoreExplain.${tier}`)}</p>
         </div>
         <div className={cn("rounded-xl border p-5", CONFIDENCE_TONE[confidenceTier])}>
-          <p className="text-xs font-semibold uppercase tracking-wide">
-            {t("confidenceScoreLabel")}
-          </p>
+          <Eyebrow>{t("confidenceScoreLabel")}</Eyebrow>
           <p className="mt-1 text-4xl font-bold tabular-nums">{confidenceScore}</p>
           <p className="mt-1 text-sm">{t(`confidenceScoreExplain.${confidenceTier}`)}</p>
         </div>
