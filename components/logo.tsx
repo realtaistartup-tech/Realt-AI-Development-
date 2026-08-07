@@ -51,7 +51,7 @@ export function Logo({ className, label = "Realt AI" }: LogoProps) {
         <rect x="0" y="27" width="28" height="9" />
         <rect x="0" y="55" width="34" height="9" />
       </g>
-      {/* A */}
+      {/* A — clean upside-down V, no crossbar */}
       <g transform="translate(110,0)">
         <line
           x1="20"
@@ -71,7 +71,6 @@ export function Logo({ className, label = "Realt AI" }: LogoProps) {
           strokeWidth="9"
           strokeLinecap="square"
         />
-        <rect x="10" y="35" width="20" height="9" />
       </g>
       {/* L */}
       <g transform="translate(164,0)">
@@ -83,7 +82,7 @@ export function Logo({ className, label = "Realt AI" }: LogoProps) {
         <rect x="0" y="0" width="34" height="9" />
         <rect x="12.5" y="0" width="9" height="64" />
       </g>
-      {/* A */}
+      {/* A — clean upside-down V, no crossbar */}
       <g transform="translate(272,0)">
         <line
           x1="20"
@@ -103,7 +102,6 @@ export function Logo({ className, label = "Realt AI" }: LogoProps) {
           strokeWidth="9"
           strokeLinecap="square"
         />
-        <rect x="10" y="35" width="20" height="9" />
       </g>
       {/* I */}
       <g transform="translate(326,0)">
