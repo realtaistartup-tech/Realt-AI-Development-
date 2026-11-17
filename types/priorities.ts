@@ -8,6 +8,8 @@ export type PriorityCategory =
 
 export type CommuteMode = "drive" | "transit" | "walk" | "bike";
 
+export type HousingIntent = "buy" | "rent";
+
 export interface PriorityWeight {
   category: PriorityCategory;
   /** 1 = nice to have, 5 = critical */
@@ -17,6 +19,7 @@ export interface PriorityWeight {
 export interface UserPriorities {
   budgetMin: number;
   budgetMax: number;
+  housingIntent?: HousingIntent;
   commuteMaxMinutes: number;
   commuteMode: CommuteMode;
   minBedrooms: number;

@@ -7,5 +7,8 @@ export function getImportance(priorities: UserPriorities, category: string): num
 }
 
 export function clampScore(value: number): number {
+  if (!Number.isFinite(value)) return 0;
   return Math.max(0, Math.min(100, value));
+}
+
 }
