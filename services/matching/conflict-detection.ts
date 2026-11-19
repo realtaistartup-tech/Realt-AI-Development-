@@ -11,79 +11,167 @@ import { getImportance } from "./priority-helpers";
  * every conflict below explains why it exists, how much it matters, and
  * what realistic options exist, each with its own honest consequence.
  *
- * All of this operates on free-text signals in mustHaves, dealBreakers,
- * and lifestyleTags, because that's the open vocabulary the AI extraction
- * layer (and the manual review form) already writes into. New concepts
- * (pets, working from home, accessibility, tenure plans, ...) are added
- * as keyword sets here rather than new structured fields, so this stays
- * extensible without onboarding or schema changes.
+ * All of this operates on free-text signals in mustHaves and lifestyleTags
+ * (things the person WANTS), because that's the open vocabulary the AI
+ * extraction layer (and the manual review form) already writes into.
+ * dealBreakers are things the person wants to AVOID, so they are
+ * deliberately NOT read as wishes. New concepts (pets, working from home,
+ * accessibility, tenure plans, ...) are added as keyword sets here rather
+ * than new structured fields, so this stays extensible without onboarding
+ * or schema changes.
  */
 
-const PETS = ["pet", "dog", "cat"];
-const HOME_OFFICE = ["home office", "work from home", "remote work", "wfh", "home-office"];
-const NATURE = ["nature", "green space", "countryside", "forest", "rural", "hiking"];
-const URBAN_CENTER = [
+/**
+ * Makes free text comparable: "Home-Office", "home_office" and
+ * "home office" all become "home office".
+ */
+function normalizeText(value: string): string {
+  return value.toLowerCase().replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
+// Word boundaries that also work for å, ä and ö (unlike \b).
+const WORD_START = "(?<![\\p{L}\\p{N}])";
+const WORD_END = "(?![\\p{L}\\p{N}])";
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Builds one matcher for a keyword list.
+ *
+ * Keywords match WHOLE words only, with an optional plural "s". This is
+ * what stops "cat" from matching "location", "pet" from matching "carpet"
+ * and "nature" from matching "signature".
+ *
+ * A trailing "*" makes a keyword a stem that matches any word starting
+ * with it, e.g. "accessib*" matches "accessible" and "accessibility".
+ */
+function buildMatcher(keywords: string[]): RegExp {
+  const patterns = keywords.map((keyword) => {
+    const isStem = keyword.endsWith("*");
+    const base = escapeRegExp(
+      normalizeText(isStem ? keyword.slice(0, -1) : keyword),
+    );
+
+    return isStem ? `${WORD_START}${base}` : `${WORD_START}${base}s?${WORD_END}`;
+  });
+
+  return new RegExp(patterns.join("|"), "iu");
+}
+
+const PETS = buildMatcher(["pet", "dog", "cat"]);
+const HOME_OFFICE = buildMatcher([
+  "home office",
+  "work from home",
+  "remote work",
+  "wfh",
+]);
+const NATURE = buildMatcher([
+  "nature",
+  "green space",
+  "countryside",
+  "forest",
+  "rural",
+  "hiking",
+]);
+const URBAN_CENTER = buildMatcher([
   "nightlife",
   "city center",
   "city centre",
-  "city-center",
   "downtown",
   "urban core",
   "central location",
-];
-const QUIET = ["quiet", "peaceful", "noise-sensitive", "noise sensitive", "low noise", "calm street"];
-const FAMILY_GROWTH = [
+]);
+const QUIET = buildMatcher([
+  "quiet",
+  "peaceful",
+  "noise sensitive",
+  "low noise",
+  "calm street",
+]);
+const FAMILY_GROWTH = buildMatcher([
   "growing family",
   "planning a family",
   "more kids",
   "expecting",
   "family growth",
   "future kids",
-  "family-growth-planned",
-];
-const ACCESSIBILITY = ["wheelchair", "step-free", "step free", "accessib", "mobility"];
-const HISTORIC = ["historic", "character", "period property", "old building", "pre-war", "charm"];
-const FLEXIBLE_TENURE = [
-  "flexible",
-  "short-term",
+]);
+const ACCESSIBILITY = buildMatcher([
+  "wheelchair",
+  "step free",
+  "accessib*",
+  "mobility",
+]);
+const HISTORIC = buildMatcher([
+  "historic*",
+  "character*",
+  "period property",
+  "old building",
+  "pre war",
+  "charm*",
+]);
+// "flexible" alone also matches things like "flexible layout", which says
+// nothing about tenure, so only tenure-related phrases count here.
+const FLEXIBLE_TENURE = buildMatcher([
+  "flexible tenure",
+  "flexible lease",
+  "flexible contract",
   "short term",
   "may relocate",
   "might relocate",
   "not ready to commit",
-];
-const LONG_TERM_OWNERSHIP = [
+]);
+const LONG_TERM_OWNERSHIP = buildMatcher([
   "forever home",
   "settle down",
-  "long-term home",
+  "long term home",
   "buying",
-  "long-term-ownership",
+  "long term ownership",
   "permanent home",
-];
-const PARKING = ["parking", "garage"];
+]);
+const PARKING = buildMatcher(["parking", "garage"]);
 
-function taggedText(priorities: UserPriorities): string[] {
-  return [...priorities.mustHaves, ...priorities.dealBreakers, ...priorities.lifestyleTags].map(
-    (tag) => tag.toLowerCase(),
-  );
+/**
+ * What the person WANTS, as normalized text. Deal-breakers are excluded on
+ * purpose: someone who lists "nightlife" as a deal-breaker is saying they
+ * do NOT want it, so it must not create a nightlife conflict.
+ */
+function wantedTags(priorities: UserPriorities): string[] {
+  return [...priorities.mustHaves, ...priorities.lifestyleTags]
+    .map(normalizeText)
+    .filter((tag) => tag.length > 0);
 }
 
-function hasSignal(tags: string[], keywords: string[]): boolean {
-  return tags.some((tag) => keywords.some((keyword) => tag.includes(keyword)));
+function hasSignal(tags: string[], matcher: RegExp): boolean {
+  return tags.some((tag) => matcher.test(tag));
 }
 
-/** Below this, a Swedish urban budget is tight enough that "critical" priorities start competing directly for the same limited supply. */
+/**
+ * Below this PURCHASE price, a Swedish urban budget is tight enough that
+ * "critical" priorities start competing directly for the same limited
+ * supply. This is a purchase price in SEK, so it is never applied to
+ * rental searches, where the budget is a monthly rent.
+ */
 const TIGHT_BUDGET_SEK = 4_000_000;
 
 export function detectPriorityConflicts(priorities: UserPriorities): PriorityConflict[] {
   const conflicts: PriorityConflict[] = [];
-  const tags = taggedText(priorities);
+  const tags = wantedTags(priorities);
 
   const budgetImportance = getImportance(priorities, "budget");
   const commuteImportance = getImportance(priorities, "commute");
   const spaceImportance = getImportance(priorities, "space");
   const safetyImportance = getImportance(priorities, "safety");
 
-  const isTightBudget = priorities.budgetMax > 0 && priorities.budgetMax <= TIGHT_BUDGET_SEK;
+  // A monthly rent (e.g. 12 000 kr) is always far below 4 000 000, so
+  // without this check every renter was treated as having a "tight" budget.
+  // Rental searches get no tight-budget conflicts until a rent threshold
+  // has been decided. An unknown intent is treated as a purchase.
+  const isBuying = priorities.housingIntent !== "rent";
+  const isTightBudget =
+    isBuying && priorities.budgetMax > 0 && priorities.budgetMax <= TIGHT_BUDGET_SEK;
   const wantsShortCentralCommute = priorities.commuteMaxMinutes <= 20 && commuteImportance >= 4;
 
   if (priorities.budgetMin > priorities.budgetMax) {
