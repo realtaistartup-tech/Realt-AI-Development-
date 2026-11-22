@@ -520,5 +520,16 @@
         }
       ]
     }
+  },
+  "assistant": {
+    "name": "Realt AI Assistant",
+    "metaTitle": "Realt AI Assistant",
+    "metaDescription": "Chat with Realt AI Assistant about the home you're looking for.",
+    "greeting": "Hi! I'm Realt AI Assistant. Tell me about the home you're looking for — budget, commute, space, safety, schools or lifestyle — in your own words.",
+    "placeholder": "Describe your ideal home…",
+    "inputLabel": "Your message",
+    "send": "Send",
+    "thinking": "Thinking…",
+    "summaryIntro": "Thanks! Here's what I understood. Check it and adjust anything before I find your matches."
   }
 }

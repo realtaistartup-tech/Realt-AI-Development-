@@ -1,4 +1,4 @@
-import type { PriorityConfidence, UserPriorities } from "@/types";
+﻿import type { PriorityConfidence, UserPriorities } from "@/types";
 import { PRIORITY_CATEGORIES } from "@/types";
 import { priorityConfidenceSchema, userPrioritiesSchema } from "@/lib/validation";
 import { AiServiceUnavailableError, isAiConfigured, requestStructuredCompletion } from "./client";
@@ -80,6 +80,53 @@ const FALLBACK_DEFAULTS: UserPriorities = {
   weights: PRIORITY_CATEGORIES.map((category) => ({ category, importance: 3 })),
 };
 
+// --- Swedish phrasing (budget, room types, commute, lifestyle) ---
+
+function toNumber(value: string): number {
+  return Number(value.replace(",", "."));
+}
+
+const MILLION_UNIT = "(?:miljoner|miljon|mkr|mnkr)";
+
+function parseSwedishBudget(text: string): { min?: number; max: number } | null {
+  const range = text.match(
+    new RegExp(`mellan\\s+(\\d+(?:[.,]\\d+)?)\\s*(?:och|-|–)\\s*(\\d+(?:[.,]\\d+)?)\\s*${MILLION_UNIT}`),
+  );
+  if (range) {
+    const a = Math.round(toNumber(range[1] ?? "") * 1_000_000);
+    const b = Math.round(toNumber(range[2] ?? "") * 1_000_000);
+    if (a > 0 && b > 0) return { min: Math.min(a, b), max: Math.max(a, b) };
+  }
+  const million = text.match(new RegExp(`(\\d+(?:[.,]\\d+)?)\\s*${MILLION_UNIT}`));
+  if (million) {
+    const amount = Math.round(toNumber(million[1] ?? "") * 1_000_000);
+    if (amount > 0) return { max: amount };
+  }
+  const thousand = text.match(/(\d+(?:[.,]\d+)?)\s*(?:tusen|tkr)\b/);
+  if (thousand) {
+    const amount = Math.round(toNumber(thousand[1] ?? "") * 1_000);
+    if (amount > 0) return { max: amount };
+  }
+  const spaced = text.match(/(\d{1,3}(?:[ \u00a0]\d{3})+)/);
+  if (spaced) {
+    const amount = Number((spaced[1] ?? "").replace(/[ \u00a0]/g, ""));
+    if (Number.isFinite(amount) && amount > 0) return { max: amount };
+  }
+  return null;
+}
+
+const SWEDISH_ROOM_TYPES: Record<string, number> = { ettan: 1, tvåa: 2, trea: 3, femma: 5 };
+function roomsToBedrooms(rooms: number): number { return Math.max(1, rooms - 1); }
+
+const SWEDISH_LIFESTYLE: Array<[string[], string]> = [
+  [["lugn", "tyst"], "quiet"],
+  [["familjevänlig", "barnvänlig"], "family-friendly"],
+  [["naturnära", "natur", "grönområde", "skog"], "nature"],
+  [["centralt", "innerstad"], "city-center"],
+  [["nattliv", "uteliv"], "nightlife"],
+  [["gångvänlig", "gångavstånd"], "walkable"],
+];
+
 export interface HeuristicExtraction {
   priorities: UserPriorities;
   /** Which of the essential fields were actually found in the text, as
@@ -101,146 +148,87 @@ export function extractPrioritiesHeuristically(freeText: string): HeuristicExtra
   const text = freeText.toLowerCase();
   const priorities: UserPriorities = structuredClone(FALLBACK_DEFAULTS);
 
-  const budgetMatch = text.match(/\$?\s?(\d{2,3}(?:,\d{3})+|\d{5,7})/);
-  if (budgetMatch) {
-    const amount = Number(budgetMatch[1].replace(/,/g, ""));
-    if (Number.isFinite(amount) && amount > 0) {
-      priorities.budgetMax = amount;
-      priorities.budgetMin = Math.round(amount * 0.7);
+  const addTag = (tag: string) => { if (!priorities.lifestyleTags.includes(tag)) priorities.lifestyleTags.push(tag); };
+  const addMustHave = (item: string) => { if (!priorities.mustHaves.includes(item)) priorities.mustHaves.push(item); };
+
+  let budgetFound = false;
+  const swedishBudget = parseSwedishBudget(text);
+  if (swedishBudget) {
+    priorities.budgetMax = swedishBudget.max;
+    priorities.budgetMin = swedishBudget.min ?? Math.round(swedishBudget.max * 0.7);
+    budgetFound = true;
+  } else {
+    const budgetMatch = text.match(/\$?\s?(\d{2,3}(?:,\d{3})+|\d{5,7})/);
+    if (budgetMatch) {
+      const amount = Number((budgetMatch[1] ?? "").replace(/,/g, ""));
+      if (Number.isFinite(amount) && amount > 0) {
+        priorities.budgetMax = amount;
+        priorities.budgetMin = Math.round(amount * 0.7);
+        budgetFound = true;
+      }
     }
   }
 
+  let spaceFound = false;
+  const bedroomRange = text.match(/(\d+)\s*[-–]\s*(\d+)\s*(?:bed|bedroom|br|sovrum)/);
   const bedroomMatch = text.match(/(\d+)\s*(?:bed|bedroom|br|sovrum)/);
-  if (bedroomMatch) {
+  const roomMatch = text.match(/(\d+)\s*(?:rum|rok)\b/);
+  const roomTypeMatch = text.match(/\b(ettan|tvåa|trea|femma)\b/);
+  const fourRoomMatch = /\b(?:en|ett)\s+fyra\b/.test(text);
+  if (bedroomRange) {
+    priorities.minBedrooms = Math.min(Number(bedroomRange[1]), Number(bedroomRange[2]));
+    spaceFound = true;
+  } else if (bedroomMatch) {
     priorities.minBedrooms = Number(bedroomMatch[1]);
+    spaceFound = true;
+  } else if (roomMatch) {
+    priorities.minBedrooms = roomsToBedrooms(Number(roomMatch[1]));
+    spaceFound = true;
+  } else if (roomTypeMatch) {
+    priorities.minBedrooms = roomsToBedrooms(SWEDISH_ROOM_TYPES[roomTypeMatch[1] ?? ""] ?? 2);
+    spaceFound = true;
+  } else if (fourRoomMatch) {
+    priorities.minBedrooms = roomsToBedrooms(4);
+    spaceFound = true;
   }
 
   const bathroomMatch = text.match(/(\d+(?:\.\d+)?)\s*(?:bath|bathroom|ba|badrum)/);
-  if (bathroomMatch) {
-    priorities.minBathrooms = Number(bathroomMatch[1]);
-  }
+  if (bathroomMatch) priorities.minBathrooms = Number(bathroomMatch[1]);
 
   const commuteMatch = text.match(/(\d+)\s*(?:min|minute)/);
-  if (commuteMatch) {
-    priorities.commuteMaxMinutes = Number(commuteMatch[1]);
-  }
+  if (commuteMatch) priorities.commuteMaxMinutes = Number(commuteMatch[1]);
 
-  if (text.includes("transit") || text.includes("train") || text.includes("bus")) {
+  if (["transit","train","bus","tunnelbana","pendeltåg","buss","tåg","kollektivtrafik","spårvagn"].some((w) => text.includes(w))) {
     priorities.commuteMode = "transit";
-  } else if (text.includes("bike") || text.includes("cycling")) {
+  } else if (["bike","cycling","cykel","cykla"].some((w) => text.includes(w))) {
     priorities.commuteMode = "bike";
-  } else if (text.includes("walk")) {
+  } else if (["walk","promenad","gångavstånd"].some((w) => text.includes(w))) {
     priorities.commuteMode = "walk";
   }
 
-  const lifestyleKeywords = [
-    "quiet",
-    "walkable",
-    "family-friendly",
-    "urban",
-    "suburban",
-    "nightlife",
-    "near-parks",
-    "city-center",
-    "nature",
-  ];
-  priorities.lifestyleTags = lifestyleKeywords.filter((keyword) =>
-    text.includes(keyword.replace("-", " ")),
-  );
+  const lifestyleKeywords = ["quiet","walkable","family-friendly","urban","suburban","nightlife","near-parks","city-center","nature"];
+  priorities.lifestyleTags = lifestyleKeywords.filter((keyword) => text.includes(keyword.replace("-", " ")));
+  for (const [needles, tag] of SWEDISH_LIFESTYLE) {
+    if (needles.some((needle) => text.includes(needle))) addTag(tag);
+  }
 
-  // Additional signals used by detectPriorityConflicts to surface hidden
-  // trade-offs (pets vs. rental restrictions, WFH vs. layout, etc.). These
-  // only ever get added when the exact phrase is present in what the person
-  // wrote — never inferred or guessed, consistent with the rest of this
-  // deterministic fallback.
-  if (/\bpets?\b/.test(text) || /\bdogs?\b/.test(text) || /\bcats?\b/.test(text)) {
-    priorities.lifestyleTags.push("pets");
-  }
-  if (
-    text.includes("home office") ||
-    text.includes("work from home") ||
-    text.includes("remote work") ||
-    /\bwfh\b/.test(text)
-  ) {
-    priorities.lifestyleTags.push("home-office");
-  }
-  if (text.includes("wheelchair") || text.includes("step-free") || text.includes("step free") || text.includes("accessib")) {
-    priorities.lifestyleTags.push("accessible");
-  }
-  if (
-    text.includes("historic") ||
-    text.includes("character") ||
-    text.includes("period property") ||
-    text.includes("old building") ||
-    text.includes("pre-war")
-  ) {
-    priorities.lifestyleTags.push("historic-character");
-  }
-  if (
-    text.includes("flexible") ||
-    text.includes("short-term") ||
-    text.includes("short term") ||
-    text.includes("may relocate") ||
-    text.includes("might relocate")
-  ) {
-    priorities.lifestyleTags.push("flexible-tenure");
-  }
-  if (
-    text.includes("forever home") ||
-    text.includes("settle down") ||
-    text.includes("long-term home") ||
-    text.includes("buying")
-  ) {
-    priorities.lifestyleTags.push("long-term-ownership");
-  }
-  if (
-    text.includes("growing family") ||
-    text.includes("planning a family") ||
-    text.includes("more kids") ||
-    text.includes("expecting") ||
-    text.includes("want kids") ||
-    text.includes("future kids")
-  ) {
-    priorities.lifestyleTags.push("family-growth-planned");
-  }
-  if (text.includes("parking") || text.includes("garage")) {
-    priorities.mustHaves.push("parking");
-  }
+  if (/\bpets?\b/.test(text) || /\bdogs?\b/.test(text) || /\bcats?\b/.test(text) || /\b(?:husdjur|hunden|hundar|hund|katten|katter|katt)\b/.test(text)) addTag("pets");
+  if (["home office","work from home","remote work","hemmakontor","jobba hemifrån","jobbar hemifrån","arbeta hemifrån","distansarbete"].some((w) => text.includes(w)) || /\bwfh\b/.test(text)) addTag("home-office");
+  if (["wheelchair","step-free","step free","accessib","rullstol","tillgänglighet","trappfri","stegfri"].some((w) => text.includes(w))) addTag("accessible");
+  if (["historic","character","period property","old building","pre-war","historisk","sekelskifte","äldre fastighet","gammal byggnad","karaktär"].some((w) => text.includes(w))) addTag("historic-character");
+  if (["flexible","short-term","short term","may relocate","might relocate","flexibelt boende","korttid","kanske flytta","kan komma att flytta"].some((w) => text.includes(w))) addTag("flexible-tenure");
+  if (["forever home","settle down","long-term home","buying","evighetshem","bosätta oss","långsiktigt boende"].some((w) => text.includes(w))) addTag("long-term-ownership");
+  if (["growing family","planning a family","more kids","expecting","want kids","future kids","växande familj","fler barn","planerar barn","vill ha barn"].some((w) => text.includes(w))) addTag("family-growth-planned");
+  if (["parking","garage","parkering","p-plats"].some((w) => text.includes(w))) addMustHave("parking");
 
   const schoolsMentioned = text.includes("school") || text.includes("skol");
-  if (schoolsMentioned) {
-    priorities.weights = priorities.weights.map((w) =>
-      w.category === "schools" ? { ...w, importance: 5 } : w,
-    );
-  }
-  const safetyMentioned =
-    text.includes("safe") || text.includes("safety") || text.includes("säker") || text.includes("trygg");
-  if (safetyMentioned) {
-    priorities.weights = priorities.weights.map((w) =>
-      w.category === "safety" ? { ...w, importance: 5 } : w,
-    );
-  }
-  const budgetIsPriority =
-    text.includes("tight budget") ||
-    text.includes("affordable") ||
-    text.includes("cheap") ||
-    text.includes("billig") ||
-    text.includes("prisvärd");
-  if (budgetIsPriority) {
-    priorities.weights = priorities.weights.map((w) =>
-      w.category === "budget" ? { ...w, importance: 5 } : w,
-    );
-  }
+  if (schoolsMentioned) priorities.weights = priorities.weights.map((w) => w.category === "schools" ? { ...w, importance: 5 } : w);
+  const safetyMentioned = ["safe","safety","säker","trygg"].some((w) => text.includes(w));
+  if (safetyMentioned) priorities.weights = priorities.weights.map((w) => w.category === "safety" ? { ...w, importance: 5 } : w);
+  const budgetIsPriority = ["tight budget","affordable","cheap","billig","prisvärd","stram budget","låg budget","begränsad budget","överkomlig"].some((w) => text.includes(w));
+  if (budgetIsPriority) priorities.weights = priorities.weights.map((w) => w.category === "budget" ? { ...w, importance: 5 } : w);
 
-  return {
-    priorities,
-    confidence: {
-      budget: Boolean(budgetMatch),
-      commute: Boolean(commuteMatch),
-      space: Boolean(bedroomMatch),
-      weights: schoolsMentioned || safetyMentioned || budgetIsPriority,
-    },
-  };
+  return { priorities, confidence: { budget: budgetFound, commute: Boolean(commuteMatch), space: spaceFound, weights: schoolsMentioned || safetyMentioned || budgetIsPriority } };
 }
 
 export interface ExtractionResult {

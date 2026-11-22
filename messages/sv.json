@@ -520,5 +520,16 @@
         }
       ]
     }
+  },
+  "assistant": {
+    "name": "Realt AI Assistant",
+    "metaTitle": "Realt AI Assistant",
+    "metaDescription": "Chatta med Realt AI Assistant om bostaden du söker.",
+    "greeting": "Hej! Jag är Realt AI Assistant. Berätta med egna ord vilken bostad du söker – budget, pendling, yta, trygghet, skolor eller livsstil.",
+    "placeholder": "Beskriv din drömbostad…",
+    "inputLabel": "Ditt meddelande",
+    "send": "Skicka",
+    "thinking": "Tänker…",
+    "summaryIntro": "Tack! Så här har jag förstått dig. Kontrollera och justera innan jag letar matchningar."
   }
 }
