@@ -6,7 +6,6 @@ import { History, LogOut, Settings, User } from "lucide-react";
 
 import { useAccount } from "@/components/account-provider";
 import { Link } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
