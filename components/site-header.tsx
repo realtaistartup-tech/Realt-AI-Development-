@@ -18,7 +18,7 @@ export function SiteHeader() {
         </Link>
         <nav aria-label={t("nav.primary")} className="flex items-center gap-1 sm:gap-2">
           <Button asChild size="sm" className="hidden sm:inline-flex">
-            <Link href="/onboarding">{t("nav.findMyHome")}</Link>
+            <Link href="/assistant">{t("nav.findMyHome")}</Link>
           </Button>
           <AccountMenu />
           <LocaleSwitcher />

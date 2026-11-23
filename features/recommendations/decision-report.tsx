@@ -93,7 +93,7 @@ export function DecisionReport() {
         <h1 className="text-xl font-semibold">{t("missing.heading")}</h1>
         <p className="mt-2 text-muted-foreground">{t("missing.description")}</p>
         <Button asChild className="mt-6">
-          <Link href="/onboarding">{t("missing.cta")}</Link>
+          <Link href="/assistant">{t("missing.cta")}</Link>
         </Button>
       </div>
     );

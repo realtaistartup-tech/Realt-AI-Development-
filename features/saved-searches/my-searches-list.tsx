@@ -104,7 +104,7 @@ export function MySearchesList() {
         <h1 className="text-xl font-semibold">{t("empty.heading")}</h1>
         <p className="mt-2 text-muted-foreground">{t("empty.description")}</p>
         <Button asChild className="mt-6">
-          <Link href="/onboarding">{t("empty.cta")}</Link>
+          <Link href="/assistant">{t("empty.cta")}</Link>
         </Button>
       </div>
     );

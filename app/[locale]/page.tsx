@@ -30,7 +30,7 @@ export default function Home() {
         </p>
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg">
-            <Link href="/onboarding">
+            <Link href="/assistant">
               {t("ctaPrimary")}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
@@ -78,7 +78,7 @@ export default function Home() {
         </h2>
         <p className="mt-3 text-muted-foreground">{t("finalCta.subheading")}</p>
         <Button asChild size="lg" className="mt-8">
-          <Link href="/onboarding">
+          <Link href="/assistant">
             {t("finalCta.button")}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>

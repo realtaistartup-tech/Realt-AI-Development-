@@ -530,6 +530,48 @@
     "inputLabel": "Your message",
     "send": "Send",
     "thinking": "Thinking…",
-    "summaryIntro": "Thanks! Here's what I understood. Check it and adjust anything before I find your matches."
+    "summaryIntro": "Thanks! Here's what I understood. Check it and adjust anything before I find your matches.",
+    "emptyHeading": "What kind of home are you looking for?",
+    "newChat": "New chat",
+    "newChatTitle": "New chat",
+    "history": "Recent chats",
+    "noHistory": "Your chats will appear here.",
+    "deleteChat": "Delete chat",
+    "showMenu": "Show menu",
+    "hideMenu": "Hide menu",
+    "backToSite": "Back to the site",
+    "situationTitle": "Your situation",
+    "conflictsTitle": "Priority conflict"
+  },
+  "accountMenu": {
+    "menuLabel": "Account menu",
+    "signIn": "Sign in",
+    "signInTitle": "Sign in",
+    "signInDescription": "Sign in to save searches and pick up where you left off.",
+    "profile": "Profile",
+    "settings": "Settings",
+    "mySearches": "My searches",
+    "signOut": "Sign out"
+  },
+  "settings": {
+    "metaTitle": "Settings",
+    "metaDescription": "Change appearance and language for Realt AI.",
+    "title": "Settings",
+    "back": "Back to the chat",
+    "appearance": "Appearance",
+    "appearanceDescription": "Choose light, dark or follow your device.",
+    "language": "Language",
+    "languageDescription": "Choose the language the app is shown in.",
+    "moreSoon": "More settings are coming."
+  },
+  "profile": {
+    "metaTitle": "Profile",
+    "metaDescription": "Your Realt AI account.",
+    "title": "Profile",
+    "back": "Back to the chat",
+    "email": "Email",
+    "nameSoon": "Your name and initials will show here once you can enter them at sign-up.",
+    "signedOut": "You are not signed in.",
+    "signOut": "Sign out"
   }
 }

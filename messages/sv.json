@@ -530,6 +530,48 @@
     "inputLabel": "Ditt meddelande",
     "send": "Skicka",
     "thinking": "Tänker…",
-    "summaryIntro": "Tack! Så här har jag förstått dig. Kontrollera och justera innan jag letar matchningar."
+    "summaryIntro": "Tack! Så här har jag förstått dig. Kontrollera och justera innan jag letar matchningar.",
+    "emptyHeading": "Vilken bostad letar du efter?",
+    "newChat": "Ny chatt",
+    "newChatTitle": "Ny chatt",
+    "history": "Tidigare samtal",
+    "noHistory": "Dina samtal visas här.",
+    "deleteChat": "Ta bort chatt",
+    "showMenu": "Visa meny",
+    "hideMenu": "Dölj meny",
+    "backToSite": "Tillbaka till sidan",
+    "situationTitle": "Din situation",
+    "conflictsTitle": "Prioritetskonflikt"
+  },
+  "accountMenu": {
+    "menuLabel": "Kontomeny",
+    "signIn": "Logga in",
+    "signInTitle": "Logga in",
+    "signInDescription": "Logga in för att spara sökningar och fortsätta där du slutade.",
+    "profile": "Profil",
+    "settings": "Inställningar",
+    "mySearches": "Mina sökningar",
+    "signOut": "Logga ut"
+  },
+  "settings": {
+    "metaTitle": "Inställningar",
+    "metaDescription": "Ändra utseende och språk för Realt AI.",
+    "title": "Inställningar",
+    "back": "Tillbaka till chatten",
+    "appearance": "Utseende",
+    "appearanceDescription": "Välj ljust, mörkt eller följ din enhet.",
+    "language": "Språk",
+    "languageDescription": "Välj vilket språk appen visas på.",
+    "moreSoon": "Fler inställningar kommer."
+  },
+  "profile": {
+    "metaTitle": "Profil",
+    "metaDescription": "Ditt konto på Realt AI.",
+    "title": "Profil",
+    "back": "Tillbaka till chatten",
+    "email": "E-post",
+    "nameSoon": "Namn och initialer visas här när du kan ange dem vid registrering.",
+    "signedOut": "Du är inte inloggad.",
+    "signOut": "Logga ut"
   }
 }
