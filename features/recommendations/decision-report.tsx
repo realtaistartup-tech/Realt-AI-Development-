@@ -66,8 +66,9 @@ export function DecisionReport() {
   }, []);
 
   useEffect(() => {
-    load();
-  }, [load]);
+  const timer = setTimeout(load, 0);
+  return () => clearTimeout(timer);
+}, [load]);
 
   // Move focus into the report once it replaces the loading state, so
   // screen reader users get a clear signal that new content has arrived

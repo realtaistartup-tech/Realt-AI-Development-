@@ -38,10 +38,11 @@ export function MySearchesList() {
   }, []);
 
   useEffect(() => {
-    if (account) {
-      loadSearches();
-    }
-  }, [account, loadSearches]);
+  if (!account) return;
+
+  const timer = setTimeout(loadSearches, 0);
+  return () => clearTimeout(timer);
+}, [account, loadSearches]);
 
   function handleViewMatches(search: SavedSearch) {
     savePriorities(search.priorities);

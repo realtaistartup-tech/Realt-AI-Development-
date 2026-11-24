@@ -9,6 +9,7 @@ import { AccountProvider } from "@/components/account-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { routing } from "@/i18n/routing";
+
 import "../globals.css";
 
 const inter = Inter({

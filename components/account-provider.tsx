@@ -54,6 +54,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Account state is updated asynchronously after fetching.
     void refreshAccount();
 
     if (!authConfigured) return;

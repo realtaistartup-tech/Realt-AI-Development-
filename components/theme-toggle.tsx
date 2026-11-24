@@ -19,6 +19,7 @@ export function ThemeToggle() {
   const t = useTranslations("theme");
   const [mounted, setMounted] = useState(false);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- Wait for client mount to prevent hydration mismatch.
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {
