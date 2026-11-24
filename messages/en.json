@@ -16,7 +16,11 @@
     "tagline": "Realt AI helps you understand your priorities before you look at properties.",
     "copyright": "© {year} Realt AI. All rights reserved.",
     "privacyLink": "Privacy Policy",
-    "termsLink": "Terms of Service"
+    "termsLink": "Terms of Service",
+    "contactHeading": "Contact",
+    "followHeading": "Follow us",
+    "instagram": "Instagram",
+    "tiktok": "TikTok"
   },
   "theme": {
     "light": "light",
@@ -31,35 +35,195 @@
   },
   "home": {
     "badge": "An AI-first decision assistant",
-    "heading": "People don't buy apartments. People buy a future life.",
-    "subheading": "Realt AI helps you understand what actually matters to you, weighs the trade-offs honestly, and explains every recommendation — so you can choose a home with confidence, not guesswork.",
-    "ctaPrimary": "Start understanding my priorities",
-    "howItWorks": {
-      "heading": "The Realt Thinking Framework",
-      "subheading": "The same reasoning process behind every recommendation Realt AI makes.",
+    "hero": {
+      "heading": "Looking for a new home? You've found the right place.",
+      "paragraph1": "Whether you want to rent an apartment, buy your first house or find a place to start over, Realt AI helps you through the whole housing journey. Explore new possibilities, discover areas that fit your lifestyle and get help finding a home that feels right for you — not just on paper, but in everyday life.",
+      "paragraph2": "And the best part? Realt AI is completely free for people looking for a home. No hidden fees, no paid upgrades and no extra costs. We are here to help you find the right place — and it should not cost you anything.",
+      "cta": "Find my next home",
+      "images": {
+        "apartment": "Modern apartment building against a blue sky",
+        "house": "Modern house with garage and garden",
+        "balcony": "Apartment building with balconies at sunset",
+        "villa": "Modern villa with a pool",
+        "townhouses": "Row of modern townhouses",
+        "rowHouses": "Row houses with wood and metal facades"
+      }
+    },
+    "about": {
+      "heading": "About us",
+      "p1": "Realt AI is an AI-driven housing intelligence company built to transform how people discover, evaluate and choose their next home.",
+      "p2": "Originally created to help students and young adults find housing that fits their finances, education and lifestyle, we recognized that these challenges extend across the entire housing market.",
+      "p3": "Our platform uses AI to understand individual needs, analyze housing opportunities and connect people with relevant housing providers, including real estate agencies, property companies and housing platforms.",
+      "p4": "We are a Free B2B2C Agentic SaaS (Software as a Service). Our service is and will remain 100% free for users. We generate revenue through business partnerships and companies seeking relevant visibility, never by charging people to find a home.",
+      "p5": "Our vision is global: making smarter housing decisions accessible to everyone, everywhere.",
+      "tagline": "Realt AI — A smarter way to find where you belong."
+    },
+    "countdown": {
+      "eyebrow": "Launch",
+      "heading": "Launching 1 February 2027 at 10:00",
+      "sweden": "We are starting in Sweden.",
+      "days": "days",
+      "hours": "hours",
+      "minutes": "minutes",
+      "seconds": "seconds",
+      "launched": "Realt AI has launched.",
+      "waitlist": {
+        "heading": "Join the waitlist",
+        "description": "Enter your email and we will send you one message when Realt AI launches.",
+        "placeholder": "Your email address",
+        "button": "Join",
+        "sending": "Joining…",
+        "success": "You're on the list. We'll email you when Realt AI launches.",
+        "invalid": "Please enter a valid email address.",
+        "error": "Something went wrong. Please try again.",
+        "consent": "We only use your email to tell you about the launch."
+      }
+    },
+    "how": {
+      "heading": "How does Realt AI work?",
+      "subheading": "Most search tools show you homes. Realt AI starts with you: it learns what matters, weighs it honestly and explains every recommendation.",
       "steps": {
-        "understand": {
-          "title": "Understand your goals",
-          "description": "Tell Realt AI what matters to you in plain language — budget, commute, space, safety, schools, lifestyle."
+        "describe": {
+          "title": "Understands you in plain language",
+          "description": "Write the way you talk. Realt AI reads budget, commute, space, lifestyle and deal-breakers from your own words and turns them into a structured profile."
         },
-        "tradeoffs": {
-          "title": "See the trade-offs",
-          "description": "Realt AI flags conflicts between your priorities honestly, instead of pretending every box can be checked."
+        "weights": {
+          "title": "Learns what matters most",
+          "description": "Not every wish weighs the same. Your priorities become weights, so the things you care about most steer the result."
         },
-        "match": {
-          "title": "Get a transparent match",
-          "description": "Every property comes with an explainable score — you always see exactly why it fits, or why it doesn't."
+        "conflicts": {
+          "title": "Spots conflicts before you do",
+          "description": "When two wishes pull in opposite directions, Realt AI tells you up front and helps you choose, instead of pretending you can have everything."
         },
-        "decide": {
-          "title": "Decide with confidence",
-          "description": "Compromises and risks are called out up front, so you choose a home knowingly, not by accident."
+        "score": {
+          "title": "Scores every home, transparently",
+          "description": "Each home gets a match score built from your weighted priorities, with the reasons for and against shown, so there are no black boxes."
+        },
+        "connect": {
+          "title": "Connects you with the right providers",
+          "description": "Relevant homes come from agencies, property companies and housing platforms that match your profile."
+        },
+        "free": {
+          "title": "Free for you, always",
+          "description": "Searching with Realt AI costs nothing. We earn from business partnerships, never from people looking for a home."
         }
+      },
+      "visual": {
+        "message": "Two of us, a 3-room home in Stockholm, under 4 million kr, max 30 minutes to work, quiet area.",
+        "chipBudget": "Budget ≤ 4,000,000 kr",
+        "chipCommute": "Commute ≤ 30 min",
+        "chipSpace": "3 rooms",
+        "chipLifestyle": "Quiet area",
+        "weightBudget": "Budget",
+        "weightCommute": "Commute",
+        "weightSpace": "Space",
+        "conflictTitle": "Priority conflict",
+        "conflictA": "Quiet area",
+        "conflictB": "Lively city centre",
+        "conflictHint": "These often pull in opposite directions. Which matters more?",
+        "score": "Match score 87%",
+        "reasonBudget": "Fits your budget",
+        "reasonCommute": "24 min to work",
+        "reasonTradeoff": "No parking included",
+        "agencies": "Real estate agencies",
+        "companies": "Property companies",
+        "platforms": "Housing platforms",
+        "free": "for people looking for a home",
+        "caption": "Illustrative example.",
+        "freeBig": "100% free"
       }
     },
     "finalCta": {
-      "heading": "Ready to think through your next home?",
-      "subheading": "It takes a few minutes to describe what matters to you. No account required.",
+      "heading": "So what are you waiting for? Find your dream home.",
+      "paragraph1": "It takes just a few minutes to tell Realt AI what matters to you. Write in your own words, answer a couple of quick questions and see how your priorities shape the homes that fit you best.",
+      "paragraph2": "And once again: Realt AI is completely free for people looking for a home. No hidden fees, no paid upgrades, no catch. There is no good reason not to try it. The worst that can happen is that you understand your own priorities a little better, and the best is that you find the place where you belong.",
       "button": "Get started"
+    },
+    "contact": {
+      "heading": "Contact us",
+      "description": "Questions, ideas, or want to try Realt AI early? Write to us.",
+      "subject": "Hello Realt AI",
+      "business": "A broker, landlord or company that wants to know more? Write to us and we will tell you what a collaboration could look like."
+    },
+    "features": {
+      "heading": "Our key features",
+      "analysis": {
+        "title": "Personalized AI Analysis",
+        "subtitle": "Housing decisions, built around you.",
+        "p1": "Realt AI analyses your individual needs, budget, lifestyle and personal priorities to help you discover housing options that genuinely fit your life. Through an intelligent, conversational analysis, Realt AI learns what matters most to you — from location and affordability to space, comfort and everyday convenience.",
+        "p2": "Beyond simply understanding your preferences, Realt AI helps identify potential compromises, competing priorities and factors you may not have considered. By turning complex housing requirements into clear insights, we help you understand your options, make informed decisions and feel more confident throughout your housing journey."
+      },
+      "area": {
+        "title": "Area Exploration",
+        "subtitle": "Discover the life around your next home.",
+        "p1": "Finding the right home is about more than the property itself. The surrounding area plays an equally important role in shaping your everyday life. With Area Exploration, Realt AI helps you discover what living in a particular location could actually look like.",
+        "p2": "Explore nearby restaurants, gyms, grocery stores, parks, public transport and other essential services directly through an interactive map. Understand distances, discover useful places and get a broader perspective of the neighbourhood before making a decision.",
+        "p3": "By bringing the surrounding environment into your housing search, Realt AI helps you evaluate not only where you could live, but also how well that location fits your lifestyle, routines and daily needs."
+      },
+      "matching": {
+        "title": "Smarter Housing Matching",
+        "subtitle": "Less searching. More meaningful matches.",
+        "p1": "Realt AI goes beyond traditional housing filters by evaluating properties according to your individual needs, preferences and priorities. Instead of simply showing you listings that match a set of search criteria, our AI analyses how well each housing option aligns with the way you want to live.",
+        "p2": "Each recommendation is designed to help you understand why a particular property may be a good fit, highlighting relevant advantages, potential disadvantages and important factors to consider. You can compare different options based on what matters most to you, rather than getting lost in endless listings.",
+        "p3": "The result is a more focused and intelligent housing search, where every recommendation has a purpose — helping you spend less time searching and more time discovering a place that truly feels right."
+      },
+      "more": "Click to see more",
+      "less": "Show less",
+      "visual": {
+        "chatTitle": "Realt AI",
+        "question": "What's most important to you?",
+        "chipLocation": "Location",
+        "chipPrice": "Price",
+        "chipSpace": "Space",
+        "chipSafety": "Safety",
+        "userMessage": "A quiet area, close to the city and a gym.",
+        "reply": "Got it. Based on your preferences, we'll focus on modern apartments in peaceful areas near the city center.",
+        "work": "Work",
+        "gym": "Gym",
+        "friends": "Friends",
+        "minutes": "min",
+        "match": "96% match",
+        "address": "Storgatan 24",
+        "city": "Malmö",
+        "price": "4 250 000 kr",
+        "size": "72 m²"
+      },
+      "caption": "Illustrative examples."
+    },
+    "steps": {
+      "eyebrow": "Get started in 8 steps",
+      "s1": {
+        "title": "Create your account",
+        "description": "Sign up in a moment to save your searches and pick up where you left off."
+      },
+      "s2": {
+        "title": "Answer the basics",
+        "description": "Realt AI first asks where you want to live, then whether you want to rent or buy."
+      },
+      "s3": {
+        "title": "Go deeper",
+        "description": "Realt AI asks several more questions, including things you did not think would matter."
+      },
+      "s4": {
+        "title": "Your answers are analysed",
+        "description": "Realt AI goes through everything you said and turns it into a clear picture of your priorities."
+      },
+      "s5": {
+        "title": "Conflicts are spotted",
+        "description": "If two wishes pull in opposite directions, you hear about it up front."
+      },
+      "s6": {
+        "title": "Every home is scored",
+        "description": "Each home gets a transparent match score, with the reasons for and against."
+      },
+      "s7": {
+        "title": "The right providers are connected",
+        "description": "Relevant homes come from agencies, property companies and housing platforms."
+      },
+      "s8": {
+        "title": "Open your top three matches",
+        "description": "Step into the window with your options and continue to the listings page, where you find landlords, brokers and other housing providers."
+      }
     }
   },
   "onboarding": {
@@ -562,7 +726,8 @@
     "appearanceDescription": "Choose light, dark or follow your device.",
     "language": "Language",
     "languageDescription": "Choose the language the app is shown in.",
-    "moreSoon": "More settings are coming."
+    "moreSoon": "More settings are coming.",
+    "appearanceSystem": "The appearance (light or dark) automatically follows your device setting."
   },
   "profile": {
     "metaTitle": "Profile",

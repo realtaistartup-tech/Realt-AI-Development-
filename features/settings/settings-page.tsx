@@ -1,18 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { useTheme } from "next-themes";
-import { ArrowLeft, Monitor, Moon, Sun } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
-
-const THEMES = [
-  { value: "light", Icon: Sun },
-  { value: "dark", Icon: Moon },
-  { value: "system", Icon: Monitor },
-] as const;
 
 function optionClass(active: boolean) {
   return `flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors ${
@@ -24,17 +16,10 @@ function optionClass(active: boolean) {
 
 export function SettingsPage() {
   const t = useTranslations("settings");
-  const tt = useTranslations("theme");
   const tl = useTranslations("locale");
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  const currentTheme = mounted ? (theme ?? "system") : null;
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-10">
@@ -49,21 +34,7 @@ export function SettingsPage() {
 
       <section className="mt-8 border-t border-border pt-6">
         <h2 className="text-base font-semibold">{t("appearance")}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{t("appearanceDescription")}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {THEMES.map(({ value, Icon }) => (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={currentTheme === value}
-              onClick={() => setTheme(value)}
-              className={optionClass(currentTheme === value)}
-            >
-              <Icon className="h-4 w-4" aria-hidden="true" />
-              {tt(value)}
-            </button>
-          ))}
-        </div>
+        <p className="mt-1 text-sm text-muted-foreground">{t("appearanceSystem")}</p>
       </section>
 
       <section className="mt-8 border-t border-border pt-6">

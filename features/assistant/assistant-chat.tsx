@@ -427,7 +427,7 @@ export function AssistantChat() {
       >
         <div className="flex items-center justify-between px-4 py-4">
           <Link href="/" aria-label={ta("backToSite")} className="flex items-center">
-            <Logo className="h-5" />
+            <Logo className="h-4" />
           </Link>
           <Button variant="ghost" size="icon" aria-label={ta("hideMenu")} onClick={() => setSidebarOpen(false)}>
             <X className="h-4 w-4" aria-hidden="true" />
