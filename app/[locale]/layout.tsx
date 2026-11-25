@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { AccountProvider } from "@/components/account-provider";
+import { HideInApp } from "@/components/hide-in-app";
+import { WelcomeEffect } from "@/components/welcome-effect";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { routing } from "@/i18n/routing";
@@ -100,11 +102,16 @@ export default async function RootLayout({
               >
                 {t("skipToContent")}
               </a>
-              <SiteHeader />
+              <HideInApp>
+                <SiteHeader />
+              </HideInApp>
               <main id="main-content" className="flex-1">
                 {children}
               </main>
-              <SiteFooter />
+              <HideInApp>
+                <SiteFooter />
+              </HideInApp>
+              <WelcomeEffect />
             </AccountProvider>
           </ThemeProvider>
         </NextIntlClientProvider>

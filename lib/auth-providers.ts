@@ -33,9 +33,13 @@ export const OAUTH_PROVIDERS: OAuthProviderDefinition[] = [
     labelKey: "microsoft",
     enabled: process.env.NEXT_PUBLIC_AUTH_MICROSOFT_ENABLED === "true",
   },
-  // Apple: intentionally not implemented yet (requires a paid Apple
-  // Developer account). Adding it later is exactly this:
-  // { id: "apple", labelKey: "apple", enabled: process.env.NEXT_PUBLIC_AUTH_APPLE_ENABLED === "true" },
+  // Apple needs a paid Apple Developer account, so it stays off until
+  // NEXT_PUBLIC_AUTH_APPLE_ENABLED is set to "true".
+  {
+    id: "apple",
+    labelKey: "apple",
+    enabled: process.env.NEXT_PUBLIC_AUTH_APPLE_ENABLED === "true",
+  },
 ];
 
 export function getEnabledOAuthProviders(): OAuthProviderDefinition[] {

@@ -468,6 +468,7 @@
     "dialog": {
       "title": "Sign in",
       "description": "Sign in to save searches and pick up where you left off.",
+      "providerUnavailable": "This sign-in method isn't available yet. Use email for now.",
       "notConfigured": "Sign-in isn't configured yet.",
       "emailLabel": "Email",
       "emailPlaceholder": "you@example.com",
@@ -491,7 +492,14 @@
       "resetSent": "If an account exists for {email}, we've sent a password reset link.",
       "backToSignIn": "Back to sign in",
       "passwordTooShort": "Password must be at least {min} characters.",
-      "error": "Something went wrong. Please try again."
+      "error": "Something went wrong. Please try again.",
+      "firstNameLabel": "First name",
+      "lastNameLabel": "Last name",
+      "displayNameLabel": "What should Realt AI call you?",
+      "displayNamePlaceholder": "Your nickname",
+      "ageConfirm": "I confirm that I am 13 or older.",
+      "namesRequired": "Please enter your first and last name.",
+      "ageRequired": "You need to confirm that you are 13 or older."
     }
   },
   "resetPassword": {
@@ -696,16 +704,45 @@
     "thinking": "Thinking…",
     "summaryIntro": "Thanks! Here's what I understood. Check it and adjust anything before I find your matches.",
     "emptyHeading": "What kind of home are you looking for?",
-    "newChat": "New chat",
-    "newChatTitle": "New chat",
-    "history": "Recent chats",
-    "noHistory": "Your chats will appear here.",
-    "deleteChat": "Delete chat",
-    "showMenu": "Show menu",
-    "hideMenu": "Hide menu",
+    "newChat": "New search",
+    "newChatTitle": "New search",
+    "history": "Your searches",
+    "noHistory": "Your searches will appear here.",
+    "deleteChat": "Delete",
+    "showMenu": "Open sidebar",
+    "hideMenu": "Close sidebar",
     "backToSite": "Back to the site",
     "situationTitle": "Your situation",
-    "conflictsTitle": "Priority conflict"
+    "conflictsTitle": "Priority conflict",
+    "gate": {
+      "title": "Sign in to continue",
+      "subtitle": "Log in or create a free account to talk to the assistant.",
+      "back": "Back to home page"
+    },
+    "pinned": "Pinned",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "rename": "Rename",
+    "moreOptions": "More options",
+    "greetMorning": "Good morning",
+    "greetDay": "Good day",
+    "greetEvening": "Good evening",
+    "greetLate": "Burning the midnight oil?",
+    "startLine": "Let's start finding your next home.",
+    "firstQuestion": "Where do you want to live? Tell me the place and the city.",
+    "placeholderLocation": "Place and city, e.g. Södermalm, Stockholm",
+    "placeholderTenure": "Rent or buy?",
+    "askTenure": "Great. Do you want to rent or buy?",
+    "askTenureAgain": "Please choose rent or buy.",
+    "rent": "Rent",
+    "buy": "Buy",
+    "rentNext": "Got it, renting in {city}. I'll point you to rental homes there. (The rental page is coming soon.)",
+    "buyNext": "Got it, buying in {city}. I'll connect you with a broker there. (Broker connections are coming soon.)",
+    "continuePrompt": "In the meantime, tell me about the home you're looking for — budget, commute, space, safety, schools or lifestyle — in your own words.",
+    "startLate": "Let's find your next home, {name}.",
+    "startLateNoName": "Let's find your next home.",
+    "you": "You",
+    "disclaimer": "Realt AI can make mistakes. Double-check important details before you make your housing decision."
   },
   "accountMenu": {
     "menuLabel": "Account menu",
@@ -723,11 +760,29 @@
     "title": "Settings",
     "back": "Back to the chat",
     "appearance": "Appearance",
-    "appearanceDescription": "Choose light, dark or follow your device.",
+    "appearanceDescription": "Choose how Realt AI looks. System follows your device.",
     "language": "Language",
     "languageDescription": "Choose the language the app is shown in.",
     "moreSoon": "More settings are coming.",
-    "appearanceSystem": "The appearance (light or dark) automatically follows your device setting."
+    "appearanceSystem": "The appearance (light or dark) automatically follows your device setting.",
+    "subtitle": "Manage appearance, language and your data.",
+    "sectionGeneral": "General",
+    "sectionData": "Data",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "clearTitle": "Clear search history",
+    "clearDescription": "Removes your saved searches from this browser.",
+    "clearButton": "Clear",
+    "clearConfirm": "Click again to confirm",
+    "clearDone": "Cleared",
+    "nav": {
+      "account": "Account",
+      "app": "App",
+      "profile": "Profile",
+      "general": "General",
+      "backToApp": "Back to the app"
+    }
   },
   "profile": {
     "metaTitle": "Profile",
@@ -737,6 +792,22 @@
     "email": "Email",
     "nameSoon": "Your name and initials will show here once you can enter them at sign-up.",
     "signedOut": "You are not signed in.",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "subtitle": "Review your account details.",
+    "sectionDetails": "Details",
+    "name": "Name",
+    "nameDescription": "The name linked to your account",
+    "displayName": "Nickname",
+    "displayNameDescription": "What Realt AI calls you",
+    "emailDescription": "The email address linked to your account",
+    "plan": "Plan",
+    "planDescription": "Realt AI is free for everyone looking for a home",
+    "planValue": "Free"
+  },
+  "welcome": {
+    "back": "Welcome back, {name}",
+    "first": "Welcome, {name}",
+    "backNoName": "Welcome back",
+    "firstNoName": "Welcome"
   }
 }

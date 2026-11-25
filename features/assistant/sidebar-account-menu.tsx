@@ -15,13 +15,23 @@ import {
 } from "@/components/ui/dialog";
 import { SignInForm } from "@/features/account/sign-in-form";
 
-/** Plain circle for now; initials of first + last name come with the extended sign-up. */
-export function AccountAvatar({ className = "h-8 w-8" }: { className?: string }) {
+/**
+ * Profile circle with the first letter of the name the person goes by (falls
+ * back to the first letter of the email). Uploaded profile pictures can
+ * replace this later.
+ */
+export function AccountAvatar({ className = "h-8 w-8 text-sm" }: { className?: string }) {
+  const { account } = useAccount();
+  const source = account?.displayName ?? account?.firstName ?? account?.email ?? "";
+  const letter = source.trim().charAt(0).toUpperCase();
+
   return (
     <span
       aria-hidden="true"
-      className={`inline-block shrink-0 rounded-full border border-border bg-muted ${className}`}
-    />
+      className={`inline-flex shrink-0 select-none items-center justify-center rounded-full border border-border bg-muted font-semibold text-foreground ${className}`}
+    >
+      {letter}
+    </span>
   );
 }
 
@@ -89,7 +99,7 @@ export function SidebarAccountMenu() {
         >
           <div className="flex items-center gap-3 px-3 py-2">
             <AccountAvatar />
-            <span className="min-w-0 truncate text-sm font-medium">{account.email}</span>
+            <span className="min-w-0 truncate text-sm font-medium">{account.displayName ?? account.email}</span>
           </div>
           <div className="my-1 h-px bg-border" />
           <Link href="/profile" role="menuitem" className={itemClass} onClick={() => setOpen(false)}>
@@ -127,7 +137,7 @@ export function SidebarAccountMenu() {
         className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left hover:bg-muted"
       >
         <AccountAvatar />
-        <span className="min-w-0 truncate text-sm font-medium">{account.email}</span>
+        <span className="min-w-0 truncate text-sm font-medium">{account.displayName ?? account.email}</span>
       </button>
     </div>
   );

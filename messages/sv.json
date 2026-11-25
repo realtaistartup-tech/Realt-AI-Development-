@@ -468,6 +468,7 @@
     "dialog": {
       "title": "Logga in",
       "description": "Logga in för att spara sökningar och fortsätta där du slutade.",
+      "providerUnavailable": "Den här inloggningsmetoden är inte tillgänglig än. Använd e-post så länge.",
       "notConfigured": "Inloggning är inte konfigurerad än.",
       "emailLabel": "E-post",
       "emailPlaceholder": "du@example.com",
@@ -491,7 +492,14 @@
       "resetSent": "Om ett konto finns för {email} har vi skickat en länk för att återställa lösenordet.",
       "backToSignIn": "Tillbaka till inloggning",
       "passwordTooShort": "Lösenordet måste vara minst {min} tecken.",
-      "error": "Något gick fel. Försök igen."
+      "error": "Något gick fel. Försök igen.",
+      "firstNameLabel": "Förnamn",
+      "lastNameLabel": "Efternamn",
+      "displayNameLabel": "Vad ska Realt AI kalla dig?",
+      "displayNamePlaceholder": "Ditt smeknamn",
+      "ageConfirm": "Jag bekräftar att jag är 13 år eller äldre.",
+      "namesRequired": "Fyll i både förnamn och efternamn.",
+      "ageRequired": "Du måste bekräfta att du är 13 år eller äldre."
     }
   },
   "resetPassword": {
@@ -696,16 +704,45 @@
     "thinking": "Tänker…",
     "summaryIntro": "Tack! Så här har jag förstått dig. Kontrollera och justera innan jag letar matchningar.",
     "emptyHeading": "Vilken bostad letar du efter?",
-    "newChat": "Ny chatt",
-    "newChatTitle": "Ny chatt",
-    "history": "Tidigare samtal",
-    "noHistory": "Dina samtal visas här.",
-    "deleteChat": "Ta bort chatt",
-    "showMenu": "Visa meny",
-    "hideMenu": "Dölj meny",
+    "newChat": "Ny sökning",
+    "newChatTitle": "Ny sökning",
+    "history": "Dina sökningar",
+    "noHistory": "Dina sökningar visas här.",
+    "deleteChat": "Ta bort",
+    "showMenu": "Öppna sidomenyn",
+    "hideMenu": "Stäng sidomenyn",
     "backToSite": "Tillbaka till sidan",
     "situationTitle": "Din situation",
-    "conflictsTitle": "Prioritetskonflikt"
+    "conflictsTitle": "Prioritetskonflikt",
+    "gate": {
+      "title": "Logga in för att fortsätta",
+      "subtitle": "Logga in eller skapa ett gratis konto för att prata med assistenten.",
+      "back": "Tillbaka till startsidan"
+    },
+    "pinned": "Fästa",
+    "pin": "Fäst",
+    "unpin": "Lossa",
+    "rename": "Byt namn",
+    "moreOptions": "Fler alternativ",
+    "greetMorning": "God morgon",
+    "greetDay": "God dag",
+    "greetEvening": "God kväll",
+    "greetLate": "Jobbar du sent?",
+    "startLine": "Nu börjar vi hitta ditt nästa hem.",
+    "firstQuestion": "Var vill du bo? Berätta område och stad.",
+    "placeholderLocation": "Plats och stad, t.ex. Södermalm, Stockholm",
+    "placeholderTenure": "Hyra eller köpa?",
+    "askTenure": "Bra. Vill du hyra eller köpa?",
+    "askTenureAgain": "Välj hyra eller köpa.",
+    "rent": "Hyra",
+    "buy": "Köpa",
+    "rentNext": "Uppfattat, du vill hyra i {city}. Jag skickar dig till hyresbostäder där. (Hyressidan kommer snart.)",
+    "buyNext": "Uppfattat, du vill köpa i {city}. Jag kopplar dig till en mäklare där. (Mäklarkopplingen kommer snart.)",
+    "continuePrompt": "Berätta under tiden om hemmet du söker — budget, pendling, yta, trygghet, skolor eller livsstil — med dina egna ord.",
+    "startLate": "Nu hittar vi ditt nästa hem, {name}.",
+    "startLateNoName": "Nu hittar vi ditt nästa hem.",
+    "you": "Du",
+    "disclaimer": "Realt AI kan göra fel. Kontrollera viktiga uppgifter innan du fattar ditt bostadsbeslut."
   },
   "accountMenu": {
     "menuLabel": "Kontomeny",
@@ -723,11 +760,29 @@
     "title": "Inställningar",
     "back": "Tillbaka till chatten",
     "appearance": "Utseende",
-    "appearanceDescription": "Välj ljust, mörkt eller följ din enhet.",
+    "appearanceDescription": "Välj hur Realt AI ser ut. System följer din enhet.",
     "language": "Språk",
     "languageDescription": "Välj vilket språk appen visas på.",
     "moreSoon": "Fler inställningar kommer.",
-    "appearanceSystem": "Utseendet (ljust eller mörkt) följer automatiskt din enhets inställning."
+    "appearanceSystem": "Utseendet (ljust eller mörkt) följer automatiskt din enhets inställning.",
+    "subtitle": "Hantera utseende, språk och din data.",
+    "sectionGeneral": "Allmänt",
+    "sectionData": "Data",
+    "themeSystem": "System",
+    "themeLight": "Ljust",
+    "themeDark": "Mörkt",
+    "clearTitle": "Rensa sökhistorik",
+    "clearDescription": "Tar bort dina sparade sökningar från den här webbläsaren.",
+    "clearButton": "Rensa",
+    "clearConfirm": "Klicka igen för att bekräfta",
+    "clearDone": "Rensat",
+    "nav": {
+      "account": "Konto",
+      "app": "App",
+      "profile": "Profil",
+      "general": "Allmänt",
+      "backToApp": "Tillbaka till appen"
+    }
   },
   "profile": {
     "metaTitle": "Profil",
@@ -737,6 +792,22 @@
     "email": "E-post",
     "nameSoon": "Namn och initialer visas här när du kan ange dem vid registrering.",
     "signedOut": "Du är inte inloggad.",
-    "signOut": "Logga ut"
+    "signOut": "Logga ut",
+    "subtitle": "Granska dina kontouppgifter.",
+    "sectionDetails": "Uppgifter",
+    "name": "Namn",
+    "nameDescription": "Namnet som är kopplat till ditt konto",
+    "displayName": "Smeknamn",
+    "displayNameDescription": "Vad Realt AI kallar dig",
+    "emailDescription": "E-postadressen som är kopplad till ditt konto",
+    "plan": "Plan",
+    "planDescription": "Realt AI är gratis för alla som söker bostad",
+    "planValue": "Gratis"
+  },
+  "welcome": {
+    "back": "Välkommen tillbaka, {name}",
+    "first": "Välkommen, {name}",
+    "backNoName": "Välkommen tillbaka",
+    "firstNoName": "Välkommen"
   }
 }
