@@ -86,9 +86,25 @@ function toNumber(value: string): number {
   return Number(value.replace(",", "."));
 }
 
-const MILLION_UNIT = "(?:miljoner|miljon|mkr|mnkr)";
+const MILLION_UNIT = "(?:miljoner|miljon|millions?|mille|mkr|mnkr)";
 
 function parseSwedishBudget(text: string): { min?: number; max: number } | null {
+  const spacedRange = text.match(
+    /(\d{1,3}(?:[ \u00a0]\d{3})+)\s*(?:kr|sek|:-)?\s*(?:to|till|-|–|and|och)\s*(\d{1,3}(?:[ \u00a0]\d{3})+)/,
+  );
+  if (spacedRange) {
+    const a = Number((spacedRange[1] ?? "").replace(/[ \u00a0]/g, ""));
+    const b = Number((spacedRange[2] ?? "").replace(/[ \u00a0]/g, ""));
+    if (a > 0 && b > 0) return { min: Math.min(a, b), max: Math.max(a, b) };
+  }
+  const millionRange = text.match(
+    new RegExp(`(\\d+(?:[.,]\\d+)?)\\s*(?:-|–|to|till)\\s*(\\d+(?:[.,]\\d+)?)\\s*${MILLION_UNIT}`),
+  );
+  if (millionRange) {
+    const a = Math.round(toNumber(millionRange[1] ?? "") * 1_000_000);
+    const b = Math.round(toNumber(millionRange[2] ?? "") * 1_000_000);
+    if (a > 0 && b > 0) return { min: Math.min(a, b), max: Math.max(a, b) };
+  }
   const range = text.match(
     new RegExp(`mellan\\s+(\\d+(?:[.,]\\d+)?)\\s*(?:och|-|–)\\s*(\\d+(?:[.,]\\d+)?)\\s*${MILLION_UNIT}`),
   );
@@ -170,8 +186,14 @@ export function extractPrioritiesHeuristically(freeText: string): HeuristicExtra
   }
 
   let spaceFound = false;
+  const NUM = "(\\d+|one|two|three|four|five|två|tre|fyra)";
+  const FILL = "(?:\\s+[a-zåäö]+){0,2}?";
+  const num = (w: string | undefined): number => {
+    const map: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, två: 2, tre: 3, fyra: 4 };
+    return /^\d+$/.test(w ?? "") ? Number(w) : (map[w ?? ""] ?? 1);
+  };
   const bedroomRange = text.match(/(\d+)\s*[-–]\s*(\d+)\s*(?:bed|bedroom|br|sovrum)/);
-  const bedroomMatch = text.match(/(\d+)\s*(?:bed|bedroom|br|sovrum)/);
+  const bedroomMatch = text.match(new RegExp(`\\b${NUM}${FILL}\\s+(?:bedrooms?|beds?|br|sovrum)\\b`));
   const roomMatch = text.match(/(\d+)\s*(?:rum|rok)\b/);
   const roomTypeMatch = text.match(/\b(ettan|tvåa|trea|femma)\b/);
   const fourRoomMatch = /\b(?:en|ett)\s+fyra\b/.test(text);
@@ -179,7 +201,7 @@ export function extractPrioritiesHeuristically(freeText: string): HeuristicExtra
     priorities.minBedrooms = Math.min(Number(bedroomRange[1]), Number(bedroomRange[2]));
     spaceFound = true;
   } else if (bedroomMatch) {
-    priorities.minBedrooms = Number(bedroomMatch[1]);
+    priorities.minBedrooms = num(bedroomMatch[1]);
     spaceFound = true;
   } else if (roomMatch) {
     priorities.minBedrooms = roomsToBedrooms(Number(roomMatch[1]));
@@ -192,11 +214,12 @@ export function extractPrioritiesHeuristically(freeText: string): HeuristicExtra
     spaceFound = true;
   }
 
-  const bathroomMatch = text.match(/(\d+(?:\.\d+)?)\s*(?:bath|bathroom|ba|badrum)/);
-  if (bathroomMatch) priorities.minBathrooms = Number(bathroomMatch[1]);
+  const bathroomMatch = text.match(new RegExp(`\\b(\\d+(?:\\.\\d+)?|one|two|three|en|ett|två)${FILL}\\s+(?:baths?|bathrooms?|badrum|toalett(?:er)?)\\b`));
+  if (bathroomMatch) priorities.minBathrooms = num(bathroomMatch[1] === "en" || bathroomMatch[1] === "ett" ? "one" : bathroomMatch[1]);
 
-  const commuteMatch = text.match(/(\d+)\s*(?:min|minute)/);
-  if (commuteMatch) priorities.commuteMaxMinutes = Number(commuteMatch[1]);
+  const commuteAll = [...text.matchAll(/(\d+)\s*(?:min|minute)/g)].map((m) => Number(m[1]));
+  const commuteMatch = commuteAll.length > 0;
+  if (commuteMatch) priorities.commuteMaxMinutes = Math.max(...commuteAll);
 
   if (["transit","train","bus","tunnelbana","pendeltåg","buss","tåg","kollektivtrafik","spårvagn"].some((w) => text.includes(w))) {
     priorities.commuteMode = "transit";
@@ -228,7 +251,7 @@ export function extractPrioritiesHeuristically(freeText: string): HeuristicExtra
   const budgetIsPriority = ["tight budget","affordable","cheap","billig","prisvärd","stram budget","låg budget","begränsad budget","överkomlig"].some((w) => text.includes(w));
   if (budgetIsPriority) priorities.weights = priorities.weights.map((w) => w.category === "budget" ? { ...w, importance: 5 } : w);
 
-  return { priorities, confidence: { budget: budgetFound, commute: Boolean(commuteMatch), space: spaceFound, weights: schoolsMentioned || safetyMentioned || budgetIsPriority } };
+  return { priorities, confidence: { budget: budgetFound, commute: commuteMatch, space: spaceFound, weights: schoolsMentioned || safetyMentioned || budgetIsPriority } };
 }
 
 export interface ExtractionResult {
