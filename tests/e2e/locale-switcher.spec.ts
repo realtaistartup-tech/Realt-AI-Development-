@@ -4,25 +4,44 @@ test.describe("Locale switcher", () => {
   test.use({ locale: "sv-SE" });
 
   test("switches from Swedish to English and back via the header control", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Man köper inte en lägenhet");
+    await page.goto("/sv");
 
-    await page.getByLabel("Språk").click();
-    await page.getByRole("option", { name: "English" }).click();
-    await expect(page).toHaveURL(/\/en$/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("People don't buy apartments");
+    await expect(
+      page.getByRole("heading", { level: 1 })
+    ).toContainText("Letar du efter ett nytt hem? Du har hittat rätt.");
 
-    await page.getByLabel("Language").click();
-    await page.getByRole("option", { name: "Svenska" }).click();
-    await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Man köper inte en lägenhet");
+    await page.getByRole("button", { name: "Språk" }).click();
+    await page.getByRole("menuitemradio", { name: "English" }).click();
+
+    await expect(page).toHaveURL(new URL("/", page.url()).href);
+
+    await expect(
+      page.getByRole("heading", { level: 1 })
+    ).toContainText("Looking for a new home? You've found the right place.");
+
+    await page.getByRole("button", { name: "Language" }).click();
+    await page.getByRole("menuitemradio", { name: "Svenska" }).click();
+
+    await expect(page).toHaveURL(/\/sv\/?$/);
+
+    await expect(
+      page.getByRole("heading", { level: 1 })
+    ).toContainText("Letar du efter ett nytt hem? Du har hittat rätt.");
   });
 
   test("preserves the current page when switching locale", async ({ page }) => {
-    await page.goto("/onboarding");
-    await page.getByLabel("Språk").click();
-    await page.getByRole("option", { name: "English" }).click();
-    await expect(page).toHaveURL(/\/en\/onboarding$/);
-    await expect(page.getByRole("heading", { name: "Tell us what you're looking for" })).toBeVisible();
+    await page.goto("/sv/onboarding");
+
+    await page.getByRole("button", { name: "Språk" }).click();
+    await page.getByRole("menuitemradio", { name: "English" }).click();
+
+    await expect(page).toHaveURL(new URL("/onboarding", page.url()).href);
+
+    await expect(
+      page.getByRole("heading", {
+        name: "Tell us what you're looking for",
+        level: 1,
+      })
+    ).toBeVisible();
   });
 });

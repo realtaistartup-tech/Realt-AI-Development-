@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OAUTH_PROVIDERS } from "@/lib/auth-providers";
-import { GoogleIcon, MicrosoftIcon } from "./oauth-icons";
+import { AppleIcon, GoogleIcon, MicrosoftIcon } from "./oauth-icons";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -17,20 +17,28 @@ type Mode = "signIn" | "signUp" | "forgotPassword";
 
 interface SignInFormProps {
   onSuccess?: () => void;
+  /** Show every provider button, even ones not configured yet (they explain that when clicked). */
+  showAllProviders?: boolean;
+  /** Start in sign-up mode instead of sign-in. */
+  initialMode?: "signIn" | "signUp";
 }
 
-export function SignInForm({ onSuccess }: SignInFormProps) {
+export function SignInForm({ onSuccess, showAllProviders = false, initialMode = "signIn" }: SignInFormProps) {
   const t = useTranslations("account.dialog");
   const { authConfigured, signInWithPassword, signUp, signInWithOAuth, resetPassword } = useAccount();
-  const [mode, setMode] = useState<Mode>("signIn");
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [oauthPending, setOauthPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [resetSent, setResetSent] = useState(false);
 
-  const enabledProviders = OAUTH_PROVIDERS.filter((provider) => provider.enabled);
+  const enabledProviders = showAllProviders ? OAUTH_PROVIDERS : OAUTH_PROVIDERS.filter((provider) => provider.enabled);
 
   if (!authConfigured) {
     return (
@@ -42,6 +50,10 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
 
   async function handleOAuthClick(providerId: (typeof enabledProviders)[number]["id"]) {
     setError(null);
+    if (!OAUTH_PROVIDERS.find((provider) => provider.id === providerId)?.enabled) {
+      setError(t("providerUnavailable"));
+      return;
+    }
     setOauthPending(providerId);
     const result = await signInWithOAuth(providerId);
     if (!result.ok) {
@@ -72,9 +84,26 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       return;
     }
 
+    if (mode === "signUp") {
+      if (firstName.trim().length === 0 || lastName.trim().length === 0) {
+        setError(t("namesRequired"));
+        return;
+      }
+      if (!ageConfirmed) {
+        setError(t("ageRequired"));
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     const result =
-      mode === "signUp" ? await signUp(email, password) : await signInWithPassword(email, password);
+      mode === "signUp"
+        ? await signUp(email, password, {
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            displayName: displayName.trim() || firstName.trim(),
+          })
+        : await signInWithPassword(email, password);
     setIsSubmitting(false);
 
     if (!result.ok) {
@@ -121,6 +150,8 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                 ) : provider.labelKey === "google" ? (
                   <GoogleIcon className="h-4 w-4" />
+                ) : provider.labelKey === "apple" ? (
+                  <AppleIcon className="h-4 w-4" />
                 ) : (
                   <MicrosoftIcon className="h-4 w-4" />
                 )}
@@ -137,6 +168,43 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {mode === "signUp" && (
+          <>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="sign-up-first-name">{t("firstNameLabel")}</Label>
+                <Input
+                  id="sign-up-first-name"
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                  autoComplete="given-name"
+                  required
+                  autoFocus
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="sign-up-last-name">{t("lastNameLabel")}</Label>
+                <Input
+                  id="sign-up-last-name"
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                  autoComplete="family-name"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sign-up-display-name">{t("displayNameLabel")}</Label>
+              <Input
+                id="sign-up-display-name"
+                value={displayName}
+                onChange={(event) => setDisplayName(event.target.value)}
+                placeholder={firstName.trim() || t("displayNamePlaceholder")}
+                autoComplete="nickname"
+              />
+            </div>
+          </>
+        )}
         <div className="space-y-2">
           <Label htmlFor="sign-in-email">{t("emailLabel")}</Label>
           <Input
@@ -146,7 +214,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
             onChange={(event) => setEmail(event.target.value)}
             placeholder={t("emailPlaceholder")}
             required
-            autoFocus
+            autoFocus={mode !== "signUp"}
           />
         </div>
 
@@ -157,7 +225,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
               {mode === "signIn" && (
                 <button
                   type="button"
-                  className="text-xs font-medium text-primary underline-offset-4 hover:underline"
+                  className="text-xs font-medium text-foreground underline-offset-4 hover:underline"
                   onClick={() => {
                     setError(null);
                     setMode("forgotPassword");
@@ -178,6 +246,18 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
               minLength={mode === "signUp" ? MIN_PASSWORD_LENGTH : undefined}
             />
           </div>
+        )}
+
+        {mode === "signUp" && (
+          <label className="flex cursor-pointer items-start gap-2 text-sm text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={ageConfirmed}
+              onChange={(event) => setAgeConfirmed(event.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 accent-foreground"
+            />
+            <span>{t("ageConfirm")}</span>
+          </label>
         )}
 
         {error && (
@@ -207,7 +287,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       {mode === "forgotPassword" ? (
         <button
           type="button"
-          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          className="text-sm font-medium text-foreground underline-offset-4 hover:underline"
           onClick={() => {
             setError(null);
             setMode("signIn");
@@ -218,7 +298,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       ) : (
         <button
           type="button"
-          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          className="text-sm font-medium text-foreground underline-offset-4 hover:underline"
           onClick={() => {
             setError(null);
             setMode(mode === "signIn" ? "signUp" : "signIn");

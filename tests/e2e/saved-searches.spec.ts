@@ -4,7 +4,7 @@ test.describe("Saved searches", () => {
   test.use({ locale: "sv-SE" });
 
   test("requires sign-in to view saved searches", async ({ page }) => {
-    await page.goto("/my-searches");
+    await page.goto("/sv/my-searches");
     await expect(
       page.getByRole("heading", { name: "Logga in för att se dina sparade sökningar" }),
     ).toBeVisible();

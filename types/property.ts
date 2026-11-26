@@ -1,4 +1,4 @@
-import type { CommuteMode } from "./priorities";
+import type { CommuteMode, HousingIntent } from "./priorities";
 
 export interface Property {
   id: string;
@@ -7,6 +7,7 @@ export interface Property {
   city: string;
   /** SEK */
   price: number;
+  listingType?: HousingIntent;
   bedrooms: number;
   bathrooms: number;
   /** Square meters */

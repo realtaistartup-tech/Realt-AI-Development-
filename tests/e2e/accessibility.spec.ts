@@ -104,10 +104,12 @@ test("guided onboarding summary screen has no automatically detectable accessibi
   expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
 });
 
-test("sign-in dialog has no automatically detectable accessibility violations", async ({ page }) => {
-  await page.goto("/en");
-  await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByRole("dialog")).toBeVisible();
+test("sign-in gate has no automatically detectable accessibility violations", async ({ page }) => {
+  await page.goto("/en/assistant");
+
+  await expect(
+    page.getByRole("dialog", { name: "Sign in to continue" })
+  ).toBeVisible();
 
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])

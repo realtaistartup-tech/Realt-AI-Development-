@@ -33,6 +33,9 @@ export async function requestStructuredCompletion<T>(
   if (!apiKey) {
     throw new AiServiceUnavailableError("OPENAI_API_KEY is not configured.");
   }
+  // Any OpenAI-compatible provider (Mistral, Gemini, Groq, a local Ollama …) works by setting OPENAI_BASE_URL.
+  const baseUrl = process.env.OPENAI_BASE_URL?.replace(/\/+$/, "");
+  if (baseUrl) return requestChatCompletion<T>(options, apiKey, baseUrl);
 
   const response = await fetch(OPENAI_RESPONSES_URL, {
     method: "POST",
@@ -76,4 +79,51 @@ export async function requestStructuredCompletion<T>(
   }
 
   return JSON.parse(rawText) as T;
+}
+
+/**
+ * Chat-completions flavour used by OpenAI-compatible providers. Asks for strict
+ * JSON-schema output and, if the provider rejects that, retries in plain JSON
+ * mode with the schema spelled out in the prompt.
+ */
+async function requestChatCompletion<T>(
+  options: StructuredResponseOptions,
+  apiKey: string,
+  baseUrl: string,
+): Promise<T> {
+  const model = process.env.OPENAI_MODEL ?? DEFAULT_MODEL;
+  const call = (responseFormat: Record<string, unknown>, system: string) =>
+    fetch(`${baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: options.userInput },
+        ],
+        response_format: responseFormat,
+      }),
+    });
+
+  let response = await call(
+    {
+      type: "json_schema",
+      json_schema: { name: options.schemaName, strict: true, schema: options.jsonSchema },
+    },
+    options.systemPrompt,
+  );
+  if (response.status === 400 || response.status === 422) {
+    response = await call(
+      { type: "json_object" },
+      `${options.systemPrompt}\n\nReturn ONLY a JSON object that matches this JSON schema, with no other text:\n${JSON.stringify(options.jsonSchema)}`,
+    );
+  }
+  if (!response.ok) {
+    throw new AiServiceUnavailableError(`AI provider request failed with status ${response.status}.`);
+  }
+  const data = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
+  const text = data.choices?.[0]?.message?.content;
+  if (!text) throw new AiServiceUnavailableError("AI provider response had no content.");
+  return JSON.parse(text) as T;
 }

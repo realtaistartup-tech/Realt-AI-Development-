@@ -41,25 +41,25 @@
 }
 
 .dark {
-  --background: hsl(0 0% 12%);
+  --background: hsl(0 0% 0%);
   --foreground: hsl(0 0% 95%);
 
-  --card: hsl(0 0% 15%);
+  --card: hsl(0 0% 5%);
   --card-foreground: hsl(0 0% 95%);
 
-  --popover: hsl(0 0% 15%);
+  --popover: hsl(0 0% 6%);
   --popover-foreground: hsl(0 0% 95%);
 
   --primary: hsl(217 40% 65%);
   --primary-foreground: hsl(0 0% 12%);
 
-  --secondary: hsl(0 0% 18%);
+  --secondary: hsl(0 0% 9%);
   --secondary-foreground: hsl(0 0% 95%);
 
-  --muted: hsl(0 0% 18%);
+  --muted: hsl(0 0% 9%);
   --muted-foreground: hsl(0 0% 65%);
 
-  --accent: hsl(0 0% 20%);
+  --accent: hsl(0 0% 12%);
   --accent-foreground: hsl(0 0% 95%);
 
   --destructive: hsl(0 70% 68%);
@@ -71,8 +71,8 @@
   --warning: hsl(38 75% 58%);
   --warning-foreground: hsl(0 0% 12%);
 
-  --border: hsl(0 0% 24%);
-  --input: hsl(0 0% 24%);
+  --border: hsl(0 0% 17%);
+  --input: hsl(0 0% 17%);
   --ring: hsl(217 40% 65%);
 }
 
@@ -104,8 +104,8 @@
   --radius-md: calc(var(--radius) - 0.15rem);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 0.25rem);
-  --font-sans: var(--font-inter);
-  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-hanken);
+  --font-display: var(--font-hanken);
   --font-mono: var(--font-jetbrains-mono);
 }
 
@@ -131,9 +131,9 @@
    app relies on animation to convey information, so shrinking every
    transition/animation to effectively nothing is always safe. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *:not(.motion-ok),
+  *:not(.motion-ok)::before,
+  *:not(.motion-ok)::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -154,3 +154,43 @@
     display: block !important;
   }
 }
+
+/* Cards "pop" a little when the pointer is over them: a quick overshoot (like
+   a heartbeat), then they stay slightly enlarged until the pointer leaves.
+   Pair with .motion-ok so the effect also plays when the OS asks for reduced
+   motion; it is small and purely decorative. */
+.hover-pop {
+  transition: transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.hover-pop:hover {
+  transform: scale(1.035);
+}
+
+/* Welcome effect shown after signing in / creating an account. */
+@keyframes welcome-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes welcome-text-in {
+  0% { opacity: 0; transform: translateY(14px) scale(0.96); letter-spacing: 0.04em; filter: blur(8px); }
+  100% { opacity: 1; transform: none; letter-spacing: -0.025em; filter: blur(0); }
+}
+.welcome-overlay { animation: welcome-in 350ms ease-out both; }
+/* The overlay's entrance animation holds opacity, so the exit must be an
+   animation too (a plain transition would be overridden and look abrupt). */
+.welcome-overlay.welcome-reveal { animation: welcome-black-out 1100ms ease-out forwards; pointer-events: none; }
+@keyframes welcome-black-out {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.welcome-content { transition: opacity 700ms ease-in, transform 700ms ease-in, filter 700ms ease-in; }
+.welcome-content.welcome-content-out { opacity: 0; transform: translateY(-8px); filter: blur(6px); }
+.welcome-logo { animation: welcome-in 700ms ease-out 100ms both; }
+.welcome-text { animation: welcome-text-in 900ms cubic-bezier(0.22, 1, 0.36, 1) 350ms both; }
+
+/* Chat messages fade and rise slightly into place. */
+@keyframes chat-message-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.chat-message-in { animation: chat-message-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both; }

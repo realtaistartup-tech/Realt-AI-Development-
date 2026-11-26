@@ -16,7 +16,11 @@
     "tagline": "Realt AI hjälper dig förstå dina prioriteringar innan du tittar på bostäder.",
     "copyright": "© {year} Realt AI. Alla rättigheter förbehållna.",
     "privacyLink": "Integritetspolicy",
-    "termsLink": "Användarvillkor"
+    "termsLink": "Användarvillkor",
+    "contactHeading": "Kontakt",
+    "followHeading": "Följ oss",
+    "instagram": "Instagram",
+    "tiktok": "TikTok"
   },
   "theme": {
     "light": "ljust",
@@ -31,35 +35,195 @@
   },
   "home": {
     "badge": "En AI-first beslutsassistent",
-    "heading": "Man köper inte en lägenhet. Man köper ett framtida liv.",
-    "subheading": "Realt AI hjälper dig förstå vad som faktiskt är viktigt för dig, väger för- och nackdelar ärligt och förklarar varje rekommendation — så att du kan välja bostad med trygghet, inte gissningar.",
-    "ctaPrimary": "Börja förstå mina prioriteringar",
-    "howItWorks": {
-      "heading": "Realts tankeramverk",
-      "subheading": "Samma resonemang ligger bakom varje rekommendation Realt AI ger.",
+    "hero": {
+      "heading": "Letar du efter ett nytt hem? Du har hittat rätt.",
+      "paragraph1": "Oavsett om du vill hyra en lägenhet, köpa ditt första hus eller hitta en plats att börja om på, hjälper Realt AI dig genom hela bostadsresan. Utforska nya möjligheter, upptäck områden som passar din livsstil och få hjälp att hitta ett boende som känns rätt för dig — inte bara på papper, utan i vardagen.",
+      "paragraph2": "Och det bästa av allt? Realt AI är helt gratis för dig som söker boende. Inga dolda avgifter, inga betalda uppgraderingar eller extra kostnader. Vi är här för att hjälpa dig hitta rätt — och det ska inte behöva kosta dig någonting.",
+      "cta": "Hitta mitt nästa hem",
+      "images": {
+        "apartment": "Modernt flerbostadshus mot blå himmel",
+        "house": "Modernt hus med garage och trädgård",
+        "balcony": "Lägenhetshus med balkonger i solnedgång",
+        "villa": "Modern villa med pool",
+        "townhouses": "Rad av moderna radhus",
+        "rowHouses": "Radhus med trä- och plåtfasad"
+      }
+    },
+    "about": {
+      "heading": "Om oss",
+      "p1": "Realt AI är ett AI-drivet bostadsintelligensbolag som skapats för att förändra hur människor upptäcker, utvärderar och väljer sitt nästa hem.",
+      "p2": "Från början skapat för att hjälpa studenter och unga vuxna att hitta bostäder som passar deras ekonomi, utbildning och livsstil insåg vi att de här utmaningarna finns på hela bostadsmarknaden.",
+      "p3": "Vår plattform använder AI för att förstå individuella behov, analysera bostadsmöjligheter och koppla ihop människor med relevanta bostadsaktörer, bland annat mäklarbyråer, fastighetsbolag och bostadsplattformar.",
+      "p4": "Vi är en gratis B2B2C Agentic SaaS (Software as a Service). Vår tjänst är och förblir 100 % gratis för användarna. Vi tjänar pengar genom affärspartnerskap och företag som vill ha relevant synlighet, aldrig genom att ta betalt av människor för att hitta ett hem.",
+      "p5": "Vår vision är global: att göra smartare bostadsbeslut tillgängliga för alla, överallt.",
+      "tagline": "Realt AI — Ett smartare sätt att hitta dit du hör hemma."
+    },
+    "countdown": {
+      "eyebrow": "Lansering",
+      "heading": "Lansering 1 februari 2027 kl. 10:00",
+      "sweden": "Vi börjar i Sverige.",
+      "days": "dagar",
+      "hours": "timmar",
+      "minutes": "minuter",
+      "seconds": "sekunder",
+      "launched": "Realt AI är lanserat.",
+      "waitlist": {
+        "heading": "Gå med i väntelistan",
+        "description": "Fyll i din e-postadress så skickar vi ett meddelande när Realt AI lanseras.",
+        "placeholder": "Din e-postadress",
+        "button": "Gå med",
+        "sending": "Går med…",
+        "success": "Du står på listan. Vi mejlar dig när Realt AI lanseras.",
+        "invalid": "Ange en giltig e-postadress.",
+        "error": "Något gick fel. Försök igen.",
+        "consent": "Vi använder bara din e-postadress för att berätta om lanseringen."
+      }
+    },
+    "how": {
+      "heading": "Hur fungerar Realt AI?",
+      "subheading": "De flesta söktjänster visar bostäder. Realt AI börjar med dig: den lär sig vad som är viktigt, väger det ärligt och förklarar varje rekommendation.",
       "steps": {
-        "understand": {
-          "title": "Förstå dina mål",
-          "description": "Berätta för Realt AI vad som är viktigt för dig i vanligt språk — budget, pendling, yta, trygghet, skolor, livsstil."
+        "describe": {
+          "title": "Förstår dig med vanliga ord",
+          "description": "Skriv som du pratar. Realt AI läser av budget, pendling, yta, livsstil och dealbreakers i dina egna ord och gör om dem till en strukturerad profil."
         },
-        "tradeoffs": {
-          "title": "Se avvägningarna",
-          "description": "Realt AI flaggar ärligt när dina prioriteringar krockar med varandra, istället för att låtsas att allt går att uppfylla."
+        "weights": {
+          "title": "Lär sig vad som väger tyngst",
+          "description": "Alla önskemål väger inte lika. Dina prioriteringar blir vikter, så att det du bryr dig mest om styr resultatet."
         },
-        "match": {
-          "title": "Få en transparent matchning",
-          "description": "Varje bostad får ett förklarbart betyg — du ser alltid exakt varför den passar, eller varför den inte gör det."
+        "conflicts": {
+          "title": "Ser konflikter före dig",
+          "description": "När två önskemål drar åt olika håll berättar Realt AI det direkt och hjälper dig välja, i stället för att låtsas att du kan få allt."
         },
-        "decide": {
-          "title": "Bestäm med trygghet",
-          "description": "Kompromisser och risker lyfts fram i förväg, så att du väljer bostad medvetet, inte av misstag."
+        "score": {
+          "title": "Poängsätter varje bostad, öppet",
+          "description": "Varje bostad får ett matchningsbetyg byggt på dina viktade prioriteringar, med skälen för och emot, så det finns inga svarta lådor."
+        },
+        "connect": {
+          "title": "Kopplar dig till rätt aktörer",
+          "description": "Relevanta bostäder kommer från mäklarbyråer, fastighetsbolag och bostadsplattformar som passar din profil."
+        },
+        "free": {
+          "title": "Gratis för dig, alltid",
+          "description": "Att söka med Realt AI kostar ingenting. Vi tjänar pengar på affärspartnerskap, aldrig på människor som söker bostad."
         }
+      },
+      "visual": {
+        "message": "Vi är två, en trea i Stockholm, under 4 miljoner kr, max 30 minuter till jobbet, lugnt område.",
+        "chipBudget": "Budget ≤ 4 000 000 kr",
+        "chipCommute": "Pendling ≤ 30 min",
+        "chipSpace": "3 rum",
+        "chipLifestyle": "Lugnt område",
+        "weightBudget": "Budget",
+        "weightCommute": "Pendling",
+        "weightSpace": "Yta",
+        "conflictTitle": "Prioritetskonflikt",
+        "conflictA": "Lugnt område",
+        "conflictB": "Livlig innerstad",
+        "conflictHint": "De här drar ofta åt olika håll. Vilket är viktigast?",
+        "score": "Matchning 87 %",
+        "reasonBudget": "Passar din budget",
+        "reasonCommute": "24 min till jobbet",
+        "reasonTradeoff": "Ingen parkering ingår",
+        "agencies": "Mäklarbyråer",
+        "companies": "Fastighetsbolag",
+        "platforms": "Bostadsplattformar",
+        "free": "för dig som söker bostad",
+        "freeBig": "100 % gratis",
+        "caption": "Illustrativt exempel."
+      }
+    },
+    "features": {
+      "heading": "Våra viktigaste funktioner",
+      "more": "Klicka för att se mer",
+      "less": "Visa mindre",
+      "caption": "Illustrativa exempel.",
+      "analysis": {
+        "title": "Personlig AI-analys",
+        "subtitle": "Bostadsbeslut, byggda kring dig.",
+        "p1": "Realt AI analyserar dina individuella behov, din budget, livsstil och personliga prioriteringar för att hjälpa dig hitta bostäder som verkligen passar ditt liv. Genom en intelligent, samtalsbaserad analys lär sig Realt AI vad som är viktigast för dig — från läge och ekonomi till yta, komfort och vardagsbekvämlighet.",
+        "p2": "Utöver att förstå dina önskemål hjälper Realt AI dig att se möjliga kompromisser, motstridiga prioriteringar och faktorer du kanske inte har tänkt på. Genom att göra komplexa bostadskrav till tydliga insikter hjälper vi dig att förstå dina alternativ, fatta välgrundade beslut och känna dig tryggare under hela din bostadsresa."
+      },
+      "area": {
+        "title": "Områdesutforskning",
+        "subtitle": "Upptäck livet runt ditt nästa hem.",
+        "p1": "Att hitta rätt hem handlar om mer än själva bostaden. Området runt omkring spelar en lika viktig roll för din vardag. Med områdesutforskning hjälper Realt AI dig att upptäcka hur det faktiskt skulle vara att bo på en viss plats.",
+        "p2": "Utforska närliggande restauranger, gym, matbutiker, parker, kollektivtrafik och annan viktig service direkt på en interaktiv karta. Förstå avstånd, hitta användbara platser och få en bredare bild av området innan du bestämmer dig.",
+        "p3": "Genom att ta med omgivningen i din bostadssökning hjälper Realt AI dig att bedöma inte bara var du skulle kunna bo, utan också hur väl platsen passar din livsstil, dina rutiner och dina dagliga behov."
+      },
+      "matching": {
+        "title": "Smartare bostadsmatchning",
+        "subtitle": "Mindre letande. Mer meningsfulla träffar.",
+        "p1": "Realt AI går längre än traditionella bostadsfilter genom att utvärdera bostäder utifrån dina individuella behov, önskemål och prioriteringar. I stället för att bara visa annonser som matchar ett antal sökkriterier analyserar vår AI hur väl varje bostad passar det sätt du vill leva på.",
+        "p2": "Varje rekommendation är utformad för att hjälpa dig förstå varför en bostad kan passa dig, med relevanta fördelar, möjliga nackdelar och viktiga faktorer att tänka på. Du kan jämföra olika alternativ utifrån det som är viktigast för dig, i stället för att drunkna i oändliga annonser.",
+        "p3": "Resultatet är en mer fokuserad och intelligent bostadssökning där varje rekommendation har ett syfte — så att du lägger mindre tid på att leta och mer tid på att hitta en plats som verkligen känns rätt."
+      },
+      "visual": {
+        "chatTitle": "Realt AI",
+        "question": "Vad är viktigast för dig?",
+        "chipLocation": "Läge",
+        "chipPrice": "Pris",
+        "chipSpace": "Yta",
+        "chipSafety": "Trygghet",
+        "userMessage": "Ett lugnt område, nära stan och ett gym.",
+        "reply": "Uppfattat. Utifrån dina önskemål fokuserar vi på moderna lägenheter i lugna områden nära centrum.",
+        "work": "Jobb",
+        "gym": "Gym",
+        "friends": "Vänner",
+        "minutes": "min",
+        "match": "96 % match",
+        "address": "Storgatan 24",
+        "city": "Malmö",
+        "price": "4 250 000 kr",
+        "size": "72 m²"
+      }
+    },
+    "steps": {
+      "eyebrow": "Kom igång i 8 steg",
+      "s1": {
+        "title": "Skapa ditt konto",
+        "description": "Registrera dig på en stund för att spara dina sökningar och fortsätta där du slutade."
+      },
+      "s2": {
+        "title": "Svara på grunderna",
+        "description": "Realt AI frågar först var du vill bo och sedan om du vill hyra eller köpa."
+      },
+      "s3": {
+        "title": "Gå djupare",
+        "description": "Realt AI ställer fler frågor, även om sådant du inte trodde skulle spela roll."
+      },
+      "s4": {
+        "title": "Dina svar analyseras",
+        "description": "Realt AI går igenom allt du sagt och gör om det till en tydlig bild av dina prioriteringar."
+      },
+      "s5": {
+        "title": "Konflikter upptäcks",
+        "description": "Om två önskemål drar åt olika håll får du veta det direkt."
+      },
+      "s6": {
+        "title": "Varje bostad poängsätts",
+        "description": "Varje bostad får ett öppet matchningsbetyg, med skälen för och emot."
+      },
+      "s7": {
+        "title": "Rätt aktörer kopplas in",
+        "description": "Relevanta bostäder kommer från mäklarbyråer, fastighetsbolag och bostadsplattformar."
+      },
+      "s8": {
+        "title": "Öppna dina tre bästa träffar",
+        "description": "Gå in i fönstret med dina alternativ och vidare till annonssidan, där du hittar hyresvärdar, mäklare och andra bostadsaktörer."
       }
     },
     "finalCta": {
-      "heading": "Redo att fundera igenom ditt nästa hem?",
-      "subheading": "Det tar några minuter att beskriva vad som är viktigt för dig. Inget konto krävs.",
+      "heading": "Så vad väntar du på? Hitta ditt drömboende.",
+      "paragraph1": "Det tar bara några minuter att berätta för Realt AI vad som är viktigt för dig. Skriv med egna ord, svara på ett par snabba frågor och se hur dina prioriteringar formar de bostäder som passar dig bäst.",
+      "paragraph2": "Och återigen: Realt AI är helt gratis för dig som söker bostad. Inga dolda avgifter, inga betalda uppgraderingar, ingen hake. Det finns ingen bra anledning att låta bli att prova. Det värsta som kan hända är att du förstår dina egna prioriteringar lite bättre, och det bästa är att du hittar platsen där du hör hemma.",
       "button": "Kom igång"
+    },
+    "contact": {
+      "heading": "Kontakta oss",
+      "description": "Frågor, idéer eller vill du testa Realt AI tidigt? Skriv till oss.",
+      "subject": "Hej Realt AI",
+      "business": "Är du mäklare, hyresvärd eller företag och vill veta mer? Skriv till oss, så berättar vi hur ett samarbete kan se ut."
     }
   },
   "onboarding": {
@@ -304,6 +468,7 @@
     "dialog": {
       "title": "Logga in",
       "description": "Logga in för att spara sökningar och fortsätta där du slutade.",
+      "providerUnavailable": "Den här inloggningsmetoden är inte tillgänglig än. Använd e-post så länge.",
       "notConfigured": "Inloggning är inte konfigurerad än.",
       "emailLabel": "E-post",
       "emailPlaceholder": "du@example.com",
@@ -327,7 +492,14 @@
       "resetSent": "Om ett konto finns för {email} har vi skickat en länk för att återställa lösenordet.",
       "backToSignIn": "Tillbaka till inloggning",
       "passwordTooShort": "Lösenordet måste vara minst {min} tecken.",
-      "error": "Något gick fel. Försök igen."
+      "error": "Något gick fel. Försök igen.",
+      "firstNameLabel": "Förnamn",
+      "lastNameLabel": "Efternamn",
+      "displayNameLabel": "Vad ska Realt AI kalla dig?",
+      "displayNamePlaceholder": "Ditt smeknamn",
+      "ageConfirm": "Jag bekräftar att jag är 13 år eller äldre.",
+      "namesRequired": "Fyll i både förnamn och efternamn.",
+      "ageRequired": "Du måste bekräfta att du är 13 år eller äldre."
     }
   },
   "resetPassword": {
@@ -520,5 +692,193 @@
         }
       ]
     }
+  },
+  "assistant": {
+    "name": "Realt AI Assistant",
+    "metaTitle": "Realt AI Assistant",
+    "metaDescription": "Chatta med Realt AI Assistant om bostaden du söker.",
+    "greeting": "Hej! Jag är Realt AI Assistant. Berätta med egna ord vilken bostad du söker – budget, pendling, yta, trygghet, skolor eller livsstil.",
+    "placeholder": "Beskriv din drömbostad…",
+    "inputLabel": "Ditt meddelande",
+    "send": "Skicka",
+    "thinking": "Tänker…",
+    "summaryIntro": "Tack! Så här har jag förstått dig. Kontrollera och justera innan jag letar matchningar.",
+    "emptyHeading": "Vilken bostad letar du efter?",
+    "newChat": "Ny sökning",
+    "newChatTitle": "Ny sökning",
+    "history": "Dina sökningar",
+    "noHistory": "Dina sökningar visas här.",
+    "deleteChat": "Ta bort",
+    "showMenu": "Öppna sidomenyn",
+    "hideMenu": "Stäng sidomenyn",
+    "backToSite": "Tillbaka till sidan",
+    "situationTitle": "Din situation",
+    "conflictsTitle": "Prioritetskonflikt",
+    "gate": {
+      "title": "Logga in för att fortsätta",
+      "subtitle": "Logga in eller skapa ett gratis konto för att prata med assistenten.",
+      "back": "Tillbaka till startsidan"
+    },
+    "pinned": "Fästa",
+    "pin": "Fäst",
+    "unpin": "Lossa",
+    "rename": "Byt namn",
+    "moreOptions": "Fler alternativ",
+    "greetMorning": "God morgon",
+    "greetDay": "God dag",
+    "greetEvening": "God kväll",
+    "greetLate": "Jobbar du sent?",
+    "greetMorning1": "God morgon, {name}",
+    "greetMorning2": "Hoppla, ny dag, {name}",
+    "greetMorning3": "Tidig start, {name}?",
+    "greetMorning4": "Morrn, {name}",
+    "greetMorning5": "Ny dag, nytt hem, {name}",
+    "greetDay1": "God dag, {name}",
+    "greetDay2": "Hej, {name}",
+    "greetDay3": "Välkommen, {name}",
+    "greetDay4": "Hej där, {name}",
+    "greetDay5": "Kul att se dig, {name}",
+    "greetEvening1": "God kväll, {name}",
+    "greetEvening2": "Trevlig kväll, {name}",
+    "greetEvening3": "Dags att varva ner, {name}?",
+    "greetEvening4": "Hej igen, {name}",
+    "greetEvening5": "En bra kväll för bostadsjakt, {name}",
+    "greetLate1": "Jobbar du sent, {name}?",
+    "greetLate2": "Uppe sent, {name}?",
+    "greetLate3": "Nattuggla, {name}?",
+    "greetLate4": "Sent ute, stora planer, {name}?",
+    "greetLate5": "Drömmer du om ett nytt hem, {name}?",
+    "greetLate6": "Nattens lugn är perfekt för att planera, {name}",
+    "startLine1": "Nu börjar vi hitta ditt nästa hem.",
+    "startLine2": "Nu hittar vi en plats som passar ditt liv.",
+    "startLine3": "Berätta vad ett hem betyder för dig.",
+    "startLine4": "Ditt nästa hem börjar med några frågor.",
+    "tenureAckRentArea": "Uppfattat, du vill hyra i {city}, området {area}. Jag ställer in sökningen där.",
+    "tenureAckBuyArea": "Uppfattat, du vill köpa i {city}, området {area}. Jag ställer in sökningen där.",
+    "startLine": "Nu börjar vi hitta ditt nästa hem.",
+    "firstQuestion": "Var vill du bo? Berätta område och stad.",
+    "placeholderLocation": "Plats och stad, t.ex. Södermalm, Stockholm",
+    "placeholderTenure": "Hyra eller köpa?",
+    "askTenure": "Bra. Vill du hyra eller köpa?",
+    "askTenureAgain": "Välj hyra eller köpa.",
+    "rent": "Hyra",
+    "buy": "Köpa",
+    "rentNext": "Uppfattat, du vill hyra i {city}. Jag skickar dig till hyresbostäder där. (Hyressidan kommer snart.)",
+    "buyNext": "Uppfattat, du vill köpa i {city}. Jag kopplar dig till en mäklare där. (Mäklarkopplingen kommer snart.)",
+    "continuePrompt": "Berätta under tiden om hemmet du söker — budget, pendling, yta, trygghet, skolor eller livsstil — med dina egna ord.",
+    "startLate": "Nu hittar vi ditt nästa hem, {name}.",
+    "startLateNoName": "Nu hittar vi ditt nästa hem.",
+    "you": "Du",
+    "disclaimer": "Realt AI kan göra fel. Kontrollera viktiga uppgifter innan du fattar ditt bostadsbeslut.",
+    "tenureAckRent": "Uppfattat, du vill hyra i {place}. Jag ställer in sökningen på {place}.",
+    "tenureAckBuy": "Uppfattat, du vill köpa i {place}. Jag ställer in sökningen på {place}.",
+    "scopeAsk": "Ska jag leta bara i {area}, eller även i områdena intill, och kanske lite bredare? Du bestämmer, och du kan ändra det senare.",
+    "scopeOnly": "Bara {area}",
+    "scopeNearby": "{area} och närliggande områden",
+    "scopeWider": "Ett bredare område också",
+    "scopeOnlyReply": "Okej, jag fokuserar bara på {area}.",
+    "scopeNearbyReply": "Bra idé. Jag tar med grannområdena också, så att du ser fler alternativ nära {area}.",
+    "scopeWiderReply": "Uppfattat, jag tittar bredare också och visar hur långt varje bostad ligger från {area}.",
+    "scopeAgain": "Välj: bara {area}, närliggande områden också, eller ett bredare område.",
+    "householdAsk": "Nästa fråga: vilka ska bo där, och hur många är ni?",
+    "householdAgain": "Jag hängde inte riktigt med. Vilka ska bo där? Till exempel “jag och min flickvän” eller “två vänner”.",
+    "householdCountAsk": "Hur många är ni totalt? Till exempel ”två vuxna och två barn”.",
+    "titleRent": "Hyra i {place}",
+    "titleBuy": "Köpa i {place}",
+    "ackBudget": "Noterat: en budget på {min} till {max} kr.",
+    "ackCommute": "Noterat: upp till {minutes} minuter, {mode}.",
+    "mode_drive": "med bil",
+    "mode_transit": "med kollektivtrafik",
+    "mode_walk": "till fots",
+    "mode_bike": "med cykel",
+    "hhAlone": "Bara jag",
+    "hhCouple": "Jag och min partner",
+    "hhFamily": "Familj med barn",
+    "hhFriends": "Jag och en kompis",
+    "hhSiblings": "Jag och mitt syskon",
+    "roomsCouple": "Ska ni dela sovrum, eller vill ni ha separata rum?",
+    "roomsFriends": "Jag antar att ni vill ha separata sovrum. Stämmer det?",
+    "roomsOther": "Ska alla ha egna rum, eller kan några av er dela?",
+    "roomsShare": "Dela sovrum",
+    "roomsSeparate": "Separata rum",
+    "roomsYesSeparate": "Ja, separata rum",
+    "roomsNoShare": "Nej, vi kan dela",
+    "roomsOwn": "Alla får egna rum",
+    "roomsSome": "Några av oss kan dela",
+    "roomsAgain": "Välj ett av alternativen.",
+    "budgetRent": "Tack, nu har jag en bra bild. Nu pratar vi budget. Vad är den högsta hyran per månad som funkar för dig?",
+    "budgetBuy": "Tack, nu har jag en bra bild. Nu pratar vi budget. Vilket prisspann tittar du på, och har du lånelöfte eller kontantinsats?",
+    "stepReading": "Läser dina svar…",
+    "stepPlace": "Ställer in sökningen på {place}…",
+    "stepAreas": "Kollar vilka områden som ligger intill {area}…",
+    "placeholderScope": "Bara det här området, eller närliggande också?",
+    "placeholderHousehold": "t.ex. jag och min flickvän",
+    "placeholderRooms": "Dela eller separata rum?"
+  },
+  "accountMenu": {
+    "menuLabel": "Kontomeny",
+    "signIn": "Logga in",
+    "signInTitle": "Logga in",
+    "signInDescription": "Logga in för att spara sökningar och fortsätta där du slutade.",
+    "profile": "Profil",
+    "settings": "Inställningar",
+    "mySearches": "Mina sökningar",
+    "signOut": "Logga ut"
+  },
+  "settings": {
+    "metaTitle": "Inställningar",
+    "metaDescription": "Ändra utseende och språk för Realt AI.",
+    "title": "Inställningar",
+    "back": "Tillbaka till chatten",
+    "appearance": "Utseende",
+    "appearanceDescription": "Välj hur Realt AI ser ut. System följer din enhet.",
+    "language": "Språk",
+    "languageDescription": "Välj vilket språk appen visas på.",
+    "moreSoon": "Fler inställningar kommer.",
+    "appearanceSystem": "Utseendet (ljust eller mörkt) följer automatiskt din enhets inställning.",
+    "subtitle": "Hantera utseende, språk och din data.",
+    "sectionGeneral": "Allmänt",
+    "sectionData": "Data",
+    "themeSystem": "System",
+    "themeLight": "Ljust",
+    "themeDark": "Mörkt",
+    "clearTitle": "Rensa sökhistorik",
+    "clearDescription": "Tar bort dina sparade sökningar från den här webbläsaren.",
+    "clearButton": "Rensa",
+    "clearConfirm": "Klicka igen för att bekräfta",
+    "clearDone": "Rensat",
+    "nav": {
+      "account": "Konto",
+      "app": "App",
+      "profile": "Profil",
+      "general": "Allmänt",
+      "backToApp": "Tillbaka till appen"
+    }
+  },
+  "profile": {
+    "metaTitle": "Profil",
+    "metaDescription": "Ditt konto på Realt AI.",
+    "title": "Profil",
+    "back": "Tillbaka till chatten",
+    "email": "E-post",
+    "nameSoon": "Namn och initialer visas här när du kan ange dem vid registrering.",
+    "signedOut": "Du är inte inloggad.",
+    "signOut": "Logga ut",
+    "subtitle": "Granska dina kontouppgifter.",
+    "sectionDetails": "Uppgifter",
+    "name": "Namn",
+    "nameDescription": "Namnet som är kopplat till ditt konto",
+    "displayName": "Smeknamn",
+    "displayNameDescription": "Vad Realt AI kallar dig",
+    "emailDescription": "E-postadressen som är kopplad till ditt konto",
+    "plan": "Plan",
+    "planDescription": "Realt AI är gratis för alla som söker bostad",
+    "planValue": "Gratis"
+  },
+  "welcome": {
+    "back": "Välkommen tillbaka, {name}",
+    "first": "Välkommen, {name}",
+    "backNoName": "Välkommen tillbaka",
+    "firstNoName": "Välkommen"
   }
 }
