@@ -8,6 +8,30 @@ export const INTAKE_STEPS = [
   "scope",
   "household",
   "rooms",
+  "reason",
+  "current",
+  "pets",
+  "hobbies",
+  "network",
+  "work",
+  "transport",
+  "parking",
+  "vibe",
+  "schools",
+  "future",
+  "housing",
+  "outdoor",
+  "environment",
+  "accessibility",
+  "condition",
+  "contract",
+  "rentalTerms",
+  "mustHaves",
+  "moveIn",
+  "stayLength",
+  "financing",
+  "monthly",
+  "moneyPriority",
   "budget",
   "commute",
   "space",
@@ -95,6 +119,30 @@ const STEP_GOALS: Record<IntakeStep, string> = {
   household:
     "Who will live in the home and how many people. A family/children answer is NOT enough: you need the number of adults and children (householdSize = total people). If missing, advance=false and ask for it in followUp.",
   rooms: "Whether everyone needs their own bedroom or some can share.",
+  reason: "Why they want to move (too small, too expensive, new job, life change, the area, first home). This is the most telling answer; reflect it.",
+  current: "Their current housing (with parents, renting, sublet, owning, student housing). If they own, they may need to sell first.",
+  rentalTerms: "Furnished or unfurnished, and short or long term rental.",
+  financing: "How they will finance a purchase: loan promise, applying, cash, or not yet started.",
+  moneyPriority: "What they value most financially: lowest cost, best home within budget, low risk, or long-term investment.",
+  pets: "Whether they have or plan to get pets (type and number), which affects building and home choice.",
+  hobbies: "Hobbies and free-time habits that should influence the area (nature, training, nightlife, quiet).",
+  network: "Where family and friends live, whether that is the same city, and how important proximity is.",
+  work: "Where they work or study, and whether they work from home some days.",
+  housing: "Preferred home type (apartment, house, townhouse) or openness to any.",
+  mustHaves: "Must-haves and dealbreakers for the home.",
+  transport: "How they get around day to day (car, public transport, bike, walking).",
+  parking: "Whether they need their own parking space (only asked to car users).",
+  vibe: "What the neighbourhood should feel like (quiet, lively, family friendly, close to nature).",
+  schools: "How important schools and preschools nearby are.",
+  future: "Life changes expected in the next few years (kids, someone moving in, more remote work).",
+  outdoor: "Wish for outdoor space (balcony, garden, terrace).",
+  environment: "Preferences about daylight, noise and floor level.",
+  accessibility: "Access needs such as an elevator, step-free access or proximity to healthcare.",
+  condition: "Whether they accept a home needing renovation (buyers).",
+  contract: "First-hand or second-hand rental contract (renters).",
+  moveIn: "When they want to move in.",
+  stayLength: "How long they expect to live there.",
+  monthly: "The highest total monthly cost they are comfortable with (rent or fees, utilities, insurance). This is NOT the purchase budget.",
   budget:
     "Their budget (price range or monthly rent) and, when buying, financing (cash, mortgage approval, down payment).",
   commute: "How they travel and the longest commute they accept; there can be different limits per place.",
@@ -117,6 +165,9 @@ Also fill any field you can infer from the answer, even if it belongs to another
 Step goal: see the step description in the input.`;
 }
 
+/** Last failure message, exposed by the route in development only. */
+export let lastIntakeError: string | null = null;
+
 export async function runIntakeTurn(input: IntakeTurnRequest): Promise<IntakeTurnResult | null> {
   if (!isAiConfigured()) return null;
   const userInput = [
@@ -132,10 +183,12 @@ export async function runIntakeTurn(input: IntakeTurnRequest): Promise<IntakeTur
       jsonSchema: SCHEMA as unknown as Record<string, unknown>,
       schemaName: "intake_turn",
     });
+    lastIntakeError = null;
     const parsed = resultSchema.parse(raw);
     if (!parsed.advance && !parsed.followUp) parsed.advance = true;
     return parsed;
   } catch (error) {
+    lastIntakeError = error instanceof Error ? error.message : String(error);
     console.error("Intake turn failed", error);
     return null;
   }

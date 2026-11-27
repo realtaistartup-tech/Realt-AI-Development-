@@ -24,7 +24,7 @@ import { AssistantAuthGate } from "@/features/assistant/auth-gate";
 import { SidebarAccountMenu } from "@/features/assistant/sidebar-account-menu";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { savePriorities } from "@/hooks/use-priorities-store";
+import { savePriorities, saveReportContext } from "@/hooks/use-priorities-store";
 import { detectPriorityConflicts } from "@/services/matching/conflict-detection";
 import { nextClarifyingField } from "@/services/onboarding/clarifying-flow";
 import type { PriorityConfidence, PriorityFieldKey, UserPriorities } from "@/types";
@@ -117,7 +117,129 @@ type IntakeAiResult = {
 };
 
 type Scope = "only" | "nearby" | "wider";
-type IntakeStepKey = "location" | "tenure" | "scope" | "household" | "rooms";
+/**
+ * The conversation after the basics, grouped into parts so the person sees
+ * where they are. Every question can be skipped. Some only apply to some
+ * people (schools to families, condition to buyers, contract to renters).
+ */
+const LIFE_STEPS = [
+  "reason",
+  "current",
+  "pets",
+  "hobbies",
+  "network",
+  "work",
+  "transport",
+  "parking",
+  "vibe",
+  "schools",
+  "future",
+] as const;
+const HOME_STEPS = [
+  "housing",
+  "outdoor",
+  "environment",
+  "accessibility",
+  "condition",
+  "contract",
+  "rentalTerms",
+  "mustHaves",
+] as const;
+const TIMING_STEPS = ["moveIn", "stayLength", "financing", "monthly", "moneyPriority"] as const;
+const EXTRA_STEPS = [...LIFE_STEPS, ...HOME_STEPS, ...TIMING_STEPS] as const;
+type ExtraStep = (typeof EXTRA_STEPS)[number];
+type IntakeStepKey = "location" | "tenure" | "scope" | "household" | "rooms" | "budget" | ExtraStep;
+
+/** English labels for the search profile text (fed to the extraction step, not shown). */
+const EXTRA_LABEL: Record<ExtraStep, string> = {
+  reason: "Why I want to move",
+  current: "Where I live now",
+  pets: "Pets",
+  hobbies: "Hobbies and free time",
+  network: "Where family and friends live",
+  work: "Work or studies",
+  transport: "Getting around day to day",
+  parking: "Own car space",
+  vibe: "Neighbourhood feel",
+  schools: "Kids' education",
+  future: "Plans for the coming years",
+  housing: "Home type",
+  outdoor: "Outdoor space",
+  environment: "Light, noise and floor",
+  accessibility: "Access needs",
+  condition: "Condition of the home",
+  contract: "Rental contract",
+  rentalTerms: "Furnishing and rental length",
+  mustHaves: "Must-haves and dealbreakers",
+  moveIn: "Move-in timing",
+  stayLength: "How long I plan to stay",
+  financing: "Financing",
+  monthly: "Monthly costs I can handle",
+  moneyPriority: "What matters most with money",
+};
+
+/** Quick-reply buttons per question (translation keys). Free text always works too. */
+const EXTRA_CHIPS: Partial<Record<ExtraStep, readonly string[]>> = {
+  reason: ["reasonSmall", "reasonCost", "reasonWork", "reasonLife", "reasonArea", "reasonFirst"],
+  current: ["currentParents", "currentRent", "currentSublet", "currentOwn", "currentStudent"],
+  pets: ["petsNone", "petsDog", "petsCat", "petsMore"],
+  transport: ["trCar", "trTransit", "trBike", "trWalk"],
+  parking: ["parkYes", "parkEv", "parkMaybe", "parkNo"],
+  vibe: ["vibeQuiet", "vibeSafe", "vibeLively", "vibeFamily", "vibeNature"],
+  schools: ["schoolsImportant", "schoolsSome", "schoolsNo"],
+  future: ["futureKids", "futurePartner", "futureRemote", "futureSame"],
+  housing: ["housingApartment", "housingHouse", "housingTownhouse", "housingAny"],
+  outdoor: ["outBalcony", "outGarden", "outTerrace", "outNone"],
+  environment: ["envQuiet", "envLight", "envHigh", "envNone"],
+  accessibility: ["accElevator", "accStepFree", "accCare", "accNone"],
+  condition: ["condReady", "condSmall", "condRenovate"],
+  contract: ["contractFirst", "contractSecond", "contractEither"],
+  rentalTerms: ["termUnfurnishedLong", "termFurnishedLong", "termShort", "termAny"],
+  mustHaves: ["mhSmokeFree", "mhAllergy", "mhLaundry", "mhStorage"],
+  moveIn: ["moveAsap", "moveSoon", "move3to6", "move6to12", "moveLooking"],
+  stayLength: ["stay1to2", "stay3to5", "stay5plus", "stayUnsure"],
+  financing: ["finPromise", "finApplying", "finCash", "finNotYet"],
+  moneyPriority: ["moneyLowest", "moneyBest", "moneySafe", "moneyInvest"],
+};
+
+type StepContext = { tenure?: "rent" | "buy"; householdKind?: HouseholdKind; transport?: string };
+
+function stepApplies(step: ExtraStep, ctx: StepContext): boolean {
+  if (step === "schools") return ctx.householdKind === "family";
+  if (step === "parking") return /\b(car|cars|drive|driving|bil|bilen)\b/i.test(ctx.transport ?? "");
+  if (step === "condition") return ctx.tenure === "buy";
+  if (step === "contract" || step === "rentalTerms") return ctx.tenure === "rent";
+  if (step === "financing") return ctx.tenure === "buy";
+  // Renters already gave a monthly figure as their budget.
+  if (step === "monthly") return ctx.tenure !== "rent";
+  return true;
+}
+
+/** The next lifestyle question after `from` (or the first one), or "done" when they are all asked. */
+function nextExtraStep(from: ExtraStep | null, ctx: StepContext): ExtraStep | "done" {
+  const start = from ? EXTRA_STEPS.indexOf(from) + 1 : 0;
+  return EXTRA_STEPS.slice(start).find((step) => stepApplies(step, ctx)) ?? "done";
+}
+
+function isExtraStep(value: string | undefined): value is ExtraStep {
+  return (EXTRA_STEPS as readonly string[]).includes(value ?? "");
+}
+
+const SECTION_KEYS = ["sectionBasics", "sectionLife", "sectionHome", "sectionTiming", "sectionNumbers"] as const;
+const SKIP_KEY = "skipQuestion";
+
+/** Which part of the conversation a chat is in (0-4), or null once it is summarised. */
+function sectionOf(chat: { intake?: string; stage?: string }): number | null {
+  if (chat.stage && chat.stage !== "chatting") return null;
+  const step = chat.intake;
+  if (step && step !== "done") {
+    if ((LIFE_STEPS as readonly string[]).includes(step)) return 1;
+    if ((HOME_STEPS as readonly string[]).includes(step)) return 2;
+    if ((TIMING_STEPS as readonly string[]).includes(step)) return 3;
+    return 0;
+  }
+  return 4;
+}
 type HouseholdKind = "alone" | "couple" | "friends" | "family" | "other";
 
 function parseTenure(text: string): "rent" | "buy" | null {
@@ -175,6 +297,36 @@ function parseHousehold(text: string): { kind: HouseholdKind; people: number | n
   }
   if (/\b(dog|cat|pet|dogs|cats|hund|katt|husdjur)\b/.test(lower)) return { kind: "alone", people: 1 };
   return null;
+}
+
+/**
+ * "two adults and two kids, 4 and 8 years old" -> 4. Counts numbers that belong
+ * to people words; ages ("4 and 8 years old") are not people.
+ */
+function countPeople(text: string): number {
+  const lower = text.toLowerCase();
+  const words = { ...NUMBER_WORDS, one: 1, en: 1, ett: 1, a: 1 } as Record<string, number>;
+  const num = `(\\d{1,2}|${Object.keys(words).join("|")})`;
+  const people = new RegExp(
+    `\\b${num}\\s+(?:adults?|grown-?ups?|vuxna|vuxen|kids?|children|child|barn|sons?|daughters?|people|persons|personer|teenagers?|tonåringar|babies|baby|bebis)\\b`,
+    "g",
+  );
+  let total = 0;
+  for (const match of lower.matchAll(people)) {
+    const value = match[1] ?? "";
+    total += /^\d+$/.test(value) ? Number(value) : (words[value] ?? 0);
+  }
+  if (total > 0) {
+    const plusMe = /\b(me and|and me|and i|jag och|och jag)\b/.test(lower) && !/\b(adults?|vuxna|vuxen)\b/.test(lower);
+    return plusMe ? total + 1 : total;
+  }
+  const familyOf = /\b(?:family of|we are|we're|vi är)\s+(\d{1,2}|[a-zåäö]+)\b/.exec(lower);
+  if (familyOf) {
+    const value = familyOf[1] ?? "";
+    return /^\d+$/.test(value) ? Number(value) : (words[value] ?? 0);
+  }
+  const lone = /^\s*(\d{1,2})\s*$/.exec(lower);
+  return lone ? Number(lone[1]) : 0;
 }
 
 /** true = separate bedrooms, false = sharing, null = could not tell. */
@@ -247,7 +399,9 @@ type Chat = {
   /** Pinned searches are listed first in the sidebar. */
   pinned?: boolean;
   /** Opening questions: where to live, then rent or buy. Missing = already past it (older chats). */
-  intake?: "location" | "tenure" | "scope" | "household" | "rooms" | "done";
+  intake?: "location" | "tenure" | "scope" | "household" | "rooms" | "budget" | ExtraStep | "done";
+  /** Answers to the lifestyle questions, shown back in the summary. */
+  profile?: Partial<Record<ExtraStep, string>>;
   scope?: Scope;
   householdKind?: HouseholdKind;
   householdSize?: number | null;
@@ -297,6 +451,11 @@ function formatKr(value: number): string {
   return `${Math.round(value).toLocaleString("sv-SE")} kr`;
 }
 
+/** The reader fills in a minimum of 70 % of the maximum when only a maximum was said; don't show that as if it was stated. */
+function onlyMaxBudget(p: { budgetMin: number; budgetMax: number }): boolean {
+  return p.budgetMin === Math.round(p.budgetMax * 0.7);
+}
+
 function prettyTag(tag: string): string {
   return tag.replace(/-/g, " ");
 }
@@ -317,6 +476,8 @@ export function AssistantChat() {
   const locale = useLocale();
   /** null = not known yet, false = no AI key on the server (use the built-in flow). */
   const aiOk = useRef<boolean | null>(null);
+  /** After an AI failure, skip the AI for a couple of minutes so every message does not wait for a timeout. */
+  const aiDownUntil = useRef(0);
 
   const [chats, setChats] = useState<Chat[]>([]);
   const [activeId, setActiveId] = useState("");
@@ -324,6 +485,8 @@ export function AssistantChat() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [draft, setDraft] = useState("");
   const [selectedWeights, setSelectedWeights] = useState<Category[]>([]);
+  const [editingStep, setEditingStep] = useState<ExtraStep | null>(null);
+  const [editDraft, setEditDraft] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -569,10 +732,14 @@ export function AssistantChat() {
             ? [
                 makeMessage(
                   "assistant",
-                  ta("ackBudget", {
-                    min: data.priorities.budgetMin.toLocaleString("sv-SE"),
-                    max: data.priorities.budgetMax.toLocaleString("sv-SE"),
-                  }),
+                  onlyMaxBudget(data.priorities)
+                    ? ta(chat.tenure === "rent" ? "ackRentMax" : "ackBudgetMax", {
+                        max: data.priorities.budgetMax.toLocaleString("sv-SE"),
+                      })
+                    : ta("ackBudget", {
+                        min: data.priorities.budgetMin.toLocaleString("sv-SE"),
+                        max: data.priorities.budgetMax.toLocaleString("sv-SE"),
+                      }),
                 ),
               ]
             : []),
@@ -612,7 +779,9 @@ export function AssistantChat() {
   async function handleIntakeAnswer(chat: Chat, text: string) {
     const typed = makeMessage("user", text);
     const step = chat.intake as IntakeStepKey;
-    if (aiOk.current !== false) {
+    if (isExtraStep(chat.intake) && text === ta(SKIP_KEY)) return answerExtra(chat, chat.intake, text);
+    if (chat.intake === "budget" && text === ta(SKIP_KEY)) return answerBudget(chat, text);
+    if (aiOk.current !== false && Date.now() >= aiDownUntil.current) {
       addUserMessage(chat.id, typed);
       setIsSending(true);
       const ai = await askIntakeAi(chat, step, text);
@@ -621,6 +790,8 @@ export function AssistantChat() {
       // No AI on the server: take the typed message back and use the built-in flow.
       patchChat(chat.id, (c) => ({ ...c, messages: c.messages.filter((m) => m.id !== typed.id) }));
     }
+    if (isExtraStep(chat.intake)) return answerExtra(chat, chat.intake, text);
+    if (chat.intake === "budget") return answerBudget(chat, text);
     switch (chat.intake) {
       case "location": {
         patchChat(chat.id, (c) => ({
@@ -652,12 +823,7 @@ export function AssistantChat() {
       }
       case "household": {
         if (chat.householdKind === "family" && chat.householdSize == null) {
-          const total = (text.match(/\d+/g) ?? []).reduce((sum, n) => sum + Number(n), 0);
-          const words = Object.entries(NUMBER_WORDS).reduce(
-            (sum, [w, n]) => sum + (new RegExp(`\\b${w}\\b`, "i").test(text) ? n : 0),
-            0,
-          );
-          const count = total + words;
+          const count = countPeople(text);
           if (count > 0) return submitHousehold({ kind: "family", people: count }, text);
           addUserMessage(chat.id, typed);
           return assistantSays(chat.id, { ns: "assistant", key: "householdCountAsk" });
@@ -754,12 +920,12 @@ export function AssistantChat() {
       ...c,
       householdKind: household.kind,
       householdSize: household.people,
-      intake: needsRooms ? "rooms" : "done",
+      intake: needsRooms ? "rooms" : "budget",
       userTexts: [...c.userTexts, `Who will live there: ${raw}`],
       messages: [...c.messages, makeMessage("user", raw)],
     }));
     if (!needsRooms) {
-      await assistantSays(chat.id, { ns: "assistant", key: chat.tenure === "buy" ? "budgetBuy" : "budgetRent" });
+      await askStep(chat.id, "budget", chat.tenure);
       return;
     }
     const key = household.kind === "couple" ? "roomsCouple" : household.kind === "friends" ? "roomsFriends" : "roomsOther";
@@ -772,7 +938,7 @@ export function AssistantChat() {
     patchChat(chat.id, (c) => ({
       ...c,
       separateRooms: separate,
-      intake: "done",
+      intake: "budget",
       userTexts: [...c.userTexts, separate ? "We want separate bedrooms" : "We can share a bedroom"],
       messages: [
         ...c.messages,
@@ -781,11 +947,155 @@ export function AssistantChat() {
           : specMessage("user", { ns: "assistant", key: labelKey ?? (separate ? "roomsSeparate" : "roomsShare") }),
       ],
     }));
-    await assistantSays(chat.id, { ns: "assistant", key: chat.tenure === "buy" ? "budgetBuy" : "budgetRent" });
+    await askStep(chat.id, "budget", chat.tenure);
+  }
+
+  /**
+   * Asks the next question. When the lifestyle part is over ("done"), the
+   * collected answers are read into priorities and only the details that are
+   * still missing (commute, size, what matters most) are asked.
+   */
+  async function askStep(
+    chatId: string,
+    step: Chat["intake"],
+    tenure?: "rent" | "buy",
+    texts?: string[],
+    asked?: PriorityFieldKey[],
+  ) {
+    if (step === "budget") {
+      await assistantSays(chatId, { ns: "assistant", key: tenure === "buy" ? "budgetBuy" : "budgetRent" }, 700);
+    } else if (isExtraStep(step)) {
+      const intro =
+        step === LIFE_STEPS[0] ? "sectionIntroLife" : step === HOME_STEPS[0] ? "sectionIntroHome" : step === TIMING_STEPS[0] ? "sectionIntroTiming" : null;
+      if (intro) await assistantSays(chatId, { ns: "assistant", key: intro }, 500);
+      await assistantSays(chatId, { ns: "assistant", key: `ask_${step}` }, 700);
+    } else if (texts) {
+      await finishIntake(chatId, texts, asked ?? []);
+    }
+  }
+
+  async function readPriorities(texts: string[]) {
+    const response = await fetch("/api/ai/priorities", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers: texts.join("\n\n") }),
+    });
+    if (!response.ok) throw new Error(t("errors.generic"));
+    return (await response.json()) as {
+      priorities: UserPriorities;
+      source: "ai" | "heuristic";
+      confidence: PriorityConfidence;
+    };
+  }
+
+  /** End of the guided part: work out what is still missing and ask only that, or show the summary. */
+  async function finishIntake(chatId: string, texts: string[], asked: PriorityFieldKey[]) {
+    setIsSending(true);
+    try {
+      const data = await readPriorities(texts);
+      const next = nextClarifyingField(data.confidence, asked);
+      if (next) {
+        setIsSending(false);
+        await assistantSays(chatId, { ns: "assistant", key: "sectionIntroNumbers" }, 500);
+        setIsSending(true);
+      }
+      patchChat(chatId, (c) => ({
+        ...c,
+        priorities: data.priorities,
+        confidence: data.confidence,
+        source: data.source,
+        askedFields: asked,
+        pendingField: next,
+        stage: next ? "chatting" : "review",
+        messages: [...c.messages, specMessage("assistant", next ? questionFor(next) : SUMMARY_SPEC)],
+      }));
+      setSelectedWeights([]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("errors.generic"));
+    } finally {
+      setIsSending(false);
+    }
+  }
+
+  /** Budget, asked right after the basics because it decides the most. */
+  async function answerBudget(chat: Chat, text: string) {
+    const skipped = text === ta(SKIP_KEY);
+    const firstLife = nextExtraStep(null, { tenure: chat.tenure, householdKind: chat.householdKind });
+    const texts = skipped ? chat.userTexts : [...chat.userTexts, `Budget: ${text}`];
+    patchChat(chat.id, (c) => ({
+      ...c,
+      intake: firstLife,
+      askedFields: c.askedFields.includes("budget") ? c.askedFields : [...c.askedFields, "budget"],
+      userTexts: texts,
+      messages: [...c.messages, makeMessage("user", text)],
+    }));
+    if (skipped) {
+      await assistantSays(chat.id, { ns: "assistant", key: "extraAckSkip" }, 500);
+    } else {
+      setIsSending(true);
+      const data = await readPriorities(texts).catch(() => null);
+      setIsSending(false);
+      if (data?.confidence.budget) {
+        await assistantSaysText(
+          chat.id,
+          onlyMaxBudget(data.priorities)
+            ? ta(chat.tenure === "rent" ? "ackRentMax" : "ackBudgetMax", {
+                max: data.priorities.budgetMax.toLocaleString("sv-SE"),
+              })
+            : ta("ackBudget", {
+                min: data.priorities.budgetMin.toLocaleString("sv-SE"),
+                max: data.priorities.budgetMax.toLocaleString("sv-SE"),
+              }),
+          500,
+        );
+      } else {
+        await assistantSays(chat.id, { ns: "assistant", key: "extraAck2" }, 500);
+      }
+    }
+    await askStep(chat.id, firstLife, chat.tenure);
+  }
+
+  /** Built-in (no AI) handling of the lifestyle questions: store the answer, acknowledge, ask the next one. */
+  async function answerExtra(chat: Chat, step: ExtraStep, text: string) {
+    const ctx = {
+      tenure: chat.tenure,
+      householdKind: chat.householdKind,
+      transport: step === "transport" ? text : chat.profile?.transport,
+    };
+    const next = nextExtraStep(step, ctx);
+    const skipped = text === ta(SKIP_KEY);
+    const negative = step === "pets" && /^\s*(no|none|nope|nej|inga|nothing|inget)\b/i.test(text);
+    const line = skipped ? null : negative ? "Animals at home: none" : `${EXTRA_LABEL[step]}: ${text}`;
+    const texts = line ? [...chat.userTexts, line] : chat.userTexts;
+    patchChat(chat.id, (c) => ({
+      ...c,
+      intake: next,
+      profile: skipped ? c.profile : { ...c.profile, [step]: text },
+      userTexts: line ? [...c.userTexts, line] : c.userTexts,
+      messages: [...c.messages, makeMessage("user", text)],
+    }));
+    const ackKey = skipped ? "extraAckSkip" : `extraAck${(EXTRA_STEPS.indexOf(step) % 6) + 1}`;
+    await assistantSays(chat.id, { ns: "assistant", key: ackKey }, 600);
+    await askStep(chat.id, next, chat.tenure, texts, chat.askedFields);
+  }
+
+  /** Changes one answer from the summary and re-reads the priorities. */
+  async function saveProfileEdit(step: ExtraStep, value: string) {
+    const chat = active;
+    const trimmed = value.trim();
+    setEditingStep(null);
+    if (!chat || !trimmed || trimmed === chat.profile?.[step]) return;
+    const none = step === "pets" && /^\s*(no|none|nope|nej|inga|nothing|inget)\b/i.test(trimmed);
+    const texts = [...chat.userTexts, none ? "Animals at home (updated): none" : `${EXTRA_LABEL[step]} (updated): ${trimmed}`];
+    patchChat(chat.id, (c) => ({ ...c, profile: { ...c.profile, [step]: trimmed }, userTexts: texts }));
+    const data = await readPriorities(texts).catch(() => null);
+    if (data) {
+      patchChat(chat.id, (c) => ({ ...c, priorities: data.priorities, confidence: data.confidence, source: data.source }));
+    }
   }
 
   async function askIntakeAi(chat: Chat, step: string, answer: string): Promise<IntakeAiResult | null> {
-    if (aiOk.current === false) return null;
+    if (aiOk.current === false || Date.now() < aiDownUntil.current) return null;
     try {
       const response = await fetch("/api/ai/intake", {
         method: "POST",
@@ -803,6 +1113,7 @@ export function AssistantChat() {
       if (!response.ok) return null;
       const data = (await response.json()) as { result: IntakeAiResult | null; configured: boolean };
       aiOk.current = data.configured;
+      if (data.configured && !data.result) aiDownUntil.current = Date.now() + 120_000;
       return data.result;
     } catch {
       return null;
@@ -811,13 +1122,15 @@ export function AssistantChat() {
 
   /** Applies one AI-read answer: store what it understood, reply like a person, then ask what is still missing. */
   async function applyAiTurn(chat: Chat, step: IntakeStepKey, text: string, r: IntakeAiResult) {
-    const order: IntakeStepKey[] = ["location", "tenure", "scope", "household", "rooms"];
+    const order: IntakeStepKey[] = ["location", "tenure", "scope", "household", "rooms", "budget", ...EXTRA_STEPS];
     const labels: Record<IntakeStepKey, string> = {
       location: "Where I want to live",
       tenure: "Rent or buy",
       scope: "Search area",
       household: "Who will live there",
       rooms: "Bedrooms",
+      budget: "Budget",
+      ...EXTRA_LABEL,
     };
     const tenure = r.tenure ?? chat.tenure;
     const scope = r.scope ?? chat.scope;
@@ -839,7 +1152,10 @@ export function AssistantChat() {
       if (st === "scope") return !scope;
       if (st === "household") return !kind;
       if (st === "rooms") return Boolean(kind) && kind !== "alone" && separate == null;
-      return false;
+      if (isExtraStep(st)) {
+        return stepApplies(st, { tenure, householdKind: kind, transport: step === "transport" ? text : chat.profile?.transport });
+      }
+      return true;
     };
     const next: Chat["intake"] = advance
       ? (order.slice(order.indexOf(step) + 1).find(needs) ?? "done")
@@ -861,6 +1177,8 @@ export function AssistantChat() {
       separateRooms: separate ?? undefined,
       intake: next,
       retries: advance ? 0 : (c.retries ?? 0) + 1,
+      profile: isExtraStep(step) ? { ...c.profile, [step]: text } : c.profile,
+      askedFields: step === "budget" && !c.askedFields.includes("budget") ? [...c.askedFields, "budget"] : c.askedFields,
       userTexts: [...c.userTexts, `${labels[step]}: ${r.summary}`],
     }));
 
@@ -879,7 +1197,9 @@ export function AssistantChat() {
       const key = kind === "couple" ? "roomsCouple" : kind === "friends" ? "roomsFriends" : "roomsOther";
       await assistantSays(chat.id, { ns: "assistant", key }, 700);
     } else {
-      await assistantSays(chat.id, { ns: "assistant", key: tenure === "buy" ? "budgetBuy" : "budgetRent" }, 700);
+      const asked: PriorityFieldKey[] =
+        step === "budget" && !chat.askedFields.includes("budget") ? [...chat.askedFields, "budget"] : chat.askedFields;
+      await askStep(chat.id, next, tenure, [...chat.userTexts, `${labels[step]}: ${r.summary}`], asked);
     }
   }
 
@@ -919,13 +1239,13 @@ export function AssistantChat() {
   function timeGreeting(name?: string): string {
     const hour = new Date().getHours();
     const [slot, count] =
-      hour >= 5 && hour < 10
-        ? ["greetMorning", 5]
-        : hour >= 10 && hour < 17
-          ? ["greetDay", 5]
+      hour >= 5 && hour < 12
+        ? ["greetMorning", 10]
+        : hour >= 12 && hour < 17
+          ? ["greetDay", 10]
           : hour >= 17 && hour < 22
-            ? ["greetEvening", 5]
-            : ["greetLate", 6];
+            ? ["greetEvening", 10]
+            : ["greetLate", 10];
     const raw = ta(`${slot}${pick(count as number)}` as Parameters<typeof ta>[0], { name: "\u0001" });
     return name ? raw.replace("\u0001", name) : raw.replace(/,?\s*\u0001/, "");
   }
@@ -994,7 +1314,16 @@ export function AssistantChat() {
 
   function handleConfirm() {
     if (!active?.priorities || !active.confidence) return;
-    savePriorities(active.priorities, active.confidence);
+    savePriorities(
+      active.tenure ? { ...active.priorities, housingIntent: active.tenure } : active.priorities,
+      active.confidence,
+    );
+    saveReportContext({
+      tenure: active.tenure,
+      place: active.location ? placeFor(active).place : undefined,
+      profile: active.profile,
+      householdSize: active.householdSize ?? null,
+    });
     router.push("/recommendations");
   }
 
@@ -1024,7 +1353,11 @@ export function AssistantChat() {
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={
-            active?.intake === "location"
+            active?.intake === "budget" && active.tenure === "rent"
+              ? ta("placeholder_budgetRent")
+              : isExtraStep(active?.intake) || active?.intake === "budget"
+              ? ta(`placeholder_${active?.intake}` as Parameters<typeof ta>[0])
+              : active?.intake === "location"
               ? ta("placeholderLocation")
               : active?.intake === "tenure"
                 ? ta("placeholderTenure")
@@ -1278,7 +1611,7 @@ export function AssistantChat() {
                 <h2 className="text-3xl font-semibold tracking-tight">
                   {timeGreeting(account?.displayName ?? account?.firstName ?? undefined)}
                 </h2>
-                <p className="text-muted-foreground">{ta(`startLine${pick(4)}` as Parameters<typeof ta>[0])}</p>
+                <p className="text-muted-foreground">{ta(`startLine${pick(8)}` as Parameters<typeof ta>[0])}</p>
                 <p className="text-lg font-medium">{ta("firstQuestion")}</p>
               </div>
               {composer}
@@ -1356,6 +1689,27 @@ export function AssistantChat() {
                   </div>
                 )}
 
+                {(isExtraStep(active?.intake) || active?.intake === "budget") && !isSending && (
+                  <p className="motion-ok chat-message-in -mt-2 px-1 text-xs text-muted-foreground">
+                    {ta(`why_${active?.intake}` as Parameters<typeof ta>[0])}
+                  </p>
+                )}
+
+                {(isExtraStep(active?.intake) || active?.intake === "budget") && !isSending && (
+                  <div className="flex flex-wrap gap-2">
+                    {[...(isExtraStep(active?.intake) ? (EXTRA_CHIPS[active.intake] ?? []) : []), SKIP_KEY].map((key) => (
+                      <Button
+                        key={key}
+                        variant={key === "skipQuestion" ? "ghost" : "outline"}
+                        className={key === "skipQuestion" ? "rounded-full px-4 text-muted-foreground" : "rounded-full px-5"}
+                        onClick={() => void submit(ta(key as Parameters<typeof ta>[0]))}
+                      >
+                        {ta(key as Parameters<typeof ta>[0])}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+
                 {active?.intake === "rooms" && !isSending && (
                   <div className="flex flex-wrap gap-2">
                     {(active.householdKind === "couple"
@@ -1424,7 +1778,9 @@ export function AssistantChat() {
                       </h2>
                       <div className="flex flex-wrap gap-2">
                         <Chip>
-                          {formatKr(priorities.budgetMin)} – {formatKr(priorities.budgetMax)}
+                          {onlyMaxBudget(priorities)
+                            ? ta(active?.tenure === "rent" ? "budgetUpToMonth" : "budgetUpTo", { max: formatKr(priorities.budgetMax) })
+                            : `${formatKr(priorities.budgetMin)} – ${formatKr(priorities.budgetMax)}`}
                         </Chip>
                         <Chip>
                           {t("summary.commuteValue", {
@@ -1462,6 +1818,83 @@ export function AssistantChat() {
                           {t("summary.assumedNote", { fields: assumed.map((field) => fieldLabel(field)).join(", ") })}
                         </p>
                       )}
+                    </section>
+
+                    {active?.profile && Object.keys(active.profile).length > 0 && (
+                      <section className="rounded-2xl border border-border p-4">
+                        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                          {ta("profileTitle")}
+                        </p>
+                        <p className="mb-3 text-xs text-muted-foreground">{ta("profileHint")}</p>
+                        <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[auto_1fr]">
+                          {EXTRA_STEPS.filter((step) => active.profile?.[step]).map((step) => (
+                            <div key={step} className="contents">
+                              <dt className="text-muted-foreground">{ta(`profile_${step}` as Parameters<typeof ta>[0])}</dt>
+                              <dd>
+                                {editingStep === step ? (
+                                  <form
+                                    className="flex gap-2"
+                                    onSubmit={(event) => {
+                                      event.preventDefault();
+                                      void saveProfileEdit(step, editDraft);
+                                    }}
+                                  >
+                                    <input
+                                      autoFocus
+                                      value={editDraft}
+                                      onChange={(event) => setEditDraft(event.target.value)}
+                                      onKeyDown={(event) => {
+                                        if (event.key === "Escape") setEditingStep(null);
+                                      }}
+                                      maxLength={300}
+                                      aria-label={ta(`profile_${step}` as Parameters<typeof ta>[0])}
+                                      className="min-w-0 flex-1 rounded-lg border border-border bg-transparent px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground"
+                                    />
+                                    <Button type="submit" size="sm" className="rounded-full">
+                                      {ta("profileSave")}
+                                    </Button>
+                                  </form>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingStep(step);
+                                      setEditDraft(active.profile?.[step] ?? "");
+                                    }}
+                                    className="group inline-flex items-start gap-2 rounded text-left hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground"
+                                    aria-label={ta("profileEdit", { field: ta(`profile_${step}` as Parameters<typeof ta>[0]) })}
+                                  >
+                                    <span>{active.profile?.[step]}</span>
+                                    <Pencil className="mt-0.5 h-3.5 w-3.5 shrink-0 opacity-40 transition-opacity group-hover:opacity-100" aria-hidden="true" />
+                                  </button>
+                                )}
+                              </dd>
+                            </div>
+                          ))}
+                        </dl>
+                      </section>
+                    )}
+
+                    <section className="rounded-2xl border border-border p-4">
+                      <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        {ta("checklistTitle")}
+                      </p>
+                      <p className="mb-3 text-sm text-muted-foreground">{ta("checklistIntro")}</p>
+                      <ul className="space-y-2 text-sm">
+                        {(active?.tenure === "rent"
+                          ? (["checkRent1", "checkRent2", "checkRent3", "checkRent4", "checkRent5"] as const)
+                          : active?.tenure === "buy"
+                            ? (["checkBuy1", "checkBuy2", "checkBuy3", "checkBuy4", "checkBuy5", "checkBuy6"] as const)
+                            : ([] as const)
+                        )
+                          .concat(["checkAll1", "checkAll2", "checkAll3"] as never)
+                          .map((key) => (
+                            <li key={key} className="flex gap-2">
+                              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground" aria-hidden="true" />
+                              <span>{ta(key as Parameters<typeof ta>[0])}</span>
+                            </li>
+                          ))}
+                      </ul>
                     </section>
 
                     {conflicts.map((conflict) => (
@@ -1526,7 +1959,33 @@ export function AssistantChat() {
             </div>
 
             <div className="px-4 pb-4">
-              <div className="mx-auto max-w-3xl">{composer}</div>
+              <div className="mx-auto max-w-3xl space-y-2">
+                {active && sectionOf(active) !== null && (
+                  <div className="px-1" aria-live="polite">
+                    <div className="mb-1.5 flex items-center justify-between text-xs text-muted-foreground">
+                      <span>
+                        {ta("progressLabel", {
+                          n: String((sectionOf(active) ?? 0) + 1),
+                          total: String(SECTION_KEYS.length),
+                        })}
+                        {" · "}
+                        <span className="text-foreground">{ta(SECTION_KEYS[sectionOf(active) ?? 0])}</span>
+                      </span>
+                    </div>
+                    <div className="flex gap-1" aria-hidden="true">
+                      {SECTION_KEYS.map((key, index) => (
+                        <span
+                          key={key}
+                          className={`h-1 flex-1 rounded-full transition-colors duration-500 ${
+                            index <= (sectionOf(active) ?? 0) ? "bg-foreground" : "bg-muted"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {composer}
+              </div>
             </div>
           </>
         )}

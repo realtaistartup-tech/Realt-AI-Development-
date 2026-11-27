@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { checkRateLimit, getClientKey } from "@/lib/rate-limit";
 import { isAiConfigured } from "@/services/ai/client";
-import { intakeTurnRequestSchema, runIntakeTurn } from "@/services/ai/intake-turn";
+import { intakeTurnRequestSchema, lastIntakeError, runIntakeTurn } from "@/services/ai/intake-turn";
 
 const RATE_LIMIT = 40;
 const RATE_WINDOW_MS = 60_000;
@@ -30,5 +30,12 @@ export async function POST(request: Request) {
 
   const result = await runIntakeTurn(parsed.data);
   // null = no AI available; the client falls back to its built-in flow.
-  return NextResponse.json({ result, configured: isAiConfigured() }, { status: 200 });
+  return NextResponse.json(
+    {
+      result,
+      configured: isAiConfigured(),
+      ...(process.env.NODE_ENV !== "production" && !result ? { debug: lastIntakeError } : {}),
+    },
+    { status: 200 },
+  );
 }

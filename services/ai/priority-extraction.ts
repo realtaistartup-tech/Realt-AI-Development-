@@ -106,7 +106,7 @@ function parseSwedishBudget(text: string): { min?: number; max: number } | null 
     if (a > 0 && b > 0) return { min: Math.min(a, b), max: Math.max(a, b) };
   }
   const range = text.match(
-    new RegExp(`mellan\\s+(\\d+(?:[.,]\\d+)?)\\s*(?:och|-|–)\\s*(\\d+(?:[.,]\\d+)?)\\s*${MILLION_UNIT}`),
+    new RegExp(`(?:mellan|between)\\s+(\\d+(?:[.,]\\d+)?)\\s*(?:och|and|-|–)\\s*(\\d+(?:[.,]\\d+)?)\\s*${MILLION_UNIT}`),
   );
   if (range) {
     const a = Math.round(toNumber(range[1] ?? "") * 1_000_000);
@@ -138,6 +138,7 @@ const SWEDISH_LIFESTYLE: Array<[string[], string]> = [
   [["lugn", "tyst"], "quiet"],
   [["familjevänlig", "barnvänlig"], "family-friendly"],
   [["naturnära", "natur", "grönområde", "skog"], "nature"],
+  [["green", "grönt", "parks", "parker"], "near-parks"],
   [["centralt", "innerstad"], "city-center"],
   [["nattliv", "uteliv"], "nightlife"],
   [["gångvänlig", "gångavstånd"], "walkable"],
@@ -168,13 +169,18 @@ export function extractPrioritiesHeuristically(freeText: string): HeuristicExtra
   const addMustHave = (item: string) => { if (!priorities.mustHaves.includes(item)) priorities.mustHaves.push(item); };
 
   let budgetFound = false;
-  const swedishBudget = parseSwedishBudget(text);
+  // Monthly running costs are not the budget; keep them out of the budget parsing.
+  const budgetText = text
+    .split("\n")
+    .filter((line) => !line.startsWith("monthly costs"))
+    .join("\n");
+  const swedishBudget = parseSwedishBudget(budgetText);
   if (swedishBudget) {
     priorities.budgetMax = swedishBudget.max;
     priorities.budgetMin = swedishBudget.min ?? Math.round(swedishBudget.max * 0.7);
     budgetFound = true;
   } else {
-    const budgetMatch = text.match(/\$?\s?(\d{2,3}(?:,\d{3})+|\d{5,7})/);
+    const budgetMatch = budgetText.match(/\$?\s?(\d{2,3}(?:,\d{3})+|\d{5,7})/);
     if (budgetMatch) {
       const amount = Number((budgetMatch[1] ?? "").replace(/,/g, ""));
       if (Number.isFinite(amount) && amount > 0) {
@@ -221,12 +227,21 @@ export function extractPrioritiesHeuristically(freeText: string): HeuristicExtra
   const commuteMatch = commuteAll.length > 0;
   if (commuteMatch) priorities.commuteMaxMinutes = Math.max(...commuteAll);
 
-  if (["transit","train","bus","tunnelbana","pendeltåg","buss","tåg","kollektivtrafik","spårvagn"].some((w) => text.includes(w))) {
-    priorities.commuteMode = "transit";
-  } else if (["bike","cycling","cykel","cykla"].some((w) => text.includes(w))) {
-    priorities.commuteMode = "bike";
-  } else if (["walk","promenad","gångavstånd"].some((w) => text.includes(w))) {
-    priorities.commuteMode = "walk";
+  // The latest line that names a way of travelling wins ("by car" in the commute
+  // answer beats "bike" mentioned earlier). Whole words only, so "busy" is not "bus".
+  const MODES: Array<[UserPriorities["commuteMode"], RegExp]> = [
+    ["drive", /\b(?:car|cars|drive|driving|bil|bilen|köra|kör)\b/],
+    ["transit", /\b(?:transit|public transport|train|trains|bus|buses|metro|tram|tunnelbana|pendeltåg|buss|bussen|tåg|tåget|kollektivtrafik|kollektivt|spårvagn)\b/],
+    ["bike", /\b(?:bike|biking|cycle|cycling|cykel|cykla|cyklar)\b/],
+    ["walk", /\b(?:walk|walking|on foot|promenad|promenera|gå|gångavstånd)\b/],
+  ];
+  const modeLines = text.split("\n").reverse();
+  for (const line of modeLines) {
+    const hit = MODES.find(([, pattern]) => pattern.test(line));
+    if (hit) {
+      priorities.commuteMode = hit[0];
+      break;
+    }
   }
 
   const lifestyleKeywords = ["quiet","walkable","family-friendly","urban","suburban","nightlife","near-parks","city-center","nature"];
@@ -242,13 +257,13 @@ export function extractPrioritiesHeuristically(freeText: string): HeuristicExtra
   if (["flexible","short-term","short term","may relocate","might relocate","flexibelt boende","korttid","kanske flytta","kan komma att flytta"].some((w) => text.includes(w))) addTag("flexible-tenure");
   if (["forever home","settle down","long-term home","buying","evighetshem","bosätta oss","långsiktigt boende"].some((w) => text.includes(w))) addTag("long-term-ownership");
   if (["growing family","planning a family","more kids","expecting","want kids","future kids","växande familj","fler barn","planerar barn","vill ha barn"].some((w) => text.includes(w))) addTag("family-growth-planned");
-  if (["parking","garage","parkering","p-plats"].some((w) => text.includes(w))) addMustHave("parking");
+  if (["parking","garage","parkering","p-plats","ev charging","laddplats"].some((w) => text.includes(w))) addMustHave("parking");
 
   const schoolsMentioned = text.includes("school") || text.includes("skol");
   if (schoolsMentioned) priorities.weights = priorities.weights.map((w) => w.category === "schools" ? { ...w, importance: 5 } : w);
   const safetyMentioned = ["safe","safety","säker","trygg"].some((w) => text.includes(w));
   if (safetyMentioned) priorities.weights = priorities.weights.map((w) => w.category === "safety" ? { ...w, importance: 5 } : w);
-  const budgetIsPriority = ["tight budget","affordable","cheap","billig","prisvärd","stram budget","låg budget","begränsad budget","överkomlig"].some((w) => text.includes(w));
+  const budgetIsPriority = ["tight budget","lowest possible cost","lägsta möjliga kostnad","affordable","cheap","billig","prisvärd","stram budget","låg budget","begränsad budget","överkomlig"].some((w) => text.includes(w));
   if (budgetIsPriority) priorities.weights = priorities.weights.map((w) => w.category === "budget" ? { ...w, importance: 5 } : w);
 
   return { priorities, confidence: { budget: budgetFound, commute: commuteMatch, space: spaceFound, weights: schoolsMentioned || safetyMentioned || budgetIsPriority } };

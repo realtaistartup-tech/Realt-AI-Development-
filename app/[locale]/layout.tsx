@@ -102,7 +102,7 @@ export default async function RootLayout({
               >
                 {t("skipToContent")}
               </a>
-              <HideInApp>
+              <HideInApp alsoOn={["/recommendations"]}>
                 <SiteHeader />
               </HideInApp>
               <main id="main-content" className="flex-1">

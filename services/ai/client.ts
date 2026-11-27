@@ -8,8 +8,16 @@ export class AiServiceUnavailableError extends Error {
   }
 }
 
+/** AI_* variables are the provider-neutral names; OPENAI_* still work for backwards compatibility. */
+function aiConfig() {
+  const apiKey = (process.env.AI_API_KEY || process.env.OPENAI_API_KEY || "").trim();
+  const baseUrl = (process.env.AI_BASE_URL || process.env.OPENAI_BASE_URL || "").trim().replace(/\/+$/, "");
+  const model = (process.env.AI_MODEL || process.env.OPENAI_MODEL || DEFAULT_MODEL).trim();
+  return { apiKey, baseUrl, model };
+}
+
 export function isAiConfigured(): boolean {
-  return Boolean(process.env.OPENAI_API_KEY);
+  return Boolean(aiConfig().apiKey);
 }
 
 interface StructuredResponseOptions {
@@ -29,13 +37,12 @@ interface StructuredResponseOptions {
 export async function requestStructuredCompletion<T>(
   options: StructuredResponseOptions,
 ): Promise<T> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const { apiKey, baseUrl, model } = aiConfig();
   if (!apiKey) {
-    throw new AiServiceUnavailableError("OPENAI_API_KEY is not configured.");
+    throw new AiServiceUnavailableError("AI_API_KEY is not configured.");
   }
-  // Any OpenAI-compatible provider (Mistral, Gemini, Groq, a local Ollama …) works by setting OPENAI_BASE_URL.
-  const baseUrl = process.env.OPENAI_BASE_URL?.replace(/\/+$/, "");
-  if (baseUrl) return requestChatCompletion<T>(options, apiKey, baseUrl);
+  // Any OpenAI-compatible provider (Mistral, Gemini, Groq, a local Ollama …) works by setting AI_BASE_URL.
+  if (baseUrl) return requestChatCompletion<T>(options, apiKey, baseUrl, model);
 
   const response = await fetch(OPENAI_RESPONSES_URL, {
     method: "POST",
@@ -44,7 +51,7 @@ export async function requestStructuredCompletion<T>(
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: process.env.OPENAI_MODEL ?? DEFAULT_MODEL,
+      model,
       input: [
         { role: "system", content: options.systemPrompt },
         { role: "user", content: options.userInput },
@@ -90,12 +97,13 @@ async function requestChatCompletion<T>(
   options: StructuredResponseOptions,
   apiKey: string,
   baseUrl: string,
+  model: string,
 ): Promise<T> {
-  const model = process.env.OPENAI_MODEL ?? DEFAULT_MODEL;
   const call = (responseFormat: Record<string, unknown>, system: string) =>
     fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      signal: AbortSignal.timeout(Number(process.env.AI_TIMEOUT_MS) || 12_000),
       body: JSON.stringify({
         model,
         messages: [
@@ -103,10 +111,22 @@ async function requestChatCompletion<T>(
           { role: "user", content: options.userInput },
         ],
         response_format: responseFormat,
+        // Gemini models "think" before answering, which is slow; this is a simple extraction task.
+        ...(baseUrl.includes("generativelanguage.googleapis.com") ? { reasoning_effort: "low" } : {}),
       }),
     });
 
-  let response = await call(
+  // Busy providers answer 429/503 for a moment; retry a couple of times before giving up.
+  const callWithRetry = async (format: Record<string, unknown>, system: string) => {
+    let res = await call(format, system);
+    for (let attempt = 0; attempt < 2 && (res.status === 429 || res.status === 503); attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, 1500 * (attempt + 1)));
+      res = await call(format, system);
+    }
+    return res;
+  };
+
+  let response = await callWithRetry(
     {
       type: "json_schema",
       json_schema: { name: options.schemaName, strict: true, schema: options.jsonSchema },
@@ -114,13 +134,14 @@ async function requestChatCompletion<T>(
     options.systemPrompt,
   );
   if (response.status === 400 || response.status === 422) {
-    response = await call(
+    response = await callWithRetry(
       { type: "json_object" },
       `${options.systemPrompt}\n\nReturn ONLY a JSON object that matches this JSON schema, with no other text:\n${JSON.stringify(options.jsonSchema)}`,
     );
   }
   if (!response.ok) {
-    throw new AiServiceUnavailableError(`AI provider request failed with status ${response.status}.`);
+    const detail = (await response.text().catch(() => "")).slice(0, 300);
+    throw new AiServiceUnavailableError(`AI provider request failed with status ${response.status}. ${detail}`);
   }
   const data = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
   const text = data.choices?.[0]?.message?.content;

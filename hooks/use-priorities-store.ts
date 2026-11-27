@@ -55,3 +55,29 @@ export function clearPriorities(): void {
   if (typeof window === "undefined") return;
   window.sessionStorage.removeItem(STORAGE_KEY);
 }
+
+const CONTEXT_KEY = "realt-ai:report-context";
+
+/** What the assistant chat learned beyond the scored priorities: shown back in the Decision Report. */
+export interface ReportContext {
+  tenure?: "rent" | "buy";
+  place?: string;
+  /** Lifestyle answers keyed by question (see features/assistant), in the person's own words. */
+  profile?: Record<string, string>;
+  householdSize?: number | null;
+}
+
+export function saveReportContext(context: ReportContext): void {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.setItem(CONTEXT_KEY, JSON.stringify(context));
+}
+
+export function loadReportContext(): ReportContext | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(CONTEXT_KEY);
+    return raw ? (JSON.parse(raw) as ReportContext) : null;
+  } catch {
+    return null;
+  }
+}

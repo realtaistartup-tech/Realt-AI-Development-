@@ -22,4 +22,11 @@ export interface Property {
   schoolRating: number;
   imageUrl: string;
   description: string;
+  /** Who shows the home: a real-estate agency (e.g. "Svensk Fastighetsförmedling"), a landlord or a rental site. */
+  agentName?: string;
+  agentKind?: "broker" | "landlord" | "rentalSite";
+  /** The agency's or rental site's logo, only when a data agreement allows showing it. */
+  agentLogoUrl?: string;
+  /** Link to the original listing, when a real listing is connected. */
+  listingUrl?: string;
 } 
